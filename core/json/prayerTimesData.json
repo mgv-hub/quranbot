@@ -1,0 +1,548 @@
+{
+   "countries": [
+      {
+         "code": "SA",
+         "name": "المملكة العربية السعودية",
+         "nameEn": "Saudi Arabia",
+         "flag": "🇸🇦"
+      },
+      { "code": "EG", "name": "مصر", "nameEn": "Egypt", "flag": "🇪🇬" },
+      { "code": "AE", "name": "الإمارات", "nameEn": "UAE", "flag": "🇦🇪" },
+      { "code": "KW", "name": "الكويت", "nameEn": "Kuwait", "flag": "🇰🇼" },
+      { "code": "QA", "name": "قطر", "nameEn": "Qatar", "flag": "🇶🇦" },
+      { "code": "BH", "name": "البحرين", "nameEn": "Bahrain", "flag": "🇧🇭" },
+      { "code": "OM", "name": "عمان", "nameEn": "Oman", "flag": "🇴🇲" },
+      { "code": "JO", "name": "الأردن", "nameEn": "Jordan", "flag": "🇯🇴" },
+      { "code": "LB", "name": "لبنان", "nameEn": "Lebanon", "flag": "🇱🇧" },
+      { "code": "SY", "name": "سوريا", "nameEn": "Syria", "flag": "🇸🇾" },
+      { "code": "IQ", "name": "العراق", "nameEn": "Iraq", "flag": "🇮🇶" },
+      { "code": "IR", "name": "إيران", "nameEn": "Iran", "flag": "🇮🇷" },
+      { "code": "TR", "name": "تركيا", "nameEn": "Turkey", "flag": "🇹🇷" },
+      { "code": "MA", "name": "المغرب", "nameEn": "Morocco", "flag": "🇲🇦" },
+      { "code": "DZ", "name": "الجزائر", "nameEn": "Algeria", "flag": "🇩🇿" },
+      { "code": "TN", "name": "تونس", "nameEn": "Tunisia", "flag": "🇹🇳" },
+      { "code": "LY", "name": "ليبيا", "nameEn": "Libya", "flag": "🇱🇾" },
+      { "code": "SD", "name": "السودان", "nameEn": "Sudan", "flag": "🇸🇩" },
+      { "code": "YE", "name": "اليمن", "nameEn": "Yemen", "flag": "🇾🇪" },
+      { "code": "PS", "name": "فلسطين", "nameEn": "Palestine", "flag": "🇵🇸" },
+      { "code": "PK", "name": "باكستان", "nameEn": "Pakistan", "flag": "🇵🇰" },
+      { "code": "BD", "name": "بنجلاديش", "nameEn": "Bangladesh", "flag": "🇧🇩" },
+      { "code": "IN", "name": "الهند", "nameEn": "India", "flag": "🇮🇳" },
+      { "code": "ID", "name": "إندونيسيا", "nameEn": "Indonesia", "flag": "🇮🇩" },
+      { "code": "MY", "name": "ماليزيا", "nameEn": "Malaysia", "flag": "🇲🇾" },
+      { "code": "FR", "name": "فرنسا", "nameEn": "France", "flag": "🇫🇷" },
+      { "code": "DE", "name": "ألمانيا", "nameEn": "Germany", "flag": "🇩🇪" },
+      {
+         "code": "GB",
+         "name": "المملكة المتحدة",
+         "nameEn": "United Kingdom",
+         "flag": "🇬🇧"
+      },
+      {
+         "code": "US",
+         "name": "الولايات المتحدة",
+         "nameEn": "United States",
+         "flag": "🇺🇸"
+      },
+      { "code": "CA", "name": "كندا", "nameEn": "Canada", "flag": "🇨🇦" },
+      { "code": "AU", "name": "أستراليا", "nameEn": "Australia", "flag": "🇦🇺" },
+      { "code": "RU", "name": "روسيا", "nameEn": "Russia", "flag": "🇷🇺" },
+      { "code": "CN", "name": "الصين", "nameEn": "China", "flag": "🇨🇳" },
+      { "code": "JP", "name": "اليابان", "nameEn": "Japan", "flag": "🇯🇵" },
+      {
+         "code": "KR",
+         "name": "كوريا الجنوبية",
+         "nameEn": "South Korea",
+         "flag": "🇰🇷"
+      }
+   ],
+   "citiesByCountry": {
+      "SA": [
+         { "name": "الرياض", "nameEn": "Riyadh", "lat": 24.7136, "lng": 46.6753 },
+         { "name": "جدة", "nameEn": "Jeddah", "lat": 21.4858, "lng": 39.1925 },
+         {
+            "name": "مكة المكرمة",
+            "nameEn": "Makkah",
+            "lat": 21.3891,
+            "lng": 39.8579
+         },
+         {
+            "name": "المدينة المنورة",
+            "nameEn": "Madinah",
+            "lat": 24.5247,
+            "lng": 39.5692
+         },
+         { "name": "الدمام", "nameEn": "Dammam", "lat": 26.4207, "lng": 50.0888 },
+         { "name": "الطائف", "nameEn": "Taif", "lat": 21.2703, "lng": 40.4158 },
+         { "name": "تبوك", "nameEn": "Tabuk", "lat": 28.3838, "lng": 36.57 },
+         { "name": "بريدة", "nameEn": "Buraydah", "lat": 26.326, "lng": 43.975 },
+         { "name": "حائل", "nameEn": "Hail", "lat": 27.5114, "lng": 41.7208 },
+         { "name": "نجران", "nameEn": "Najran", "lat": 17.4924, "lng": 44.1277 },
+         { "name": "أبها", "nameEn": "Abha", "lat": 18.2164, "lng": 42.5053 },
+         { "name": "جازان", "nameEn": "Jazan", "lat": 16.8894, "lng": 42.5511 }
+      ],
+      "EG": [
+         { "name": "القاهرة", "nameEn": "Cairo", "lat": 30.0444, "lng": 31.2357 },
+         {
+            "name": "الإسكندرية",
+            "nameEn": "Alexandria",
+            "lat": 31.2001,
+            "lng": 29.9187
+         },
+         { "name": "الجيزة", "nameEn": "Giza", "lat": 30.0131, "lng": 31.2089 },
+         {
+            "name": "شرم الشيخ",
+            "nameEn": "Sharm El Sheikh",
+            "lat": 27.9158,
+            "lng": 34.3299
+         },
+         { "name": "الأقصر", "nameEn": "Luxor", "lat": 25.6872, "lng": 32.6396 },
+         { "name": "أسوان", "nameEn": "Aswan", "lat": 24.0889, "lng": 32.8998 },
+         {
+            "name": "بورسعيد",
+            "nameEn": "Port Said",
+            "lat": 31.2653,
+            "lng": 32.3019
+         },
+         { "name": "السويس", "nameEn": "Suez", "lat": 29.9668, "lng": 32.5498 },
+         {
+            "name": "الإسماعيلية",
+            "nameEn": "Ismailia",
+            "lat": 30.5965,
+            "lng": 32.2715
+         },
+         {
+            "name": "المنصورة",
+            "nameEn": "Mansoura",
+            "lat": 31.0409,
+            "lng": 31.3785
+         }
+      ],
+      "AE": [
+         { "name": "دبي", "nameEn": "Dubai", "lat": 25.2048, "lng": 55.2708 },
+         {
+            "name": "أبو ظبي",
+            "nameEn": "Abu Dhabi",
+            "lat": 24.4539,
+            "lng": 54.3773
+         },
+         {
+            "name": "الشارقة",
+            "nameEn": "Sharjah",
+            "lat": 25.3463,
+            "lng": 55.4209
+         },
+         { "name": "عجمان", "nameEn": "Ajman", "lat": 25.4052, "lng": 55.5136 },
+         {
+            "name": "رأس الخيمة",
+            "nameEn": "Ras Al Khaimah",
+            "lat": 25.7889,
+            "lng": 55.9598
+         },
+         {
+            "name": "الفجيرة",
+            "nameEn": "Fujairah",
+            "lat": 25.1288,
+            "lng": 56.3265
+         },
+         {
+            "name": "أم القيوين",
+            "nameEn": "Umm Al Quwain",
+            "lat": 25.5647,
+            "lng": 55.5552
+         }
+      ],
+      "KW": [
+         {
+            "name": "الكويت",
+            "nameEn": "Kuwait City",
+            "lat": 29.3759,
+            "lng": 47.9774
+         },
+         { "name": "حولي", "nameEn": "Hawalli", "lat": 29.3328, "lng": 48.0289 },
+         {
+            "name": "السالمية",
+            "nameEn": "Salmiya",
+            "lat": 29.334,
+            "lng": 48.0711
+         },
+         { "name": "الأحمدي", "nameEn": "Ahmadi", "lat": 29.0769, "lng": 48.0839 },
+         { "name": "الجهراء", "nameEn": "Jahra", "lat": 29.3375, "lng": 47.6581 }
+      ],
+      "QA": [
+         { "name": "الدوحة", "nameEn": "Doha", "lat": 25.2854, "lng": 51.531 },
+         {
+            "name": "الريان",
+            "nameEn": "Al Rayyan",
+            "lat": 25.2919,
+            "lng": 51.4244
+         },
+         {
+            "name": "الوكرة",
+            "nameEn": "Al Wakrah",
+            "lat": 25.1657,
+            "lng": 51.598
+         },
+         { "name": "الخور", "nameEn": "Al Khor", "lat": 25.6804, "lng": 51.4969 }
+      ],
+      "BH": [
+         { "name": "المنامة", "nameEn": "Manama", "lat": 26.2285, "lng": 50.586 },
+         {
+            "name": "المحرق",
+            "nameEn": "Muharraq",
+            "lat": 26.2707,
+            "lng": 50.6136
+         },
+         { "name": "الرفاع", "nameEn": "Riffa", "lat": 26.13, "lng": 50.555 },
+         {
+            "name": "مدينة حمد",
+            "nameEn": "Hamad Town",
+            "lat": 26.1153,
+            "lng": 50.502
+         }
+      ],
+      "OM": [
+         { "name": "مسقط", "nameEn": "Muscat", "lat": 23.588, "lng": 58.3829 },
+         { "name": "صلالة", "nameEn": "Salalah", "lat": 17.0151, "lng": 54.0924 },
+         { "name": "صحار", "nameEn": "Sohar", "lat": 24.347, "lng": 56.7093 },
+         { "name": "نزوى", "nameEn": "Nizwa", "lat": 22.9333, "lng": 57.5333 }
+      ],
+      "JO": [
+         { "name": "عمان", "nameEn": "Amman", "lat": 31.9454, "lng": 35.9284 },
+         { "name": "الزرقاء", "nameEn": "Zarqa", "lat": 32.0728, "lng": 36.0878 },
+         { "name": "إربد", "nameEn": "Irbid", "lat": 32.5565, "lng": 35.8466 },
+         { "name": "العقبة", "nameEn": "Aqaba", "lat": 29.5321, "lng": 35.0063 },
+         { "name": "السلط", "nameEn": "Salt", "lat": 32.0392, "lng": 35.7272 }
+      ],
+      "LB": [
+         { "name": "بيروت", "nameEn": "Beirut", "lat": 33.8938, "lng": 35.5018 },
+         { "name": "طرابلس", "nameEn": "Tripoli", "lat": 34.4367, "lng": 35.8497 },
+         { "name": "صيدا", "nameEn": "Sidon", "lat": 33.5633, "lng": 35.3714 },
+         { "name": "صور", "nameEn": "Tyre", "lat": 33.2704, "lng": 35.2038 }
+      ],
+      "SY": [
+         { "name": "دمشق", "nameEn": "Damascus", "lat": 33.5138, "lng": 36.2765 },
+         { "name": "حلب", "nameEn": "Aleppo", "lat": 36.2021, "lng": 37.1343 },
+         { "name": "حمص", "nameEn": "Homs", "lat": 34.7333, "lng": 36.7167 },
+         {
+            "name": "اللاذقية",
+            "nameEn": "Latakia",
+            "lat": 35.5311,
+            "lng": 35.7817
+         }
+      ],
+      "IQ": [
+         { "name": "بغداد", "nameEn": "Baghdad", "lat": 33.3152, "lng": 44.3661 },
+         { "name": "البصرة", "nameEn": "Basra", "lat": 30.5089, "lng": 47.7804 },
+         { "name": "الموصل", "nameEn": "Mosul", "lat": 36.3406, "lng": 43.1328 },
+         { "name": "أربيل", "nameEn": "Erbil", "lat": 36.1901, "lng": 44.0091 },
+         { "name": "النجف", "nameEn": "Najaf", "lat": 31.9996, "lng": 44.3315 },
+         { "name": "كربلاء", "nameEn": "Karbala", "lat": 32.616, "lng": 44.0242 }
+      ],
+      "IR": [
+         { "name": "طهران", "nameEn": "Tehran", "lat": 35.6892, "lng": 51.389 },
+         { "name": "مشهد", "nameEn": "Mashhad", "lat": 36.2605, "lng": 59.6168 },
+         { "name": "أصفهان", "nameEn": "Isfahan", "lat": 32.6546, "lng": 51.668 },
+         { "name": "شیراز", "nameEn": "Shiraz", "lat": 29.5918, "lng": 52.5837 }
+      ],
+      "TR": [
+         {
+            "name": "إسطنبول",
+            "nameEn": "Istanbul",
+            "lat": 41.0082,
+            "lng": 28.9784
+         },
+         { "name": "أنقرة", "nameEn": "Ankara", "lat": 39.9334, "lng": 32.8597 },
+         { "name": "إزمير", "nameEn": "Izmir", "lat": 38.4237, "lng": 27.1428 },
+         { "name": "أنطاليا", "nameEn": "Antalya", "lat": 36.8969, "lng": 30.7133 }
+      ],
+      "MA": [
+         { "name": "الرباط", "nameEn": "Rabat", "lat": 34.0209, "lng": -6.8416 },
+         {
+            "name": "الدار البيضاء",
+            "nameEn": "Casablanca",
+            "lat": 33.5731,
+            "lng": -7.5898
+         },
+         {
+            "name": "مراكش",
+            "nameEn": "Marrakech",
+            "lat": 31.6295,
+            "lng": -7.9811
+         },
+         { "name": "فاس", "nameEn": "Fes", "lat": 34.0181, "lng": -5.0078 }
+      ],
+      "DZ": [
+         { "name": "الجزائر", "nameEn": "Algiers", "lat": 36.7538, "lng": 3.0588 },
+         { "name": "وهران", "nameEn": "Oran", "lat": 35.6969, "lng": -0.6331 },
+         {
+            "name": "قسنطينة",
+            "nameEn": "Constantine",
+            "lat": 36.365,
+            "lng": 6.6147
+         }
+      ],
+      "TN": [
+         { "name": "تونس", "nameEn": "Tunis", "lat": 36.8065, "lng": 10.1815 },
+         { "name": "صفاقس", "nameEn": "Sfax", "lat": 34.7406, "lng": 10.7603 },
+         { "name": "سوسة", "nameEn": "Sousse", "lat": 35.8256, "lng": 10.6369 }
+      ],
+      "LY": [
+         { "name": "طرابلس", "nameEn": "Tripoli", "lat": 32.8872, "lng": 13.1913 },
+         {
+            "name": "بنغازي",
+            "nameEn": "Benghazi",
+            "lat": 32.1167,
+            "lng": 20.0667
+         },
+         { "name": "مصراتة", "nameEn": "Misrata", "lat": 32.3754, "lng": 15.0925 }
+      ],
+      "SD": [
+         {
+            "name": "الخرطوم",
+            "nameEn": "Khartoum",
+            "lat": 15.5007,
+            "lng": 32.5599
+         },
+         {
+            "name": "أم درمان",
+            "nameEn": "Omdurman",
+            "lat": 15.6446,
+            "lng": 32.4777
+         },
+         {
+            "name": "بورتسودان",
+            "nameEn": "Port Sudan",
+            "lat": 19.6158,
+            "lng": 37.2164
+         }
+      ],
+      "YE": [
+         { "name": "صنعاء", "nameEn": "Sanaa", "lat": 15.3694, "lng": 44.191 },
+         { "name": "عدن", "nameEn": "Aden", "lat": 12.7794, "lng": 45.0367 },
+         { "name": "تعز", "nameEn": "Taiz", "lat": 13.5795, "lng": 44.0218 }
+      ],
+      "PS": [
+         {
+            "name": "القدس",
+            "nameEn": "Jerusalem",
+            "lat": 31.7683,
+            "lng": 35.2137
+         },
+         { "name": "غزة", "nameEn": "Gaza", "lat": 31.5017, "lng": 34.4668 },
+         {
+            "name": "رام الله",
+            "nameEn": "Ramallah",
+            "lat": 31.9038,
+            "lng": 35.2034
+         },
+         { "name": "نابلس", "nameEn": "Nablus", "lat": 32.2211, "lng": 35.2544 },
+         { "name": "الخليل", "nameEn": "Hebron", "lat": 31.5326, "lng": 35.0998 }
+      ],
+      "PK": [
+         {
+            "name": "إسلام آباد",
+            "nameEn": "Islamabad",
+            "lat": 33.6844,
+            "lng": 73.0479
+         },
+         { "name": "كراتشي", "nameEn": "Karachi", "lat": 24.8607, "lng": 67.0011 },
+         { "name": "لاهور", "nameEn": "Lahore", "lat": 31.5204, "lng": 74.3587 }
+      ],
+      "BD": [
+         { "name": "داكا", "nameEn": "Dhaka", "lat": 23.8103, "lng": 90.4125 },
+         {
+            "name": "شيتاغونغ",
+            "nameEn": "Chittagong",
+            "lat": 22.3569,
+            "lng": 91.7832
+         }
+      ],
+      "IN": [
+         {
+            "name": "نيودلهي",
+            "nameEn": "New Delhi",
+            "lat": 28.6139,
+            "lng": 77.209
+         },
+         { "name": "مومباي", "nameEn": "Mumbai", "lat": 19.076, "lng": 72.8777 },
+         {
+            "name": "بنغالور",
+            "nameEn": "Bangalore",
+            "lat": 12.9716,
+            "lng": 77.5946
+         }
+      ],
+      "ID": [
+         {
+            "name": "جاكرتا",
+            "nameEn": "Jakarta",
+            "lat": -6.2088,
+            "lng": 106.8456
+         },
+         {
+            "name": "باندونغ",
+            "nameEn": "Bandung",
+            "lat": -6.9175,
+            "lng": 107.6191
+         }
+      ],
+      "MY": [
+         {
+            "name": "كوالالمبور",
+            "nameEn": "Kuala Lumpur",
+            "lat": 3.139,
+            "lng": 101.6869
+         },
+         {
+            "name": "جورج تاون",
+            "nameEn": "George Town",
+            "lat": 5.4164,
+            "lng": 100.3327
+         }
+      ],
+      "FR": [
+         { "name": "باريس", "nameEn": "Paris", "lat": 48.8566, "lng": 2.3522 },
+         {
+            "name": "مرسيليا",
+            "nameEn": "Marseille",
+            "lat": 43.2965,
+            "lng": 5.3698
+         },
+         { "name": "ليون", "nameEn": "Lyon", "lat": 45.764, "lng": 4.8357 }
+      ],
+      "DE": [
+         { "name": "برلين", "nameEn": "Berlin", "lat": 52.52, "lng": 13.405 },
+         { "name": "ميونخ", "nameEn": "Munich", "lat": 48.1351, "lng": 11.582 },
+         { "name": "هامبورغ", "nameEn": "Hamburg", "lat": 53.5511, "lng": 9.9937 }
+      ],
+      "GB": [
+         { "name": "لندن", "nameEn": "London", "lat": 51.5074, "lng": -0.1278 },
+         {
+            "name": "مانشستر",
+            "nameEn": "Manchester",
+            "lat": 53.4808,
+            "lng": -2.2426
+         },
+         {
+            "name": "برمنغهام",
+            "nameEn": "Birmingham",
+            "lat": 52.4862,
+            "lng": -1.8904
+         }
+      ],
+      "US": [
+         {
+            "name": "نيويورك",
+            "nameEn": "New York",
+            "lat": 40.7128,
+            "lng": -74.006
+         },
+         {
+            "name": "لوس أنجلوس",
+            "nameEn": "Los Angeles",
+            "lat": 34.0522,
+            "lng": -118.2437
+         },
+         {
+            "name": "شيكاغو",
+            "nameEn": "Chicago",
+            "lat": 41.8781,
+            "lng": -87.6298
+         },
+         { "name": "هيوستن", "nameEn": "Houston", "lat": 29.7604, "lng": -95.3698 }
+      ],
+      "CA": [
+         {
+            "name": "تورونتو",
+            "nameEn": "Toronto",
+            "lat": 43.6532,
+            "lng": -79.3832
+         },
+         {
+            "name": "فانكوفر",
+            "nameEn": "Vancouver",
+            "lat": 49.2827,
+            "lng": -123.1207
+         },
+         {
+            "name": "مونتريال",
+            "nameEn": "Montreal",
+            "lat": 45.5017,
+            "lng": -73.5673
+         }
+      ],
+      "AU": [
+         { "name": "سيدني", "nameEn": "Sydney", "lat": -33.8688, "lng": 151.2093 },
+         {
+            "name": "ملبورن",
+            "nameEn": "Melbourne",
+            "lat": -37.8136,
+            "lng": 144.9631
+         }
+      ],
+      "RU": [
+         { "name": "موسكو", "nameEn": "Moscow", "lat": 55.7558, "lng": 37.6173 },
+         {
+            "name": "سانت بطرسبرغ",
+            "nameEn": "Saint Petersburg",
+            "lat": 59.9311,
+            "lng": 30.3609
+         }
+      ],
+      "CN": [
+         { "name": "بكين", "nameEn": "Beijing", "lat": 39.9042, "lng": 116.4074 },
+         {
+            "name": "شنغهاي",
+            "nameEn": "Shanghai",
+            "lat": 31.2304,
+            "lng": 121.4737
+         }
+      ],
+      "JP": [
+         { "name": "طوكيو", "nameEn": "Tokyo", "lat": 35.6762, "lng": 139.6503 },
+         { "name": "أوساكا", "nameEn": "Osaka", "lat": 34.6937, "lng": 135.5023 }
+      ],
+      "KR": [
+         { "name": "سيول", "nameEn": "Seoul", "lat": 37.5665, "lng": 126.978 },
+         { "name": "بوسان", "nameEn": "Busan", "lat": 35.1796, "lng": 129.0756 }
+      ]
+   },
+   "countryTimeFormats": {
+      "SA": "12",
+      "EG": "12",
+      "AE": "12",
+      "KW": "12",
+      "QA": "12",
+      "BH": "12",
+      "OM": "12",
+      "JO": "12",
+      "LB": "12",
+      "SY": "12",
+      "IQ": "12",
+      "IR": "24",
+      "TR": "24",
+      "MA": "24",
+      "DZ": "24",
+      "TN": "24",
+      "LY": "24",
+      "SD": "12",
+      "YE": "12",
+      "PS": "12",
+      "PK": "12",
+      "BD": "12",
+      "IN": "24",
+      "ID": "24",
+      "MY": "24",
+      "FR": "24",
+      "DE": "24",
+      "GB": "24",
+      "US": "12",
+      "CA": "12",
+      "AU": "24",
+      "RU": "24",
+      "CN": "24",
+      "JP": "24",
+      "KR": "24"
+   }
+}
