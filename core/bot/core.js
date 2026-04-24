@@ -13,6 +13,12 @@ require('@topgg-core_web');
 require('@globalAll');
 const { ActivityType } = require('discord.js');
 const { client, logger } = global;
+let activityIndex = 0;
+
+function getCairoHour() {
+   const now = new Date();
+   return (now.getUTCHours() + 2) % 24;
+}
 
 function getConnectedVoiceCount() {
    let count = 0;
@@ -37,32 +43,41 @@ function getConnectedVoiceCount() {
    return count;
 }
 
-function getTotalListeners() {
-   let totalListeners = 0;
-   client.guilds.cache.forEach((guild) => {
-      const voiceChannel = guild.members.me?.voice?.channel;
-      if (voiceChannel && voiceChannel.members) {
-         const listeners = voiceChannel.members.filter((m) => !m.user.bot).size;
-         totalListeners += listeners;
-      }
-   });
-   return totalListeners;
-}
-
 async function updateStatus() {
-   const hour = (new Date().getUTCHours() + 2) % 24;
+   const hour = getCairoHour();
    const guildCount = client.guilds.cache.size;
    const voiceCount = getConnectedVoiceCount();
-   const listenerCount = getTotalListeners();
 
-   const activity = {
-      name: 'Live Quran 24/7',
-      type: ActivityType.Streaming,
-      url: 'https://www.twitch.tv/quran_live24'
-   };
+   let activity;
+
+   const isTwitchWindow = hour >= 6 && hour < 12;
+
+   if (isTwitchWindow && global.twitchStatus?.isLive) {
+      activity = {
+         name: `LIVE: ${global.twitchStatus.title}`,
+         type: ActivityType.Streaming,
+         url: 'https://www.twitch.tv/alquranhd'
+      };
+   } else if (activityIndex % 3 === 0) {
+      activity = {
+         name: 'صلِّ على النبي ﷺ',
+         type: ActivityType.Watching,
+      };
+   } else if (activityIndex % 3 === 1) {
+      activity = {
+         name: `${guildCount} servers | ${voiceCount} Voice`,
+         type: ActivityType.Watching,
+      };
+   } else {
+      activity = {
+         name: 'مفتوح المصدر',
+         type: ActivityType.Watching,
+      };
+   }
 
    const status = hour >= 6 && hour < 12 ? 'online' : hour >= 12 && hour < 18 ? 'idle' : 'dnd';
    client.user?.setPresence({ status, activities: [activity] });
+   activityIndex++;
 }
 
 client.once('clientReady', () => {
@@ -86,18 +101,34 @@ process.on('uncaughtException', (err) => {
    logger.error('Uncaught Exception', err);
    try {
       if (client?.user) {
+         const hour = getCairoHour();
          const guildCount = client.guilds.cache.size;
          const voiceCount = getConnectedVoiceCount();
-         const listenerCount = getTotalListeners();
+         const isTwitchWindow = hour >= 6 && hour < 12;
+         let activityName, activityType, activityUrl;
+         if (isTwitchWindow && global.twitchStatus?.isLive) {
+            activityName = `LIVE: ${global.twitchStatus.title}`;
+            activityType = ActivityType.Streaming;
+            activityUrl = 'https://www.twitch.tv/alquranhd';
+         } else {
+            const fallbackIndex = activityIndex % 3;
+            if (fallbackIndex === 0) {
+               activityName = 'صلِّ على النبي ﷺ';
+            } else if (fallbackIndex === 1) {
+               activityName = `${guildCount} servers | ${voiceCount} Voice`;
+            } else {
+               activityName = 'مفتوح المصدر';
+            }
+            activityType = ActivityType.Watching;
+            activityUrl = undefined;
+         }
          client.user.setPresence({
-            status: 'dnd',
-            activities: [
-               {
-                  name: 'https://www.twitch.tv/alquranhd Live',
-                  type: ActivityType.Streaming,
-                  url: 'https://www.twitch.tv/quran_live24'
-               },
-            ],
+            status: hour >= 6 && hour < 12 ? 'online' : hour >= 12 && hour < 18 ? 'idle' : 'dnd',
+            activities: [{
+               name: activityName,
+               type: activityType,
+               url: activityUrl
+            }],
          });
       }
    } catch { }
