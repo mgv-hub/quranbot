@@ -50,13 +50,19 @@ class DotenvX {
          const filepath = path.resolve(envFile);
          if (!fs.existsSync(filepath)) {
             if (!this.ignore.includes('MISSING_ENV_FILE')) {
-               errors.push({ code: 'MISSING_ENV_FILE', message: `Missing env file: ${filepath}` });
+               errors.push({
+                  code: 'MISSING_ENV_FILE',
+                  message: `Missing env file: ${filepath}`,
+               });
             }
             continue;
          }
 
          const content = fs.readFileSync(filepath, 'utf8');
-         const parsed = this.parse(content, { privateKey: this.privateKey, overload: this.overload });
+         const parsed = this.parse(content, {
+            privateKey: this.privateKey,
+            overload: this.overload,
+         });
          Object.assign(parsedAll, parsed);
       }
 
@@ -114,7 +120,10 @@ class DotenvX {
          let value = match[2].trim();
          value = value.split('#')[0].trim();
 
-         if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+         if (
+            (value.startsWith('"') && value.endsWith('"')) ||
+            (value.startsWith("'") && value.endsWith("'"))
+         ) {
             value = value.slice(1, -1);
          }
 
@@ -159,7 +168,10 @@ class DotenvX {
          const key = match[1].trim();
          let value = match[2].trim();
 
-         if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+         if (
+            (value.startsWith('"') && value.endsWith('"')) ||
+            (value.startsWith("'") && value.endsWith("'"))
+         ) {
             value = value.slice(1, -1);
          }
 
@@ -179,7 +191,10 @@ class DotenvX {
       if (match) {
          const key = match[1].trim();
          let value = match[2].trim();
-         if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+         if (
+            (value.startsWith('"') && value.endsWith('"')) ||
+            (value.startsWith("'") && value.endsWith("'"))
+         ) {
             value = value.slice(1, -1);
          }
          parsed[key] = value;
@@ -211,7 +226,10 @@ class DotenvX {
          }
 
          const content = fs.readFileSync(filepath, 'utf8');
-         const parsed = this.parse(content, { privateKey: this.privateKey, overload: this.overload });
+         const parsed = this.parse(content, {
+            privateKey: this.privateKey,
+            overload: this.overload,
+         });
          Object.assign(parsedAll, parsed);
       }
 
@@ -399,7 +417,10 @@ class DotenvX {
          if (match) {
             const key = match[1].trim();
             let value = match[2].trim();
-            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            if (
+               (value.startsWith('"') && value.endsWith('"')) ||
+               (value.startsWith("'") && value.endsWith("'"))
+            ) {
                value = value.slice(1, -1);
             }
             parsed[key] = value;

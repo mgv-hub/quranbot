@@ -9,7 +9,10 @@ async function loadDataFromLocal() {
       const dataDir = pathlra.join(__dirname, '..', 'data');
       let localLoaded = true;
       try {
-         const surahNamesData = await fs.readFile(pathlra.join(dataDir, 'surah_names_ar.json'), 'utf8');
+         const surahNamesData = await fs.readFile(
+            pathlra.join(dataDir, 'surah_names_ar.json'),
+            'utf8',
+         );
          global.surahNames = JSON.parse(surahNamesData);
          logger.info(`Loaded ${global.surahNames.length} surah names from local file`);
       } catch (error) {
@@ -17,7 +20,10 @@ async function loadDataFromLocal() {
          localLoaded = false;
       }
       try {
-         const recitersData = await fs.readFile(pathlra.join(dataDir, 'reciters_ar.json'), 'utf8');
+         const recitersData = await fs.readFile(
+            pathlra.join(dataDir, 'reciters_ar.json'),
+            'utf8',
+         );
          global.reciters = JSON.parse(recitersData);
          logger.info(`Loaded ${Object.keys(global.reciters).length} reciters from local file`);
       } catch (error) {

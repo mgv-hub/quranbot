@@ -2,18 +2,25 @@ require('pathlra-aliaser')();
 
 const DEFAULT_USER_AGENT =
    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-const BOT_USER_AGENT = 'Mozilla/5.0 (compatible; QuranBot/0.7.29; +https://github.com/mgv-hub/quranbot)';
+const BOT_USER_AGENT =
+   'Mozilla/5.0 (compatible; QuranBot/0.7.29; +https://github.com/mgv-hub/quranbot)';
 
 const AUDIO_ACCEPT_HEADER = 'audio/*, */*;q=0.8';
 const JSON_ACCEPT_HEADER = 'application/json, text/plain, */*';
-const HTML_ACCEPT_HEADER = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
+const HTML_ACCEPT_HEADER =
+   'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8';
 
 const REQUEST_TIMEOUT_MS = 15000;
 const HEAD_REQUEST_TIMEOUT_MS = 8000;
 const STREAM_TIMEOUT_MS = 30000;
 
 function getBaseHeaders(options = {}) {
-   const { userAgent = BOT_USER_AGENT, acceptType = 'audio', includeReferer = false, customHeaders = {} } = options;
+   const {
+      userAgent = BOT_USER_AGENT,
+      acceptType = 'audio',
+      includeReferer = false,
+      customHeaders = {},
+   } = options;
 
    const headers = {
       'User-Agent': userAgent,

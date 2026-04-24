@@ -283,10 +283,12 @@ const FIREBASE_CONFIG = {
 const HTTP_CONFIG = {
    DEFAULT_USER_AGENT:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-   BOT_USER_AGENT: 'Mozilla/5.0 (compatible; QuranBot/0.7.29; +https://github.com/mgv-hub/quranbot)',
+   BOT_USER_AGENT:
+      'Mozilla/5.0 (compatible; QuranBot/0.7.29; +https://github.com/mgv-hub/quranbot)',
    AUDIO_ACCEPT_HEADER: 'audio/*, */*;q=0.8',
    JSON_ACCEPT_HEADER: 'application/json, text/plain, */*',
-   HTML_ACCEPT_HEADER: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+   HTML_ACCEPT_HEADER:
+      'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
    REQUEST_TIMEOUT_MS: 15000,
    HEAD_REQUEST_TIMEOUT_MS: 8000,
    STREAM_TIMEOUT_MS: 30000,
@@ -295,7 +297,13 @@ const HTTP_CONFIG = {
 const PERMISSIONS_CONFIG = {
    ADMIN_ROLES: ['admin', 'quran admin', 'islamic admin', 'quran', 'islamic', 'islam'],
    SPECIAL_USER_ENV: 'SPE_USER_ID',
-   REQUIRED_SETUP_PERMISSIONS: ['ManageChannels', 'ManageRoles', 'ViewChannel', 'Connect', 'Speak'],
+   REQUIRED_SETUP_PERMISSIONS: [
+      'ManageChannels',
+      'ManageRoles',
+      'ViewChannel',
+      'Connect',
+      'Speak',
+   ],
 };
 
 const CHANNEL_NAMES = {

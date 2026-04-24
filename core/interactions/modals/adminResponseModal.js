@@ -14,15 +14,18 @@ module.exports = {
             });
          }
          await interaction.deferReply({ flags: 64 });
-         const guildIdOrChannelId = interaction.fields.getTextInputValue('admin_guild_id') || '';
+         const guildIdOrChannelId =
+            interaction.fields.getTextInputValue('admin_guild_id') || '';
          const roleLevel = interaction.fields.getTextInputValue('admin_role_level');
          const messageContent = interaction.fields.getTextInputValue('admin_message');
-         const targetUserId = interaction.fields.getTextInputValue('admin_target_user_id') || '';
+         const targetUserId =
+            interaction.fields.getTextInputValue('admin_target_user_id') || '';
          const cleanGuildId = guildIdOrChannelId.trim();
          const cleanUserId = targetUserId.trim();
          if (!cleanGuildId && !cleanUserId) {
             return interaction.editReply({
-               content: 'يرجى كتابة معرف القناة أو معرف المستخدم على الأقل لا يمكن تركهما فارغين معا',
+               content:
+                  'يرجى كتابة معرف القناة أو معرف المستخدم على الأقل لا يمكن تركهما فارغين معا',
                flags: 64,
             });
          }
@@ -80,7 +83,9 @@ module.exports = {
                   );
                await targetUser.send({ embeds: [dmEmbed] });
                dmSent = true;
-               logger.info(`DM Sent Successfully To User ${targetUser.tag} (${targetUser.id})`);
+               logger.info(
+                  `DM Sent Successfully To User ${targetUser.tag} (${targetUser.id})`,
+               );
             } catch (dmError) {
                dmFailed = true;
                if (dmError.code === 50007) {
@@ -90,7 +95,9 @@ module.exports = {
                } else {
                   dmFailedReason = dmError.message || 'خطأ غير معروف';
                }
-               logger.warn(`Failed To Send DM To User ${cleanUserId} Reason ${dmFailedReason}`);
+               logger.warn(
+                  `Failed To Send DM To User ${cleanUserId} Reason ${dmFailedReason}`,
+               );
             }
          }
          if (cleanGuildId) {
@@ -98,7 +105,9 @@ module.exports = {
                const guild = global.client.guilds.cache.get(cleanGuildId);
                if (guild) {
                   targetGuild = guild;
-                  const textChannel = guild.channels.cache.find((c) => c.name.includes('تحكم') && c.isTextBased());
+                  const textChannel = guild.channels.cache.find(
+                     (c) => c.name.includes('تحكم') && c.isTextBased(),
+                  );
                   if (textChannel) {
                      targetChannel = textChannel;
                   } else {
@@ -117,7 +126,10 @@ module.exports = {
             }
             if (targetChannel && targetChannel.isTextBased?.()) {
                const botPermissions = targetChannel.permissionsFor(targetGuild?.members.me);
-               if (!botPermissions || !botPermissions.has(PermissionsBitField.Flags.SendMessages)) {
+               if (
+                  !botPermissions ||
+                  !botPermissions.has(PermissionsBitField.Flags.SendMessages)
+               ) {
                   channelFailed = true;
                   channelFailedReason = 'البوت لا يملك صلاحية ارسال الرسائل في هذه القناة';
                } else {
@@ -147,7 +159,9 @@ module.exports = {
                      if (targetUser) {
                         adminEmbed.addFields({
                            name: 'حالة الإرسال على الخاص',
-                           value: dmSent ? 'تم الإرسال بنجاح' : `فشل الإرسال ${dmFailedReason}`,
+                           value: dmSent
+                              ? 'تم الإرسال بنجاح'
+                              : `فشل الإرسال ${dmFailedReason}`,
                            inline: false,
                         });
                      }

@@ -28,20 +28,32 @@ module.exports = {
             { name: 'Uptime', value: formatUptime(client.uptime), inline: true },
          );
       const adminRow1 = new ActionRowBuilder().addComponents(
-         new ButtonBuilder().setCustomId('admin_server_list').setLabel('Server List').setStyle(ButtonStyle.Secondary),
+         new ButtonBuilder()
+            .setCustomId('admin_server_list')
+            .setLabel('Server List')
+            .setStyle(ButtonStyle.Secondary),
          new ButtonBuilder()
             .setCustomId('admin_voice_channels')
             .setLabel('Voice Channels')
             .setStyle(ButtonStyle.Secondary),
-         new ButtonBuilder().setCustomId('admin_send_message').setLabel('Send Message').setStyle(ButtonStyle.Secondary),
-         new ButtonBuilder().setCustomId('admin_bot_stats').setLabel('Bot Statistics').setStyle(ButtonStyle.Secondary),
+         new ButtonBuilder()
+            .setCustomId('admin_send_message')
+            .setLabel('Send Message')
+            .setStyle(ButtonStyle.Secondary),
+         new ButtonBuilder()
+            .setCustomId('admin_bot_stats')
+            .setLabel('Bot Statistics')
+            .setStyle(ButtonStyle.Secondary),
       );
       const adminRow2 = new ActionRowBuilder().addComponents(
          new ButtonBuilder()
             .setCustomId('admin_response_modal')
             .setLabel('Reply to Complaint')
             .setStyle(ButtonStyle.Secondary),
-         new ButtonBuilder().setCustomId('admin_close_panel').setLabel('Close').setStyle(ButtonStyle.Secondary),
+         new ButtonBuilder()
+            .setCustomId('admin_close_panel')
+            .setLabel('Close')
+            .setStyle(ButtonStyle.Secondary),
       );
       await interaction.reply({
          embeds: [adminEmbed],

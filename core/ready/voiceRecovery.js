@@ -39,7 +39,13 @@ async function recoverVoiceConnection(guild, fixedSetupData, guildId) {
             guild.channels.cache.get(fixedSetupData.voiceChannelId) ||
             (await guild.channels.fetch(fixedSetupData.voiceChannelId).catch(() => null));
       } catch (error) {
-         logger.info('Guild ' + guildId + ' Voice Channel ' + fixedSetupData.voiceChannelId + ' Not Accessible');
+         logger.info(
+            'Guild ' +
+               guildId +
+               ' Voice Channel ' +
+               fixedSetupData.voiceChannelId +
+               ' Not Accessible',
+         );
       }
 
       if (voiceChannel && voiceChannel.type === ChannelType.GuildVoice) {
@@ -65,7 +71,8 @@ async function recoverVoiceConnection(guild, fixedSetupData, guildId) {
                   state.isPaused = false;
 
                   const reciterKeys = Object.keys(global.reciters || {});
-                  const randomReciterKey = reciterKeys[Math.floor(Math.random() * reciterKeys.length)];
+                  const randomReciterKey =
+                     reciterKeys[Math.floor(Math.random() * reciterKeys.length)];
                   state.currentReciter = persistentState?.currentReciter || randomReciterKey;
                   state.currentSurah = (persistentState?.currentSurahIndex || 0) + 1;
                   state.playedOffset = persistentState?.playedOffset || 0;
@@ -87,7 +94,13 @@ async function recoverVoiceConnection(guild, fixedSetupData, guildId) {
                   );
 
                   try {
-                     const resource = await global.createSurahResource(state, state.currentSurah - 1, 0, 0, false);
+                     const resource = await global.createSurahResource(
+                        state,
+                        state.currentSurah - 1,
+                        0,
+                        0,
+                        false,
+                     );
                      state.player.play(resource);
                      state.isPaused = false;
                      state.pauseReason = null;
@@ -95,7 +108,9 @@ async function recoverVoiceConnection(guild, fixedSetupData, guildId) {
                      await new Promise((resolve) => setTimeout(resolve, 3000));
 
                      if (state.player.state.status === AudioPlayerStatus.Idle) {
-                        logger.warn('Guild ' + guildId + ' Player Idle After Recovery Retrying');
+                        logger.warn(
+                           'Guild ' + guildId + ' Player Idle After Recovery Retrying',
+                        );
                         const retryResource = await global.createSurahResource(
                            state,
                            state.currentSurah - 1,
@@ -122,15 +137,27 @@ async function recoverVoiceConnection(guild, fixedSetupData, guildId) {
                   logger.error('Failed To Connect To Voice Channel For Guild ' + guildId, err);
                }
             } else {
-               logger.info('Skipping Voice Connection For Guild ' + guildId + ' Manual Disconnect Flag Set');
+               logger.info(
+                  'Skipping Voice Connection For Guild ' +
+                     guildId +
+                     ' Manual Disconnect Flag Set',
+               );
             }
          } else {
             logger.info('Guild ' + guildId + ' Already Has Active Connection');
 
             if (state.player.state.status === AudioPlayerStatus.Idle) {
-               logger.info('Guild ' + guildId + ' Connection Exists But Player Idle Starting Playback');
+               logger.info(
+                  'Guild ' + guildId + ' Connection Exists But Player Idle Starting Playback',
+               );
                try {
-                  const resource = await global.createSurahResource(state, state.currentSurah - 1, 0, 0, false);
+                  const resource = await global.createSurahResource(
+                     state,
+                     state.currentSurah - 1,
+                     0,
+                     0,
+                     false,
+                  );
                   state.player.play(resource);
                   state.isPaused = false;
                   state.pauseReason = null;

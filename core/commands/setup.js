@@ -63,7 +63,9 @@ module.exports = {
          imp.PermissionsBitField.Flags.Connect,
          imp.PermissionsBitField.Flags.Speak,
       ];
-      const missingPermissions = requiredPermissions.filter((perm) => !me.permissions.has(perm));
+      const missingPermissions = requiredPermissions.filter(
+         (perm) => !me.permissions.has(perm),
+      );
       if (missingPermissions.length > 0) {
          try {
             if (!interaction.deferred && !interaction.replied) {
@@ -71,7 +73,8 @@ module.exports = {
             }
             await interaction
                .editReply({
-                  content: 'صلاحيات البوت غير كافية لإعداد القنوات ادمن ستريتر مؤقتاً أثناء الإعداد',
+                  content:
+                     'صلاحيات البوت غير كافية لإعداد القنوات ادمن ستريتر مؤقتاً أثناء الإعداد',
                   flags: 64,
                })
                .catch(() => {});
@@ -85,7 +88,11 @@ module.exports = {
       let oldSetup = null;
       if (isReSetup) {
          oldSetup = global.setupGuilds[guildId];
-         const oldChannels = [oldSetup.voiceChannelId, oldSetup.textChannelId, oldSetup.azkarChannelId];
+         const oldChannels = [
+            oldSetup.voiceChannelId,
+            oldSetup.textChannelId,
+            oldSetup.azkarChannelId,
+         ];
          channelWillBeDeleted = oldChannels.includes(interaction.channelId);
          if (channelWillBeDeleted && interaction.channel.type !== imp.ChannelType.GuildText) {
             try {
@@ -113,11 +120,15 @@ module.exports = {
                      'إعادة إعداد مكتشفة هذه القناة ستحذف قريباً الإعداد مستمر تحقق من الفئة الجديدة quran للوحة التحكم والتأكيد النهائي',
                })
                .catch(() => {});
-            imp.logger.info(`Guild ${guildId} Re-setup from doomed channel ${interaction.channelId} warned user`);
+            imp.logger.info(
+               `Guild ${guildId} Re-setup from doomed channel ${interaction.channelId} warned user`,
+            );
          } else {
             await interaction.editReply({ content: 'جاري إعداد فئة القرآن' }).catch(() => {});
          }
-         const setupResult = await setupQuranCategory(interaction.guild, interaction, { channelWillBeDeleted });
+         const setupResult = await setupQuranCategory(interaction.guild, interaction, {
+            channelWillBeDeleted,
+         });
          const successEmbed = {
             embeds: [
                {
@@ -186,7 +197,8 @@ module.exports = {
             imp.logger.error('Error in setup', error);
             imp.logger.error(`Stack trace ${error.stack}`);
          }
-         let errorMsg = 'حدث خطأ أثناء تنفيذ الإعداد يرجى التحقق من الصلاحيات والمحاولة لاحقاً';
+         let errorMsg =
+            'حدث خطأ أثناء تنفيذ الإعداد يرجى التحقق من الصلاحيات والمحاولة لاحقاً';
          if (
             error.code === 50013 ||
             error.message?.includes('Missing Permissions') ||
@@ -208,7 +220,9 @@ module.exports = {
                }
             }
          } else {
-            imp.logger.info(`Guild ${guildId} Skipping interaction error using system channel`);
+            imp.logger.info(
+               `Guild ${guildId} Skipping interaction error using system channel`,
+            );
             const systemChannel = interaction.guild.systemChannel;
             if (systemChannel) {
                await systemChannel.send(

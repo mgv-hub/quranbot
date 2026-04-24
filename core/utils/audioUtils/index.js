@@ -14,7 +14,11 @@ const {
    findAvailableSurahForReciter,
    findWorkingReciter,
 } = require('./reciterData');
-const { parseDurationToSeconds, formatDurationText, getDurationForSurah } = require('./durationFormatter');
+const {
+   parseDurationToSeconds,
+   formatDurationText,
+   getDurationForSurah,
+} = require('./durationFormatter');
 
 async function createSurahResource(state, index, startSeconds = 0) {
    const MAX_FALLBACK_ATTEMPTS = 5;

@@ -13,10 +13,19 @@ const {
    createNavigationRow,
 } = require('@components-core_ui');
 const { createControlEmbed } = require('@embeds-core_ui');
-const { getGuildState, removeGuildState, isAuthorized } = require('@GuildStateManager-core_state');
+const {
+   getGuildState,
+   removeGuildState,
+   isAuthorized,
+} = require('@GuildStateManager-core_state');
 const { sendRandomAzkar, startAzkarTimerForGuild } = require('@AzkarManager-core_state');
 const { registerCommands, applyCommandPermissions } = require('@CommandUtils-core_utils');
-const { checkCooldown, checkRateLimit, checkVoiceCooldown, COOLDOWN_TYPES } = require('@cooldown-core_state');
+const {
+   checkCooldown,
+   checkRateLimit,
+   checkVoiceCooldown,
+   COOLDOWN_TYPES,
+} = require('@cooldown-core_state');
 const {
    loadPrayerTimesData,
    getCountries,

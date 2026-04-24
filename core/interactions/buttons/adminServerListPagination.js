@@ -33,7 +33,9 @@ module.exports = {
          const totalPages = Math.ceil(guilds.length / itemsPerPage);
          let currentPage = 0;
          if (interaction.customId === 'admin_prev_servers') {
-            const pageField = interaction.message.embeds[0]?.fields?.find((f) => f.name === 'Page');
+            const pageField = interaction.message.embeds[0]?.fields?.find(
+               (f) => f.name === 'Page',
+            );
             if (pageField && pageField.value) {
                const match = pageField.value.match(/(\d+)\/(\d+)/);
                if (match) {
@@ -42,7 +44,9 @@ module.exports = {
             }
             currentPage = Math.max(0, currentPage - 1);
          } else if (interaction.customId === 'admin_next_servers') {
-            const pageField = interaction.message.embeds[0]?.fields?.find((f) => f.name === 'Page');
+            const pageField = interaction.message.embeds[0]?.fields?.find(
+               (f) => f.name === 'Page',
+            );
             if (pageField && pageField.value) {
                const match = pageField.value.match(/(\d+)\/(\d+)/);
                if (match) {

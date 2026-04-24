@@ -32,7 +32,8 @@ function getReciterInfo(reciterKey) {
    }
    const name = reciterData?.name || reciterKey;
    const availableCount =
-      reciterData?.links?.filter((l) => l && l.trim() !== '' && l.startsWith('http'))?.length || 114;
+      reciterData?.links?.filter((l) => l && l.trim() !== '' && l.startsWith('http'))
+         ?.length || 114;
    return { name, availableCount };
 }
 

@@ -80,7 +80,10 @@ for (let page = 0; page < Math.ceil(global.quranRadios.length / ITEMS_PER_PAGE);
 
 logger.info('Loaded ' + global.quranRadios.length + ' Quran Radios From Env Variables');
 
-logger.info('Current Date In Cairo ' + new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }));
+logger.info(
+   'Current Date In Cairo ' +
+      new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }),
+);
 
 const client = new Client({
    intents: [
@@ -106,7 +109,9 @@ global.azkarData = [];
       });
       if (response.ok) {
          global.azkarData = await response.json();
-         logger.info('Loaded ' + global.azkarData.length + ' Adhkar Categories From New adhkar.json');
+         logger.info(
+            'Loaded ' + global.azkarData.length + ' Adhkar Categories From New adhkar.json',
+         );
          let totalAdhkar = 0;
          global.azkarData.forEach((cat) => {
             if (cat.array && Array.isArray(cat.array)) {

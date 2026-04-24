@@ -90,7 +90,10 @@ module.exports = {
                .setLabel('Next')
                .setStyle(ButtonStyle.Secondary)
                .setDisabled(currentPage >= totalPages - 1),
-            new ButtonBuilder().setCustomId('admin_refresh_voice').setLabel('Refresh').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+               .setCustomId('admin_refresh_voice')
+               .setLabel('Refresh')
+               .setStyle(ButtonStyle.Secondary),
          );
          await interaction.editReply({
             embeds: [embed],

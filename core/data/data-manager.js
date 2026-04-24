@@ -15,7 +15,11 @@ const {
    fetchTafasir,
 } = require('@data-fetchers-core_data');
 const { loadRemoteAzkarData } = require('@data-azkar-core_data');
-const { loadSetupGuilds, saveSetupGuilds, updateGuildNames } = require('@data-guilds-core_data');
+const {
+   loadSetupGuilds,
+   saveSetupGuilds,
+   updateGuildNames,
+} = require('@data-guilds-core_data');
 const base = 'https://hub-mgv.github.io/QuranBotData/azkar-images/';
 
 let surahNames = [];
@@ -31,7 +35,9 @@ async function loadData() {
          if (content.trim()) {
             cacheData = JSON.parse(content);
             if (!isValidCacheData(cacheData)) {
-               logger.warn('Cache file exists but contains invalid/empty data switching to remote fallback');
+               logger.warn(
+                  'Cache file exists but contains invalid/empty data switching to remote fallback',
+               );
                useRemoteFallback = true;
             } else {
                logger.info('Loaded valid data from data_url.json cache');
@@ -44,7 +50,9 @@ async function loadData() {
          if (error.code === 'ENOENT') {
             logger.warn('data_url.json not found will try Firebase cache first');
          } else {
-            logger.warn('Error reading cache file ' + error.message + ' will try Firebase cache first');
+            logger.warn(
+               'Error reading cache file ' + error.message + ' will try Firebase cache first',
+            );
          }
       }
       const allSurahs = {};
@@ -54,7 +62,8 @@ async function loadData() {
       });
       surahNames = Object.values(allSurahs).map((s) => s.name);
       logger.info(
-         'The API successfully loaded the surah names from the languages Number of surahs ' + surahNames.length,
+         'The API successfully loaded the surah names from the languages Number of surahs ' +
+            surahNames.length,
       );
       const allReciters = {};
       const recitersFromFirebase = await fetchRecitersFromFirebase();
@@ -73,13 +82,16 @@ async function loadData() {
          Object.assign(allReciters, recitersFromApi);
          logger.info('Loaded reciters from data_url.json cache');
       } else {
-         logger.info('Loading reciters from remote URLs FALLBACK Firebase had no reciters data');
+         logger.info(
+            'Loading reciters from remote URLs FALLBACK Firebase had no reciters data',
+         );
          const recitersFromRemote = await fetchRecitersFromRemote();
          Object.assign(allReciters, recitersFromRemote);
       }
       global.reciters = allReciters;
       logger.info(
-         'The API components of the devices are corrected Número de lectores ' + Object.keys(global.reciters).length,
+         'The API components of the devices are corrected Número de lectores ' +
+            Object.keys(global.reciters).length,
       );
       global.riwayat = await fetchRiwayat('ar');
       global.moshaf = await fetchMoshaf('ar');
@@ -103,7 +115,9 @@ async function loadData() {
          `${base}1%20(15).png`,
          `${base}1%20(16).png`,
       ];
-      logger.info('Loaded ' + global.azkarImages.length + ' azkar image URLs from remote server');
+      logger.info(
+         'Loaded ' + global.azkarImages.length + ' azkar image URLs from remote server',
+      );
       const setupGuilds = await loadSetupGuilds();
       global.surahNames = surahNames;
       global.reciterNamesList = Object.values(global.reciters)

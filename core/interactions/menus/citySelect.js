@@ -1,8 +1,17 @@
 require('pathlra-aliaser')();
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, MessageFlags } = require('discord.js');
+const {
+   ActionRowBuilder,
+   ButtonBuilder,
+   ButtonStyle,
+   EmbedBuilder,
+   MessageFlags,
+} = require('discord.js');
 const logger = require('@logger');
 const fetch = require('node-fetch').default;
-const { getCitiesForCountry, getTimeFormatForCountry } = require('@prayerTimesData-core_utils');
+const {
+   getCitiesForCountry,
+   getTimeFormatForCountry,
+} = require('@prayerTimesData-core_utils');
 const { getBrowserHeaders, getTimeoutForRequest } = require('@httpConfig-core_utils');
 function formatTime(time24, countryCode) {
    if (!time24 || typeof time24 !== 'string') return 'غير متاح';

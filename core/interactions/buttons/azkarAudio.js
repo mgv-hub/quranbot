@@ -28,7 +28,8 @@ module.exports = {
          const now = Date.now();
          if (messageTimestamp && now - messageTimestamp > AZKAR_EXPIRY_MS) {
             return interaction.editReply({
-               content: 'عذراً هذا الذكر قديم جداً (أكثر من 10 أيام) لا يمكن تشغيل الصوت للرسائل القديمة',
+               content:
+                  'عذراً هذا الذكر قديم جداً (أكثر من 10 أيام) لا يمكن تشغيل الصوت للرسائل القديمة',
                flags: MessageFlags.Ephemeral,
             });
          }
@@ -43,7 +44,10 @@ module.exports = {
                for (const category of azkarData) {
                   if (category.array && Array.isArray(category.array)) {
                      for (const dhikr of category.array) {
-                        if (dhikr.filename === extractedFilename || dhikr.audio?.includes(extractedFilename)) {
+                        if (
+                           dhikr.filename === extractedFilename ||
+                           dhikr.audio?.includes(extractedFilename)
+                        ) {
                            audioUrl = 'https://hub-mgv.github.io/QuranBotData/' + dhikr.audio;
                            filename = dhikr.filename || extractedFilename;
                            dhikrText = dhikr.text || 'ذكر';

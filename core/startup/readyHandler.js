@@ -4,7 +4,10 @@ const { loadData } = require('@data-manager-core_data');
 const client = require('@botSetup').client;
 const persistentStateManager = require('@PersistentStateManager-core_state');
 const backupManager = require('@BackupManager-core_state').backupManager;
-const { loadSetupGuildsFromFirebase, loadGuildStatesFromFirebase } = require('@firebase-core_utils');
+const {
+   loadSetupGuildsFromFirebase,
+   loadGuildStatesFromFirebase,
+} = require('@firebase-core_utils');
 const { validateAndFixSetupData } = require('@setupValidator-core_ready');
 const { recoverAzkarTimers } = require('@azkarRecovery-core_ready');
 const { recoverVoiceConnection } = require('@voiceRecovery-core_ready');
@@ -25,7 +28,13 @@ loadData()
          const runtimeStates = require('@RuntimeState-core_runtime');
          await runtimeStates.restoreRuntimeStates(client);
 
-         logger.info('Logged In As ' + client.user.tag + ' - ' + (global.surahNames?.length || 114) + ' Surahs Loaded');
+         logger.info(
+            'Logged In As ' +
+               client.user.tag +
+               ' - ' +
+               (global.surahNames?.length || 114) +
+               ' Surahs Loaded',
+         );
          logger.info('Number Of Reciters ' + Object.keys(global.reciters).length);
          logger.info('Total Surahs Loaded ' + global.surahNames.length);
          logger.info('Total Adhkar Categories ' + (global.azkarData?.length || 0));
@@ -41,11 +50,19 @@ loadData()
          const allSetupGuildIds = Object.keys(global.setupGuilds || {});
          const actualBotGuilds = new Set(client.guilds.cache.keys());
 
-         logger.info('Loaded ' + allSetupGuildIds.length + ' Setup Guilds From Firebase Primary Source For Recovery');
-         logger.info('Bot Is Actually In ' + actualBotGuilds.size + ' Guilds Will Only Process These');
+         logger.info(
+            'Loaded ' +
+               allSetupGuildIds.length +
+               ' Setup Guilds From Firebase Primary Source For Recovery',
+         );
+         logger.info(
+            'Bot Is Actually In ' + actualBotGuilds.size + ' Guilds Will Only Process These',
+         );
 
          const guildsToProcess = allSetupGuildIds.filter((gid) => actualBotGuilds.has(gid));
-         logger.info('Will Process ' + guildsToProcess.length + ' Guilds That Bot Is Actually In');
+         logger.info(
+            'Will Process ' + guildsToProcess.length + ' Guilds That Bot Is Actually In',
+         );
 
          for (let i = 0; i < guildsToProcess.length; i++) {
             const guildId = guildsToProcess[i];
@@ -68,7 +85,11 @@ loadData()
 
          const staleGuildIds = allSetupGuildIds.filter((gid) => !actualBotGuilds.has(gid));
          if (staleGuildIds.length > 0) {
-            logger.info('Skipping ' + staleGuildIds.length + ' Setup Guilds Bot Not In These Shared Database Entries');
+            logger.info(
+               'Skipping ' +
+                  staleGuildIds.length +
+                  ' Setup Guilds Bot Not In These Shared Database Entries',
+            );
          }
 
          await restoreGuildStates(client, actualBotGuilds);
@@ -76,7 +97,9 @@ loadData()
          startMemoryCleanup();
 
          logger.info('Bot Is Fully READY');
-         logger.info('Voice Connections Will Be Auto Restored From Setup Guilds After Restart');
+         logger.info(
+            'Voice Connections Will Be Auto Restored From Setup Guilds After Restart',
+         );
          logger.info('Backup System Active Auto Recovery Enabled');
          logger.info('Serving ' + client.guilds.cache.size + ' Guilds');
       });

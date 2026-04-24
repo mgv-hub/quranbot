@@ -22,7 +22,10 @@ const {
 } = require('@components-core_ui');
 function isPlainObject(obj) {
    return (
-      obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.getPrototypeOf(obj) === Object.prototype
+      obj !== null &&
+      typeof obj === 'object' &&
+      !Array.isArray(obj) &&
+      Object.getPrototypeOf(obj) === Object.prototype
    );
 }
 function deepCloneForFirebase(obj) {
@@ -147,7 +150,13 @@ class BackupManager {
             }
          }
 
-         logger.info('Recovery Complete From Setup Guilds ' + recoveredCount + ' Recovered ' + failedCount + ' Failed');
+         logger.info(
+            'Recovery Complete From Setup Guilds ' +
+               recoveredCount +
+               ' Recovered ' +
+               failedCount +
+               ' Failed',
+         );
          return { success: true, recovered: recoveredCount, failed: failedCount };
       } catch (error) {
          logger.error('Recovery From Setup Guilds Failed');
@@ -194,7 +203,10 @@ class BackupManager {
                permissionOverwrites: [
                   {
                      id: guild.roles.everyone.id,
-                     allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
+                     allow: [
+                        PermissionsBitField.Flags.ViewChannel,
+                        PermissionsBitField.Flags.Connect,
+                     ],
                      deny: [PermissionsBitField.Flags.Speak],
                   },
                ],
@@ -215,7 +227,10 @@ class BackupManager {
                permissionOverwrites: [
                   {
                      id: guild.roles.everyone.id,
-                     allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
+                     allow: [
+                        PermissionsBitField.Flags.ViewChannel,
+                        PermissionsBitField.Flags.ReadMessageHistory,
+                     ],
                      deny: [PermissionsBitField.Flags.SendMessages],
                   },
                ],
@@ -236,7 +251,10 @@ class BackupManager {
                permissionOverwrites: [
                   {
                      id: guild.roles.everyone.id,
-                     allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
+                     allow: [
+                        PermissionsBitField.Flags.ViewChannel,
+                        PermissionsBitField.Flags.ReadMessageHistory,
+                     ],
                      deny: [PermissionsBitField.Flags.SendMessages],
                   },
                ],
@@ -312,7 +330,9 @@ class BackupManager {
             }
          }
 
-         logger.info('Recovery Complete ' + recoveredCount + ' Recovered ' + failedCount + ' Failed');
+         logger.info(
+            'Recovery Complete ' + recoveredCount + ' Recovered ' + failedCount + ' Failed',
+         );
          return { success: true, recovered: recoveredCount, failed: failedCount };
       } catch (error) {
          logger.error('Recovery From Backup Failed');
@@ -360,7 +380,10 @@ class BackupManager {
                permissionOverwrites: [
                   {
                      id: guild.roles.everyone.id,
-                     allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
+                     allow: [
+                        PermissionsBitField.Flags.ViewChannel,
+                        PermissionsBitField.Flags.Connect,
+                     ],
                      deny: [PermissionsBitField.Flags.Speak],
                   },
                ],
@@ -381,7 +404,10 @@ class BackupManager {
                permissionOverwrites: [
                   {
                      id: guild.roles.everyone.id,
-                     allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
+                     allow: [
+                        PermissionsBitField.Flags.ViewChannel,
+                        PermissionsBitField.Flags.ReadMessageHistory,
+                     ],
                      deny: [PermissionsBitField.Flags.SendMessages],
                   },
                ],
@@ -402,7 +428,10 @@ class BackupManager {
                permissionOverwrites: [
                   {
                      id: guild.roles.everyone.id,
-                     allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
+                     allow: [
+                        PermissionsBitField.Flags.ViewChannel,
+                        PermissionsBitField.Flags.ReadMessageHistory,
+                     ],
                      deny: [PermissionsBitField.Flags.SendMessages],
                   },
                ],

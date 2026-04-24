@@ -1,5 +1,10 @@
 require('pathlra-aliaser')();
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+const {
+   ModalBuilder,
+   TextInputBuilder,
+   TextInputStyle,
+   ActionRowBuilder,
+} = require('discord.js');
 const logger = require('@logger');
 module.exports = {
    customId: 'admin_response_modal',
@@ -22,7 +27,9 @@ module.exports = {
             .setStyle(TextInputStyle.Short)
             .setRequired(false)
             .setMaxLength(100)
-            .setPlaceholder('مثال 789262675892240396 اتركه فارغا اذا اردت ارسال على الخاص فقط');
+            .setPlaceholder(
+               'مثال 789262675892240396 اتركه فارغا اذا اردت ارسال على الخاص فقط',
+            );
          const roleLevelInput = new TextInputBuilder()
             .setCustomId('admin_role_level')
             .setLabel('أدخل صلاحيك في فريق البوت')

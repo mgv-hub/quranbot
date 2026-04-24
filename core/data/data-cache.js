@@ -3,7 +3,10 @@ const fs = require('fs').promises;
 const pathlra = require('path');
 const fetch = require('node-fetch').default;
 const logger = require('@logger');
-const { loadCachedDataFromFirebase, saveCachedDataToFirebase } = require('@firebase-core_utils');
+const {
+   loadCachedDataFromFirebase,
+   saveCachedDataToFirebase,
+} = require('@firebase-core_utils');
 const { PATHS, URLs } = require('@configConstants-core_utils');
 
 const CACHE_FILE = pathlra.join(__dirname, PATHS.CACHE_FILE);

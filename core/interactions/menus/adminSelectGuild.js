@@ -37,7 +37,11 @@ module.exports = {
          .addFields(
             { name: 'ID', value: `\`${guild.id}\``, inline: true },
             { name: 'Owner', value: owner ? `<@${owner.id}>` : 'Unknown', inline: true },
-            { name: 'Created At', value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`, inline: true },
+            {
+               name: 'Created At',
+               value: `<t:${Math.floor(guild.createdTimestamp / 1000)}:R>`,
+               inline: true,
+            },
             { name: 'Total Members', value: `${guild.memberCount}`, inline: true },
          );
       const actionRow = new ActionRowBuilder().addComponents(

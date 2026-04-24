@@ -33,7 +33,10 @@ module.exports = {
             .setCustomId(`admin_confirm_kick_${guildId}`)
             .setLabel('Confirm Leave')
             .setStyle(ButtonStyle.Secondary),
-         new ButtonBuilder().setCustomId('admin_cancel_kick').setLabel('Cancel').setStyle(ButtonStyle.Secondary),
+         new ButtonBuilder()
+            .setCustomId('admin_cancel_kick')
+            .setLabel('Cancel')
+            .setStyle(ButtonStyle.Secondary),
       );
 
       const confirmEmbed = new EmbedBuilder()

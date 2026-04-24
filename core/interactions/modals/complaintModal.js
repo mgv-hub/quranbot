@@ -20,15 +20,22 @@ module.exports = {
       const lastSubmission = await loadUserCooldownFromFirebase(userId);
       const now = Date.now();
       const cooldownMs = 24 * 60 * 60 * 1000;
-      if (lastSubmission && lastSubmission.lastSubmission && now - lastSubmission.lastSubmission < cooldownMs) {
-         const remainingHours = Math.ceil((cooldownMs - (now - lastSubmission.lastSubmission)) / (1000 * 60 * 60));
+      if (
+         lastSubmission &&
+         lastSubmission.lastSubmission &&
+         now - lastSubmission.lastSubmission < cooldownMs
+      ) {
+         const remainingHours = Math.ceil(
+            (cooldownMs - (now - lastSubmission.lastSubmission)) / (1000 * 60 * 60),
+         );
          return interaction.reply({
             content: `يجب الانتظار ${remainingHours} ساعة قبل تقديم شكوى جديدة`,
             flags: MessageFlags.Ephemeral,
          });
       }
       const reason = interaction.fields.getTextInputValue('complaint_reason');
-      const suggestion = interaction.fields.getTextInputValue('complaint_suggestion') || 'لا يوجد';
+      const suggestion =
+         interaction.fields.getTextInputValue('complaint_suggestion') || 'لا يوجد';
       const experience = interaction.fields.getTextInputValue('complaint_experience');
       const complaint = {
          userId,

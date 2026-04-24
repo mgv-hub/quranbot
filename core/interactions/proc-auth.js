@@ -17,7 +17,8 @@ function isPublicFeature(interaction) {
          customId === 'back_country_prayer' ||
          customId === 'cancel_prayer');
    const isPrayerMenu =
-      interaction.isStringSelectMenu() && (customId === 'select_country_prayer' || customId === 'select_city_prayer');
+      interaction.isStringSelectMenu() &&
+      (customId === 'select_country_prayer' || customId === 'select_city_prayer');
    const isMoreFeatures = customId === 'more_features' || customId === 'back_to_main';
    return isAzkar || isPrayer || isPrayerMenu || isMoreFeatures;
 }

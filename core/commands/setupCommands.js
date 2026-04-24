@@ -1,11 +1,19 @@
 require('pathlra-aliaser')();
 const fs = require('fs').promises;
 const pathlra = require('path');
-const { ChannelType, PermissionsBitField, OverwriteType, EmbedBuilder } = require('discord.js');
+const {
+   ChannelType,
+   PermissionsBitField,
+   OverwriteType,
+   EmbedBuilder,
+} = require('discord.js');
 const { getGuildState } = require('@GuildStateManager-core_state');
 const logger = require('@logger');
 const backupManager = require('@BackupManager-core_state').backupManager;
-const { loadSetupGuildsFromFirebase, saveSetupGuildsToFirebase } = require('@firebase-core_utils');
+const {
+   loadSetupGuildsFromFirebase,
+   saveSetupGuildsToFirebase,
+} = require('@firebase-core_utils');
 let startAzkarTimerForGuild;
 try {
    ({ startAzkarTimerForGuild } = require('@AzkarManager-core_state'));
@@ -79,11 +87,17 @@ async function setupQuranCategory(guild, interaction, options = {}) {
    if (global.setupGuilds && global.setupGuilds[guildId]) {
       isReSetup = true;
       oldSetup = global.setupGuilds[guildId];
-      const subChannelIds = [oldSetup.voiceChannelId, oldSetup.textChannelId, oldSetup.azkarChannelId];
+      const subChannelIds = [
+         oldSetup.voiceChannelId,
+         oldSetup.textChannelId,
+         oldSetup.azkarChannelId,
+      ];
       for (const chId of subChannelIds) {
          if (!chId) continue;
          try {
-            const channel = guild.channels.cache.get(chId) || (await guild.channels.fetch(chId).catch(() => null));
+            const channel =
+               guild.channels.cache.get(chId) ||
+               (await guild.channels.fetch(chId).catch(() => null));
             if (channel) {
                await channel.delete('Re-setup of Quran bot');
                await new Promise((resolve) => setTimeout(resolve, 800));
@@ -132,15 +146,22 @@ async function setupQuranCategory(guild, interaction, options = {}) {
                {
                   id: interaction.user.id,
                   type: OverwriteType.Member,
-                  allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels],
+                  allow: [
+                     PermissionsBitField.Flags.ViewChannel,
+                     PermissionsBitField.Flags.ManageChannels,
+                  ],
                },
             ],
-            reason: (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
+            reason:
+               (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
          });
       }
 
       let voiceChannel = guild.channels.cache.find(
-         (c) => c.name === '🕌︱بثّ القُرآن الكريم' && c.type === ChannelType.GuildVoice && c.parentId === category.id,
+         (c) =>
+            c.name === '🕌︱بثّ القُرآن الكريم' &&
+            c.type === ChannelType.GuildVoice &&
+            c.parentId === category.id,
       );
 
       if (!voiceChannel) {
@@ -153,7 +174,10 @@ async function setupQuranCategory(guild, interaction, options = {}) {
             permissionOverwrites: [
                {
                   id: guild.roles.everyone.id,
-                  allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
+                  allow: [
+                     PermissionsBitField.Flags.ViewChannel,
+                     PermissionsBitField.Flags.Connect,
+                  ],
                   deny: [
                      PermissionsBitField.Flags.Speak,
                      PermissionsBitField.Flags.Stream,
@@ -171,11 +195,15 @@ async function setupQuranCategory(guild, interaction, options = {}) {
                   ],
                },
             ],
-            reason: (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
+            reason:
+               (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
          });
       }
       let textChannel = guild.channels.cache.find(
-         (c) => c.name === '📖︱تحكم البوت القرآني' && c.type === ChannelType.GuildText && c.parentId === category.id,
+         (c) =>
+            c.name === '📖︱تحكم البوت القرآني' &&
+            c.type === ChannelType.GuildText &&
+            c.parentId === category.id,
       );
 
       if (!textChannel) {
@@ -187,8 +215,14 @@ async function setupQuranCategory(guild, interaction, options = {}) {
             permissionOverwrites: [
                {
                   id: guild.roles.everyone.id,
-                  allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
-                  deny: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.AddReactions],
+                  allow: [
+                     PermissionsBitField.Flags.ViewChannel,
+                     PermissionsBitField.Flags.ReadMessageHistory,
+                  ],
+                  deny: [
+                     PermissionsBitField.Flags.SendMessages,
+                     PermissionsBitField.Flags.AddReactions,
+                  ],
                },
                {
                   id: interaction.user.id,
@@ -202,11 +236,15 @@ async function setupQuranCategory(guild, interaction, options = {}) {
                   ],
                },
             ],
-            reason: (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
+            reason:
+               (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
          });
       }
       let azkarChannel = guild.channels.cache.find(
-         (c) => c.name === '🌙︱الأذكار' && c.type === ChannelType.GuildText && c.parentId === category.id,
+         (c) =>
+            c.name === '🌙︱الأذكار' &&
+            c.type === ChannelType.GuildText &&
+            c.parentId === category.id,
       );
       if (!azkarChannel) {
          azkarChannel = await guild.channels.create({
@@ -217,8 +255,14 @@ async function setupQuranCategory(guild, interaction, options = {}) {
             permissionOverwrites: [
                {
                   id: guild.roles.everyone.id,
-                  allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
-                  deny: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.AddReactions],
+                  allow: [
+                     PermissionsBitField.Flags.ViewChannel,
+                     PermissionsBitField.Flags.ReadMessageHistory,
+                  ],
+                  deny: [
+                     PermissionsBitField.Flags.SendMessages,
+                     PermissionsBitField.Flags.AddReactions,
+                  ],
                },
                {
                   id: interaction.user.id,
@@ -232,7 +276,8 @@ async function setupQuranCategory(guild, interaction, options = {}) {
                   ],
                },
             ],
-            reason: (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
+            reason:
+               (isReSetup ? 'Re-setup' : 'Setup') + ' Quran bot by ' + interaction.user.tag,
          });
       }
       state.azkarChannelId = azkarChannel.id;
@@ -302,7 +347,9 @@ async function autoSetupAllGuilds(client) {
                channel: await guild.channels.fetch(setupData.textChannelId).catch(() => null),
             };
             if (!fakeInteraction.channel) {
-               fakeInteraction.channel = guild.channels.cache.find((c) => c.type === ChannelType.GuildText);
+               fakeInteraction.channel = guild.channels.cache.find(
+                  (c) => c.type === ChannelType.GuildText,
+               );
             }
             if (!fakeInteraction.channel) {
                logger.warn('No text channel found for guild ' + guildId);

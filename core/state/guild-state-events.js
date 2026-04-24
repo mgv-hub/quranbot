@@ -33,9 +33,22 @@ function setupPlayerEvents(guildId, player) {
             state.playbackStartTime = Date.now();
 
             try {
-               resource = await global.createSurahResource(state, state.currentSurah - 1, 0, 0, false);
+               resource = await global.createSurahResource(
+                  state,
+                  state.currentSurah - 1,
+                  0,
+                  0,
+                  false,
+               );
             } catch (surahError) {
-               logger.warn('Guild ' + guildId + ' Surah ' + state.currentSurah + ' Failed: ' + surahError.message);
+               logger.warn(
+                  'Guild ' +
+                     guildId +
+                     ' Surah ' +
+                     state.currentSurah +
+                     ' Failed: ' +
+                     surahError.message,
+               );
                const workingReciter = findWorkingReciter(state.currentReciter);
                if (workingReciter) {
                   state.currentReciter = workingReciter;
@@ -43,19 +56,36 @@ function setupPlayerEvents(guildId, player) {
                   state.playedOffset = 0;
                   state.playbackStartTime = Date.now();
                   logger.info(
-                     'Guild ' + guildId + ' Reciter ' + state.currentReciter + ' Failed Switched To ' + workingReciter,
+                     'Guild ' +
+                        guildId +
+                        ' Reciter ' +
+                        state.currentReciter +
+                        ' Failed Switched To ' +
+                        workingReciter,
                   );
                   try {
                      resource = await global.createSurahResource(state, 0, 0, 0, true);
                   } catch (e) {
-                     const alternativeIndex = findAvailableSurahForReciter(state, state.currentSurah - 1);
+                     const alternativeIndex = findAvailableSurahForReciter(
+                        state,
+                        state.currentSurah - 1,
+                     );
                      if (alternativeIndex !== -1) {
                         state.currentSurah = alternativeIndex + 1;
-                        resource = await global.createSurahResource(state, alternativeIndex, 0, 0, true);
+                        resource = await global.createSurahResource(
+                           state,
+                           alternativeIndex,
+                           0,
+                           0,
+                           true,
+                        );
                      }
                   }
                } else {
-                  const alternativeIndex = findAvailableSurahForReciter(state, state.currentSurah - 1);
+                  const alternativeIndex = findAvailableSurahForReciter(
+                     state,
+                     state.currentSurah - 1,
+                  );
                   if (alternativeIndex !== -1) {
                      state.currentSurah = alternativeIndex + 1;
                      logger.info(
@@ -66,7 +96,13 @@ function setupPlayerEvents(guildId, player) {
                            ' Failed Switched To Surah ' +
                            state.currentSurah,
                      );
-                     resource = await global.createSurahResource(state, alternativeIndex, 0, 0, true);
+                     resource = await global.createSurahResource(
+                        state,
+                        alternativeIndex,
+                        0,
+                        0,
+                        true,
+                     );
                   }
                }
             }
@@ -74,7 +110,8 @@ function setupPlayerEvents(guildId, player) {
             state.playedOffset = 0;
             state.playbackStartTime = Date.now();
             const activeUrl =
-               global.radioHealthChecker?.getActiveRadioUrl(state.currentRadioUrl) || state.currentRadioUrl;
+               global.radioHealthChecker?.getActiveRadioUrl(state.currentRadioUrl) ||
+               state.currentRadioUrl;
             state.currentRadioUrl = activeUrl;
             resource = await global.createRadioResource(activeUrl, 0);
          }
@@ -92,7 +129,10 @@ function setupPlayerEvents(guildId, player) {
          }
       } catch (error) {
          state.errorCount++;
-         logger.error('Auto Resume Failed For Guild ' + guildId + ' Attempt ' + state.errorCount, error);
+         logger.error(
+            'Auto Resume Failed For Guild ' + guildId + ' Attempt ' + state.errorCount,
+            error,
+         );
          if (state.errorCount >= MAX_ERROR_COUNT) {
             state.isPaused = true;
             state.pauseReason = 'auto_resume_failed';
@@ -123,7 +163,13 @@ function setupPlayerEvents(guildId, player) {
                   state.connection.subscribe(state.player);
                   state.player.stop();
                   if (state.playbackMode === 'surah') {
-                     const resource = await global.createSurahResource(state, state.currentSurah - 1, 0, 0, true);
+                     const resource = await global.createSurahResource(
+                        state,
+                        state.currentSurah - 1,
+                        0,
+                        0,
+                        true,
+                     );
                      state.player.play(resource);
                      state.isPaused = false;
                      state.pauseReason = null;

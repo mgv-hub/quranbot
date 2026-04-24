@@ -102,7 +102,9 @@ function findWorkingReciter(excludeReciter = null) {
       if (!reciterData || !reciterData.links) {
          continue;
       }
-      const validLinks = reciterData.links.filter((link) => link && link.trim() !== '' && link.startsWith('http'));
+      const validLinks = reciterData.links.filter(
+         (link) => link && link.trim() !== '' && link.startsWith('http'),
+      );
       if (validLinks.length > 0) {
          availableReciters.push(key);
       }

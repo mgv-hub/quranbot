@@ -1,30 +1,43 @@
 require('pathlra-aliaser')();
-const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, set, get, push, serverTimestamp, remove, update } = require('firebase/database');
+const admin = require('firebase-admin');
 const logger = require('@logger');
 require('../package/Envira/src/lib/main');
-const firebaseConfig = {
-   apiKey: process.env.FIREBASE_API_KEY,
-   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+
+const firebaseAdminConfig = {
+   type: process.env.FIREBASE_ADMIN_TYPE,
+   project_id: process.env.FIREBASE_ADMIN_PROJECT_ID,
+   private_key_id: process.env.FIREBASE_ADMIN_PRIVATE_KEY_ID,
    databaseURL: process.env.FIREBASE_DATABASE_URL,
-   projectId: process.env.FIREBASE_PROJECT_ID,
-   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-   appId: process.env.FIREBASE_APP_ID,
-   measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+   private_key: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+   client_id: process.env.FIREBASE_ADMIN_CLIENT_ID,
+   client_email: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+   auth_uri: process.env.FIREBASE_ADMIN_AUTH_URI,
+   token_uri: process.env.FIREBASE_ADMIN_TOKEN_URI,
+   auth_provider_x509_cert_url: process.env.FIREBASE_ADMIN_AUTH_PROVIDER_X509_CERT_URL,
+   client_x509_cert_url: process.env.FIREBASE_ADMIN_CLIENT_X509_CERT_URL,
 };
+
 let db = null;
 let isFirebaseReady = false;
 let connectionAttempts = 0;
 const MAX_CONNECTION_ATTEMPTS = 5;
+
 function isPlainObject(obj) {
    return (
-      obj !== null && typeof obj === 'object' && !Array.isArray(obj) && Object.getPrototypeOf(obj) === Object.prototype
+      obj !== null &&
+      typeof obj === 'object' &&
+      !Array.isArray(obj) &&
+      Object.getPrototypeOf(obj) === Object.prototype
    );
 }
+
 function deepCloneForFirebase(obj) {
-   if (obj === null || typeof obj !== 'object') return obj;
-   if (Array.isArray(obj)) return obj.map((item) => deepCloneForFirebase(item));
+   if (obj === null || typeof obj !== 'object') {
+      return obj;
+   }
+   if (Array.isArray(obj)) {
+      return obj.map((item) => deepCloneForFirebase(item));
+   }
    if (isPlainObject(obj)) {
       const cloned = {};
       for (const [key, value] of Object.entries(obj)) {
@@ -36,18 +49,31 @@ function deepCloneForFirebase(obj) {
    }
    return String(obj);
 }
+
 async function initializeFirebase() {
-   if (isFirebaseReady && db) return true;
+   if (isFirebaseReady && db) {
+      return true;
+   }
    try {
-      const app = initializeApp(firebaseConfig);
-      db = getDatabase(app);
+      if (!admin.apps.length) {
+         admin.initializeApp({
+            credential: admin.credential.cert(firebaseAdminConfig),
+            databaseURL: firebaseAdminConfig.databaseURL,
+         });
+      }
+      db = admin.database();
       isFirebaseReady = true;
-      logger.info('Firebase Realtime Database Initialized Successfully');
-      logger.info('Connected To ' + firebaseConfig.databaseURL);
+      logger.info('Firebase Admin Realtime Database Initialized Successfully');
+      logger.info('Connected To ' + firebaseAdminConfig.databaseURL);
       return true;
    } catch (error) {
       connectionAttempts++;
-      logger.error('Firebase Initialization Failed Attempt ' + connectionAttempts + '/' + MAX_CONNECTION_ATTEMPTS);
+      logger.error(
+         'Firebase Admin Initialization Failed Attempt ' +
+            connectionAttempts +
+            '/' +
+            MAX_CONNECTION_ATTEMPTS,
+      );
       if (connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
          await new Promise((resolve) => setTimeout(resolve, 2000 * connectionAttempts));
          return await initializeFirebase();
@@ -55,20 +81,22 @@ async function initializeFirebase() {
       return false;
    }
 }
+
 initializeFirebase();
+
 async function saveComplaintToFirebase(complaint) {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Complaint Not Saved');
       return false;
    }
    try {
-      const newComplaintRef = push(ref(db, 'complaints'));
+      const newComplaintRef = db.ref('complaints').push();
       const cleanComplaint = deepCloneForFirebase({
          ...complaint,
          complaintId: newComplaintRef.key,
-         submittedAt: serverTimestamp(),
+         submittedAt: admin.database.ServerValue.TIMESTAMP,
       });
-      await set(newComplaintRef, cleanComplaint);
+      await newComplaintRef.set(cleanComplaint);
       logger.info('Complaint Saved To Firebase With ID ' + newComplaintRef.key);
       return true;
    } catch (error) {
@@ -76,33 +104,39 @@ async function saveComplaintToFirebase(complaint) {
       return false;
    }
 }
+
 async function loadUserCooldownFromFirebase(userId) {
    if (!isFirebaseReady || !db) return null;
    try {
-      const snapshot = await get(ref(db, 'complaint_cooldowns/' + userId));
+      const snapshot = await db.ref('complaint_cooldowns/' + userId).once('value');
       return snapshot.val();
    } catch (error) {
       logger.warn('Firebase Cooldown Read Failed');
       return null;
    }
 }
+
 async function saveUserCooldownToFirebase(userId, timestamp) {
    if (!isFirebaseReady || !db) return false;
    try {
-      await set(ref(db, 'complaint_cooldowns/' + userId), { lastSubmission: timestamp, cooldownHours: 24 });
+      await db.ref('complaint_cooldowns/' + userId).set({
+         lastSubmission: timestamp,
+         cooldownHours: 24,
+      });
       return true;
    } catch (error) {
       logger.warn('Firebase Cooldown Save Failed');
       return false;
    }
 }
+
 async function loadSetupGuildsFromFirebase() {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Returning Empty Setup Guilds');
       return {};
    }
    try {
-      const snapshot = await get(ref(db, 'setup_guilds'));
+      const snapshot = await db.ref('setup_guilds').once('value');
       const data = snapshot.val();
       if (data) {
          logger.info('Loaded ' + Object.keys(data).length + ' Setup Guilds From Firebase');
@@ -115,6 +149,7 @@ async function loadSetupGuildsFromFirebase() {
       return {};
    }
 }
+
 async function saveSetupGuildsToFirebase(data) {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Setup Guilds Not Saved');
@@ -124,12 +159,16 @@ async function saveSetupGuildsToFirebase(data) {
       const currentData = await loadSetupGuildsFromFirebase();
       const cleanData = deepCloneForFirebase({ ...currentData });
       for (const [guildId, state] of Object.entries(data)) {
-         if (!cleanData[guildId]) cleanData[guildId] = {};
+         if (!cleanData[guildId]) {
+            cleanData[guildId] = {};
+         }
          for (const [key, value] of Object.entries(state)) {
-            if (value !== undefined && value !== null) cleanData[guildId][key] = deepCloneForFirebase(value);
+            if (value !== undefined && value !== null) {
+               cleanData[guildId][key] = deepCloneForFirebase(value);
+            }
          }
       }
-      await set(ref(db, 'setup_guilds'), cleanData);
+      await db.ref('setup_guilds').set(cleanData);
       logger.info('Saved ' + Object.keys(data).length + ' Setup Guilds To Firebase');
       return true;
    } catch (error) {
@@ -137,15 +176,18 @@ async function saveSetupGuildsToFirebase(data) {
       return false;
    }
 }
+
 async function loadControlIdsFromFirebase() {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Returning Empty Control Ids');
       return {};
    }
    try {
-      const snapshot = await get(ref(db, 'control_ids'));
+      const snapshot = await db.ref('control_ids').once('value');
       const data = snapshot.val();
-      if (data) return data;
+      if (data) {
+         return data;
+      }
       logger.info('No Control Ids Found In Firebase');
       return {};
    } catch (error) {
@@ -153,6 +195,7 @@ async function loadControlIdsFromFirebase() {
       return {};
    }
 }
+
 async function saveControlIdsToFirebase(data) {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Control Ids Not Saved');
@@ -160,20 +203,21 @@ async function saveControlIdsToFirebase(data) {
    }
    try {
       const cleanData = deepCloneForFirebase(data);
-      await set(ref(db, 'control_ids'), cleanData);
+      await db.ref('control_ids').set(cleanData);
       return true;
    } catch (error) {
       logger.error('Error Saving Control Ids To Firebase');
       return false;
    }
 }
+
 async function loadCachedDataFromFirebase() {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Returning Empty Cached Data');
       return {};
    }
    try {
-      const snapshot = await get(ref(db, 'cached_data'));
+      const snapshot = await db.ref('cached_data').once('value');
       const data = snapshot.val();
       if (data) {
          logger.info('Cached Data Loaded From Firebase');
@@ -186,6 +230,7 @@ async function loadCachedDataFromFirebase() {
       return {};
    }
 }
+
 async function saveCachedDataToFirebase(data) {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Cached Data Not Saved');
@@ -193,7 +238,7 @@ async function saveCachedDataToFirebase(data) {
    }
    try {
       const cleanData = deepCloneForFirebase(data);
-      await set(ref(db, 'cached_data'), cleanData);
+      await db.ref('cached_data').set(cleanData);
       logger.info('Cached Data Saved To Firebase');
       return true;
    } catch (error) {
@@ -201,13 +246,14 @@ async function saveCachedDataToFirebase(data) {
       return false;
    }
 }
+
 async function loadGuildStatesFromFirebase() {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Returning Empty Guild States');
       return {};
    }
    try {
-      const snapshot = await get(ref(db, 'guild_states'));
+      const snapshot = await db.ref('guild_states').once('value');
       const data = snapshot.val();
       if (data) {
          logger.info('Loaded ' + Object.keys(data).length + ' Guild States From Firebase');
@@ -220,6 +266,7 @@ async function loadGuildStatesFromFirebase() {
       return {};
    }
 }
+
 async function saveGuildStatesToFirebase(data) {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Guild States Not Saved');
@@ -229,13 +276,17 @@ async function saveGuildStatesToFirebase(data) {
       const currentData = await loadGuildStatesFromFirebase();
       const cleanData = deepCloneForFirebase({ ...currentData });
       for (const [guildId, state] of Object.entries(data)) {
-         if (!cleanData[guildId]) cleanData[guildId] = {};
+         if (!cleanData[guildId]) {
+            cleanData[guildId] = {};
+         }
          for (const [key, value] of Object.entries(state)) {
-            if (value !== undefined && value !== null) cleanData[guildId][key] = deepCloneForFirebase(value);
+            if (value !== undefined && value !== null) {
+               cleanData[guildId][key] = deepCloneForFirebase(value);
+            }
          }
       }
       const firebaseReadyData = deepCloneForFirebase(cleanData);
-      await set(ref(db, 'guild_states'), firebaseReadyData);
+      await db.ref('guild_states').set(firebaseReadyData);
       logger.info('Saved ' + Object.keys(data).length + ' Guild States To Firebase');
       return true;
    } catch (error) {
@@ -243,13 +294,14 @@ async function saveGuildStatesToFirebase(data) {
       return false;
    }
 }
+
 async function loadTrackedGuildsFromFirebase() {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Returning Empty Tracked Guilds');
       return [];
    }
    try {
-      const snapshot = await get(ref(db, 'tracked_guilds'));
+      const snapshot = await db.ref('tracked_guilds').once('value');
       const data = snapshot.val();
       if (data && Array.isArray(data)) {
          logger.info('Tracked Guilds Loaded From Firebase ' + data.length + ' Guilds');
@@ -262,6 +314,7 @@ async function loadTrackedGuildsFromFirebase() {
       return [];
    }
 }
+
 async function saveTrackedGuildsToFirebase(data) {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Tracked Guilds Not Saved');
@@ -269,14 +322,19 @@ async function saveTrackedGuildsToFirebase(data) {
    }
    try {
       const cleanData = deepCloneForFirebase(Array.isArray(data) ? data : []);
-      await set(ref(db, 'tracked_guilds'), cleanData);
-      logger.info('Tracked Guilds Saved To Firebase ' + (Array.isArray(data) ? data.length : 0) + ' Guilds');
+      await db.ref('tracked_guilds').set(cleanData);
+      logger.info(
+         'Tracked Guilds Saved To Firebase ' +
+            (Array.isArray(data) ? data.length : 0) +
+            ' Guilds',
+      );
       return true;
    } catch (error) {
       logger.error('Error Saving Tracked Guilds To Firebase');
       return false;
    }
 }
+
 async function saveDhikrMessageId(guildId, channelId, messageId) {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Dhikr Message Id Not Saved');
@@ -284,11 +342,15 @@ async function saveDhikrMessageId(guildId, channelId, messageId) {
    }
    try {
       const currentData = await loadControlIdsFromFirebase();
-      if (!currentData[guildId]) currentData[guildId] = {};
-      if (!currentData[guildId][channelId]) currentData[guildId][channelId] = [];
+      if (!currentData[guildId]) {
+         currentData[guildId] = {};
+      }
+      if (!currentData[guildId][channelId]) {
+         currentData[guildId][channelId] = [];
+      }
       currentData[guildId][channelId].push(messageId);
       const cleanData = deepCloneForFirebase(currentData);
-      await set(ref(db, 'control_ids'), cleanData);
+      await db.ref('control_ids').set(cleanData);
       logger.info('Saved Dhikr Message Id For Guild ' + guildId);
       return true;
    } catch (error) {
@@ -296,10 +358,14 @@ async function saveDhikrMessageId(guildId, channelId, messageId) {
       return false;
    }
 }
+
 async function clearGuildData(guildId) {
-   logger.warn('Clear Guild Data Called For ' + guildId + ' Operation Blocked To Preserve Data');
+   logger.warn(
+      'Clear Guild Data Called For ' + guildId + ' Operation Blocked To Preserve Data',
+   );
    return false;
 }
+
 async function backupAllData() {
    if (!isFirebaseReady || !db) {
       logger.warn('Firebase Not Available Cannot Backup Data');
@@ -309,10 +375,17 @@ async function backupAllData() {
       const setupGuilds = await loadSetupGuildsFromFirebase();
       const guildStates = await loadGuildStatesFromFirebase();
       const controlIds = await loadControlIdsFromFirebase();
-      const dhikrData = await get(ref(db, 'dhikr_data')).then((s) => s.val());
-      const backupData = { setupGuilds, guildStates, controlIds, dhikrData, timestamp: Date.now() };
+      const dhikrSnapshot = await db.ref('dhikr_data').once('value');
+      const dhikrData = dhikrSnapshot.val();
+      const backupData = {
+         setupGuilds: setupGuilds,
+         guildStates: guildStates,
+         controlIds: controlIds,
+         dhikrData: dhikrData,
+         timestamp: Date.now(),
+      };
       const firebaseReadyData = deepCloneForFirebase(backupData);
-      await set(ref(db, 'backup/last'), firebaseReadyData);
+      await db.ref('backup/last').set(firebaseReadyData);
       logger.info('Full Backup Created Successfully');
       return true;
    } catch (error) {
@@ -320,40 +393,7 @@ async function backupAllData() {
       return false;
    }
 }
-async function loadLogChannelsFromFirebase() {
-   if (!isFirebaseReady || !db) {
-      logger.warn('Firebase Not Available Returning Empty Log Channels');
-      return {};
-   }
-   try {
-      const snapshot = await get(ref(db, 'log_channels'));
-      const data = snapshot.val();
-      if (data) {
-         logger.info('Loaded ' + Object.keys(data).length + ' Log Channels From Firebase');
-         return data;
-      }
-      logger.info('No Log Channels Found In Firebase');
-      return {};
-   } catch (error) {
-      logger.error('Error Loading Log Channels From Firebase');
-      return {};
-   }
-}
-async function saveLogChannelsToFirebase(data) {
-   if (!isFirebaseReady || !db) {
-      logger.warn('Firebase Not Available Log Channels Not Saved');
-      return false;
-   }
-   try {
-      const cleanData = deepCloneForFirebase(data);
-      await set(ref(db, 'log_channels'), cleanData);
-      logger.info('Saved ' + Object.keys(data).length + ' Log Channels To Firebase');
-      return true;
-   } catch (error) {
-      logger.error('Error Saving Log Channels To Firebase');
-      return false;
-   }
-}
+
 module.exports.db = db;
 module.exports.isFirebaseReady = isFirebaseReady;
 module.exports.saveComplaintToFirebase = saveComplaintToFirebase;
@@ -372,7 +412,5 @@ module.exports.saveTrackedGuildsToFirebase = saveTrackedGuildsToFirebase;
 module.exports.saveDhikrMessageId = saveDhikrMessageId;
 module.exports.clearGuildData = clearGuildData;
 module.exports.backupAllData = backupAllData;
-module.exports.firebaseConfig = firebaseConfig;
+module.exports.firebaseAdminConfig = firebaseAdminConfig;
 module.exports.initializeFirebase = initializeFirebase;
-module.exports.loadLogChannelsFromFirebase = loadLogChannelsFromFirebase;
-module.exports.saveLogChannelsToFirebase = saveLogChannelsToFirebase;

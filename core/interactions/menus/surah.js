@@ -1,8 +1,17 @@
 require('pathlra-aliaser')();
 const { getGuildState, isAuthorized } = require('@GuildStateManager-core_state');
-const { createSurahResource, isSurahAvailable, getAvailableSurahCount } = require('@audioUtils-core_utils');
+const {
+   createSurahResource,
+   isSurahAvailable,
+   getAvailableSurahCount,
+} = require('@audioUtils-core_utils');
 const { createControlEmbed } = require('@controlPanel-core_ui');
-const { createReciterRow, createSelectRow, createButtonRow, createNavigationRow } = require('@components-core_ui');
+const {
+   createReciterRow,
+   createSelectRow,
+   createButtonRow,
+   createNavigationRow,
+} = require('@components-core_ui');
 const { updateControlMessage, saveControlId } = require('@interaction-core_utils');
 const logger = require('@logger');
 const persistentStateManager = require('@PersistentStateManager-core_state');
@@ -74,7 +83,10 @@ module.exports = {
                   pauseReason: null,
                });
             } catch (error) {
-               logger.error('Error Playing Surah ' + selectedValue + ' In Guild ' + guildId, error);
+               logger.error(
+                  'Error Playing Surah ' + selectedValue + ' In Guild ' + guildId,
+                  error,
+               );
                return interaction.editReply({
                   content: 'حدث خطأ أثناء تشغيل السورة ' + error.message,
                   flags: 64,

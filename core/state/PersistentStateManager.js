@@ -4,7 +4,12 @@ const backupManager = require('@BackupManager-core_state').backupManager;
 const { loadGuildStatesFromFirebase } = require('@firebase-core_utils');
 const { isPlainObject } = require('@persist-utils-core_state');
 const { createDefaultState, cleanState } = require('@persist-defaults-core_state');
-const { saveGuildState, saveAllStates, scheduleSave, clearSaveTimeout } = require('@persist-storage-core_state');
+const {
+   saveGuildState,
+   saveAllStates,
+   scheduleSave,
+   clearSaveTimeout,
+} = require('@persist-storage-core_state');
 const {
    shouldRestore,
    restoreGuildState,
@@ -31,7 +36,11 @@ class PersistentStateManager {
             }
          }
          this.isInitialized = true;
-         logger.info('Persistent State Manager Initialized With ' + this.guildStates.size + ' Guild States');
+         logger.info(
+            'Persistent State Manager Initialized With ' +
+               this.guildStates.size +
+               ' Guild States',
+         );
       } catch (error) {
          logger.error('Failed To Initialize Persistent State Manager', error);
          this.isInitialized = true;
@@ -56,7 +65,9 @@ class PersistentStateManager {
    }
 
    async saveGuildState(guildId) {
-      await saveGuildState(guildId, this.guildStates, (state) => cleanState(state, createDefaultState));
+      await saveGuildState(guildId, this.guildStates, (state) =>
+         cleanState(state, createDefaultState),
+      );
    }
 
    async saveAllStates() {

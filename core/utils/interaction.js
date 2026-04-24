@@ -37,7 +37,9 @@ async function updateControlMessage(interaction, embed, components) {
       }
       try {
          if (interaction.channel && interaction.message) {
-            const message = await interaction.channel.messages.fetch(interaction.message.id).catch(() => null);
+            const message = await interaction.channel.messages
+               .fetch(interaction.message.id)
+               .catch(() => null);
             if (message) {
                const updatedMessage = await message
                   .edit({

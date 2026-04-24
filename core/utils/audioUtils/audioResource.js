@@ -141,7 +141,8 @@ async function getAudioDuration(url, headResponse = null) {
       const contentLength = response.headers.get('content-length');
       if (contentLength) {
          const DEFAULT_BITRATE_KBPS = 128;
-         const estimatedDuration = ((parseInt(contentLength, 10) * 8) / (DEFAULT_BITRATE_KBPS * 1024)) * 1000;
+         const estimatedDuration =
+            ((parseInt(contentLength, 10) * 8) / (DEFAULT_BITRATE_KBPS * 1024)) * 1000;
          if (estimatedDuration > 0 && estimatedDuration < 7200000) {
             if (global.durationCache) {
                global.durationCache.set(cacheKey, estimatedDuration);

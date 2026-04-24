@@ -28,7 +28,9 @@ module.exports = {
          const guild = client.guilds.cache.get(guildIdOrChannelId);
          if (guild) {
             targetGuild = guild;
-            const textChannel = guild.channels.cache.find((c) => c.name.includes('تحكم') && c.isTextBased());
+            const textChannel = guild.channels.cache.find(
+               (c) => c.name.includes('تحكم') && c.isTextBased(),
+            );
             if (textChannel) {
                targetChannel = textChannel;
             } else {

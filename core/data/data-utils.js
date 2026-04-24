@@ -3,7 +3,8 @@ require('pathlra-aliaser')();
 function isValidCacheData(data) {
    if (!data || typeof data !== 'object') return false;
    if (!data.surah || !data.surah.suwar || data.surah.suwar.length === 0) return false;
-   if (!data.reciters || !data.reciters.reciters || data.reciters.reciters.length === 0) return false;
+   if (!data.reciters || !data.reciters.reciters || data.reciters.reciters.length === 0)
+      return false;
    return true;
 }
 

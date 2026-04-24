@@ -129,7 +129,9 @@ setInterval(() => {
    const memoryUsage = process.memoryUsage();
    const mbUsed = memoryUsage.heapUsed / 1024 / 1024;
    const mbRss = memoryUsage.rss / 1024 / 1024;
-   logger.info('Memory Check RSS ' + mbRss.toFixed(2) + ' MB Heap ' + mbUsed.toFixed(2) + ' MB');
+   logger.info(
+      'Memory Check RSS ' + mbRss.toFixed(2) + ' MB Heap ' + mbUsed.toFixed(2) + ' MB',
+   );
    if (mbUsed > 2000) {
       logger.warn('Critical Memory Usage Triggering GC');
       if (global.gc) {

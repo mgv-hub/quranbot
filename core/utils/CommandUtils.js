@@ -1,5 +1,11 @@
 require('pathlra-aliaser')();
-const { ChannelType, PermissionsBitField, SlashCommandBuilder, Routes, REST } = require('discord.js');
+const {
+   ChannelType,
+   PermissionsBitField,
+   SlashCommandBuilder,
+   Routes,
+   REST,
+} = require('discord.js');
 const logger = require('@logger');
 async function registerCommands() {
    const commands = [
@@ -26,7 +32,10 @@ async function registerCommands() {
          .setName('خروج')
          .setDescription('الخروج من الروم الصوتي')
          .setDefaultMemberPermissions('8'),
-      new SlashCommandBuilder().setName('تحكم').setDescription('لوحة التحكم للقرآن').setDefaultMemberPermissions('0'),
+      new SlashCommandBuilder()
+         .setName('تحكم')
+         .setDescription('لوحة التحكم للقرآن')
+         .setDefaultMemberPermissions('0'),
       new SlashCommandBuilder()
          .setName('إعداد')
          .setDescription('إعداد فئة القرآن مع القنوات للإداريين فقط')
@@ -57,7 +66,9 @@ async function registerCommands() {
 async function applyCommandPermissions(guild) {
    const rest = new REST({ version: '10' }).setToken(global.token);
    try {
-      const guildCommands = await rest.get(Routes.applicationGuildCommands(global.clientId, guild.id));
+      const guildCommands = await rest.get(
+         Routes.applicationGuildCommands(global.clientId, guild.id),
+      );
       const restrictedNames = ['دخول', 'دخول_قناة', 'خروج', 'إعداد', 'مواقيت_الصلاة'];
       for (const cmd of guildCommands) {
          if (restrictedNames.includes(cmd.name)) {
@@ -72,7 +83,9 @@ async function applyCommandPermissions(guild) {
             let permId = guild.roles.cache.find((role) => role.name === 'Quran Admin')?.id;
             let permType = 1;
             if (!permId) {
-               permId = guild.members.cache.find((m) => m.permissions.has(PermissionsBitField.Flags.Administrator))?.id;
+               permId = guild.members.cache.find((m) =>
+                  m.permissions.has(PermissionsBitField.Flags.Administrator),
+               )?.id;
                permType = 2;
             }
             if (permId) {

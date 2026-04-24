@@ -27,7 +27,11 @@ async function loadRemoteAzkarData() {
       logger.info('Total adhkar entries: ' + totalAdhkar);
       return data;
    } catch (error) {
-      logger.warn('Failed to load remote adhkar data from adhkar.json ' + error.message + ' using fallback data');
+      logger.warn(
+         'Failed to load remote adhkar data from adhkar.json ' +
+            error.message +
+            ' using fallback data',
+      );
       return [
          {
             id: 1,

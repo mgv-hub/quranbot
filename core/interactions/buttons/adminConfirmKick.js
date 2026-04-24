@@ -39,7 +39,9 @@ module.exports = {
          const { persistentStateManager } = require('@loader-core_bootstrap');
          persistentStateManager.clearGuildState(guildId);
 
-         logger.info(`Admin ${interaction.user.tag} kicked bot from guild ${guild.name} (${guildId})`);
+         logger.info(
+            `Admin ${interaction.user.tag} kicked bot from guild ${guild.name} (${guildId})`,
+         );
 
          const successEmbed = new EmbedBuilder()
             .setColor(0x1e1f22)

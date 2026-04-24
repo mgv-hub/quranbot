@@ -1,8 +1,17 @@
 require('pathlra-aliaser')();
 const { getGuildState, isAuthorized } = require('@GuildStateManager-core_state');
-const { createSurahResource, getCurrentLinks, findAvailableSurahForReciter } = require('@audioUtils-core_utils');
+const {
+   createSurahResource,
+   getCurrentLinks,
+   findAvailableSurahForReciter,
+} = require('@audioUtils-core_utils');
 const { createControlEmbed } = require('@embeds-core_ui');
-const { createReciterRow, createSelectRow, createButtonRow, createNavigationRow } = require('@components-core_ui');
+const {
+   createReciterRow,
+   createSelectRow,
+   createButtonRow,
+   createNavigationRow,
+} = require('@components-core_ui');
 const { updateControlMessage, saveControlId } = require('@interaction-core_utils');
 const logger = require('@logger'); // 7
 const { MessageFlags } = require('discord.js');
@@ -10,13 +19,17 @@ const persistentStateManager = require('@PersistentStateManager-core_state');
 function getAvailableSurahCount(reciterKey) {
    const reciterData = global.reciters[reciterKey];
    if (!reciterData || !reciterData.links) return 114;
-   const validLinks = reciterData.links.filter((link) => link && link.trim() !== '' && link.startsWith('http'));
+   const validLinks = reciterData.links.filter(
+      (link) => link && link.trim() !== '' && link.startsWith('http'),
+   );
    return validLinks.length > 0 ? validLinks.length : 114;
 }
 function reciterHasValidLinks(reciterKey) {
    const reciterData = global.reciters[reciterKey];
    if (!reciterData || !reciterData.links) return false;
-   const validLinks = reciterData.links.filter((link) => link && link.trim() !== '' && link.startsWith('http'));
+   const validLinks = reciterData.links.filter(
+      (link) => link && link.trim() !== '' && link.startsWith('http'),
+   );
    return validLinks.length > 0;
 }
 module.exports = {
@@ -51,7 +64,9 @@ module.exports = {
          if (!reciterHasValidLinks(selectedReciter)) {
             return interaction.editReply({
                content:
-                  '**القارئ المحدد غير متاح**\n' + 'هذا القارئ لا يملك أي روابط صالحة\n' + '**الحل** اختر قارئ آخر',
+                  '**القارئ المحدد غير متاح**\n' +
+                  'هذا القارئ لا يملك أي روابط صالحة\n' +
+                  '**الحل** اختر قارئ آخر',
                flags: 64,
             });
          }
@@ -71,7 +86,13 @@ module.exports = {
                   state.player.stop();
                }
                try {
-                  const resource = await createSurahResource(state, state.currentSurah - 1, 0, 0, false);
+                  const resource = await createSurahResource(
+                     state,
+                     state.currentSurah - 1,
+                     0,
+                     0,
+                     false,
+                  );
                   state.player.play(resource);
                   state.isPaused = false;
                   state.pauseReason = null;
@@ -102,7 +123,10 @@ module.exports = {
                   await saveControlId(guildId, interaction.channelId, interaction.message.id);
                   return;
                } catch (error) {
-                  logger.error('Error Playing Surah With New Reciter In Guild ' + guildId, error);
+                  logger.error(
+                     'Error Playing Surah With New Reciter In Guild ' + guildId,
+                     error,
+                  );
                   const reciterData = global.reciters[finalReciter];
                   const reciterName = reciterData?.name || finalReciter;
                   return interaction.editReply({

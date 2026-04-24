@@ -7,7 +7,9 @@ const { PLAYER_CONFIG } = require('@sys-config-core_interactions_buttons');
 
 async function ensurePlaybackStarted(state, guildId) {
    try {
-      await new Promise((resolve) => setTimeout(resolve, PLAYER_CONFIG.PLAYBACK_START_DELAY_MS));
+      await new Promise((resolve) =>
+         setTimeout(resolve, PLAYER_CONFIG.PLAYBACK_START_DELAY_MS),
+      );
 
       if (!state.connection || state.connection.destroyed) {
          logger.warn('Guild ' + guildId + ' Connection Lost During Playback Start');
@@ -21,7 +23,13 @@ async function ensurePlaybackStarted(state, guildId) {
          logger.info('Guild ' + guildId + ' Player Idle After Join Starting Playback');
 
          if (state.playbackMode === 'surah') {
-            const resource = await createSurahResource(state, state.currentSurah - 1, 0, 0, false);
+            const resource = await createSurahResource(
+               state,
+               state.currentSurah - 1,
+               0,
+               0,
+               false,
+            );
             state.player.play(resource);
             state.isPaused = false;
             state.pauseReason = null;
@@ -47,7 +55,13 @@ async function ensurePlaybackStarted(state, guildId) {
 async function startPlayback(state, guildId) {
    try {
       if (state.playbackMode === 'surah') {
-         const resource = await createSurahResource(state, state.currentSurah - 1, 0, 0, false);
+         const resource = await createSurahResource(
+            state,
+            state.currentSurah - 1,
+            0,
+            0,
+            false,
+         );
          state.player.play(resource);
       } else if (state.currentRadioUrl) {
          const { createRadioResource } = require('@audioUtils-core_utils');

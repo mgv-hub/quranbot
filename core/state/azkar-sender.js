@@ -36,7 +36,9 @@ async function sendWithRetry(channel, content, maxRetries, guildId, channelId) {
             continue;
          }
          if (attempt < maxRetries) {
-            await new Promise((resolve) => setTimeout(resolve, AZKAR_RETRY_DELAY_MS * attempt));
+            await new Promise((resolve) =>
+               setTimeout(resolve, AZKAR_RETRY_DELAY_MS * attempt),
+            );
          }
       }
    }
@@ -69,7 +71,14 @@ async function incrementAzkarStat() {
    }
 }
 
-async function sendImageAzkar(channel, imageUrl, messageTimestamp, guildId, maxRetries, channelId) {
+async function sendImageAzkar(
+   channel,
+   imageUrl,
+   messageTimestamp,
+   guildId,
+   maxRetries,
+   channelId,
+) {
    try {
       const response = await fetch(imageUrl, {
          headers: { 'User-Agent': 'QuranBot/1.0' },
@@ -79,7 +88,13 @@ async function sendImageAzkar(channel, imageUrl, messageTimestamp, guildId, maxR
          return { success: false, reason: 'HTTP ' + response.status };
       }
       const imageEmbed = new EmbedBuilder().setColor(0x1e1f22).setImage(imageUrl);
-      const result = await sendWithRetry(channel, { embeds: [imageEmbed] }, maxRetries, guildId, channelId);
+      const result = await sendWithRetry(
+         channel,
+         { embeds: [imageEmbed] },
+         maxRetries,
+         guildId,
+         channelId,
+      );
       if (result.success) {
          trackAzkarMessage(result.message.id, messageTimestamp);
          await incrementAzkarStat();
@@ -91,14 +106,25 @@ async function sendImageAzkar(channel, imageUrl, messageTimestamp, guildId, maxR
    }
 }
 
-async function sendAudioAzkar(channel, randomDhikr, cleanedText, messageTimestamp, guildId, maxRetries, channelId) {
+async function sendAudioAzkar(
+   channel,
+   randomDhikr,
+   cleanedText,
+   messageTimestamp,
+   guildId,
+   maxRetries,
+   channelId,
+) {
    if (!randomDhikr.audio) {
       return { success: false, reason: 'No audio available' };
    }
    const audioUrl = ADHKAR_BASE_URL + randomDhikr.audio;
    const stableId = randomDhikr.filename || 'dhikr_' + randomDhikr.id;
    const customId = 'play_azkar_' + stableId + '_' + messageTimestamp;
-   const audioButton = new ButtonBuilder().setCustomId(customId).setLabel('استماع').setStyle(ButtonStyle.Secondary);
+   const audioButton = new ButtonBuilder()
+      .setCustomId(customId)
+      .setLabel('استماع')
+      .setStyle(ButtonStyle.Secondary);
    const components = [new ActionRowBuilder().addComponents(audioButton)];
    trackAudioData(customId, {
       url: audioUrl,
@@ -178,9 +204,15 @@ async function sendCategoryAudioAzkar(
    return result;
 }
 
-async function sendRandomAzkar(channelId, guildId, maxRetries = AZKAR_MAX_RETRY_ATTEMPTS, forceImage = false) {
+async function sendRandomAzkar(
+   channelId,
+   guildId,
+   maxRetries = AZKAR_MAX_RETRY_ATTEMPTS,
+   forceImage = false,
+) {
    const channel =
-      global.client.channels.cache.get(channelId) || (await global.client.channels.fetch(channelId).catch(() => null));
+      global.client.channels.cache.get(channelId) ||
+      (await global.client.channels.fetch(channelId).catch(() => null));
    if (!channel || !channel.isTextBased?.()) {
       logger.info('Azkar Channel Not Found Or Invalid ' + channelId);
       const state = global.guildStates.get(guildId);
@@ -202,17 +234,27 @@ async function sendRandomAzkar(channelId, guildId, maxRetries = AZKAR_MAX_RETRY_
    if (!randomCategory || !randomCategory.array || randomCategory.array.length === 0) {
       return { success: false, reason: 'No valid azkar category' };
    }
-   const randomDhikr = randomCategory.array[Math.floor(Math.random() * randomCategory.array.length)];
+   const randomDhikr =
+      randomCategory.array[Math.floor(Math.random() * randomCategory.array.length)];
    if (!randomDhikr) {
       return { success: false, reason: 'No valid dhikr' };
    }
    const messageTimestamp = Date.now();
    const cleanedText = clean_Dhikr(randomDhikr.text || 'لا يوجد');
-   const shouldSendImage = forceImage || (global.azkarImages && global.azkarImages.length > 0 && Math.random() > 0.5);
+   const shouldSendImage =
+      forceImage ||
+      (global.azkarImages && global.azkarImages.length > 0 && Math.random() > 0.5);
    if (shouldSendImage && global.azkarImages && global.azkarImages.length > 0) {
       const randomImageIndex = Math.floor(Math.random() * global.azkarImages.length);
       const imageUrl = global.azkarImages[randomImageIndex];
-      const imageResult = await sendImageAzkar(channel, imageUrl, messageTimestamp, guildId, maxRetries, channelId);
+      const imageResult = await sendImageAzkar(
+         channel,
+         imageUrl,
+         messageTimestamp,
+         guildId,
+         maxRetries,
+         channelId,
+      );
       if (imageResult.success) {
          return { success: true, type: 'image' };
       }

@@ -89,7 +89,9 @@ async function fetchRecitersFromFirebase() {
             for (const moshaf of reciter.moshaf) {
                if (moshaf.moshaf_type === 11 && moshaf.server) {
                   const key = 'reciter_' + reciter.id + '_ar';
-                  const serverUrl = moshaf.server.endsWith('/') ? moshaf.server : moshaf.server + '/';
+                  const serverUrl = moshaf.server.endsWith('/')
+                     ? moshaf.server
+                     : moshaf.server + '/';
                   const links = [];
                   const durations = Array(114).fill(0);
                   for (let i = 1; i <= 114; i++) {
@@ -120,7 +122,9 @@ async function fetchRecitersFromFirebase() {
          }
       }
       if (Object.keys(reciters).length > 0) {
-         logger.info('Loaded ' + Object.keys(reciters).length + ' reciters from Firebase cache');
+         logger.info(
+            'Loaded ' + Object.keys(reciters).length + ' reciters from Firebase cache',
+         );
          return reciters;
       }
       return null;
@@ -148,7 +152,9 @@ async function fetchReciters(languageCode) {
             links: reciter.moshaf
                ? reciter.moshaf.flatMap((m) => {
                     const server = m.server;
-                    return m.surah_list.split(',').map((id) => server + id.padStart(3, '0') + '.mp3');
+                    return m.surah_list
+                       .split(',')
+                       .map((id) => server + id.padStart(3, '0') + '.mp3');
                  })
                : [],
             durations: durations,

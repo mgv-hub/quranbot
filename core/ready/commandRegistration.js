@@ -16,7 +16,10 @@ async function registerAllCommands(client) {
          try {
             await applyCommandPermissions(currentGuilds[i]);
          } catch (error) {
-            logger.error('Failed To Apply Permissions For Guild ' + currentGuilds[i].id, error);
+            logger.error(
+               'Failed To Apply Permissions For Guild ' + currentGuilds[i].id,
+               error,
+            );
          }
       }, i * 1000);
    }

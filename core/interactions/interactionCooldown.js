@@ -7,12 +7,14 @@ async function checkGlobalCooldown(interaction) {
          if (!interaction.replied && !interaction.deferred) {
             if (interaction.isCommand()) {
                await interaction.reply({
-                  content: 'أنت في وضع الانتظار المؤقت بسبب كثرة الطلبات. يرجى المحاولة لاحقًا.',
+                  content:
+                     'أنت في وضع الانتظار المؤقت بسبب كثرة الطلبات. يرجى المحاولة لاحقًا.',
                   ephemeral: true,
                });
             } else {
                await interaction.reply({
-                  content: 'أنت في وضع الانتظار المؤقت بسبب كثرة الطلبات. يرجى المحاولة لاحقًا.',
+                  content:
+                     'أنت في وضع الانتظار المؤقت بسبب كثرة الطلبات. يرجى المحاولة لاحقًا.',
                   ephemeral: true,
                });
             }

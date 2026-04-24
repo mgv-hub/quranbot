@@ -1,6 +1,9 @@
 require('pathlra-aliaser')();
 const logger = require('@logger');
-const { loadControlIdsFromFirebase, saveControlIdsToFirebase } = require('@firebase-core_utils');
+const {
+   loadControlIdsFromFirebase,
+   saveControlIdsToFirebase,
+} = require('@firebase-core_utils');
 let memoryCache = {};
 let isCacheLoaded = false;
 async function loadCache() {
@@ -23,7 +26,9 @@ async function deleteOldControlMessages(guildId, channelId, newMessageId) {
             for (const oldMessageId of oldMessageIds) {
                if (oldMessageId !== newMessageId) {
                   try {
-                     const oldMessage = await channel.messages.fetch(oldMessageId).catch(() => null);
+                     const oldMessage = await channel.messages
+                        .fetch(oldMessageId)
+                        .catch(() => null);
                      if (oldMessage) {
                         await oldMessage.delete().catch(() => {});
                      }

@@ -29,7 +29,9 @@ async function getVoiceChannel(guild, setupData, state) {
       if (existingVoice) {
          voiceChannel = existingVoice;
          voiceChannelId = existingVoice.id;
-         logger.info('Guild ' + guild.id + ' Auto Fixed Voice Channel ID To ' + voiceChannelId);
+         logger.info(
+            'Guild ' + guild.id + ' Auto Fixed Voice Channel ID To ' + voiceChannelId,
+         );
       }
    }
 

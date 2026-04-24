@@ -2,12 +2,25 @@ require('pathlra-aliaser');
 
 const { createAudioPlayer } = require('@discordjs/voice');
 const logger = require('@logger');
-const { getGuildStatesMap, hasGuildState, setGuildState, getGuildStateById } = require('@guild-state-store-core_state');
-const { canJoinVoice, incrementVoiceConnections, decrementVoiceConnections } = require('@guild-state-voice-core_state');
+const {
+   getGuildStatesMap,
+   hasGuildState,
+   setGuildState,
+   getGuildStateById,
+} = require('@guild-state-store-core_state');
+const {
+   canJoinVoice,
+   incrementVoiceConnections,
+   decrementVoiceConnections,
+} = require('@guild-state-voice-core_state');
 const { validateAndResetPlayer, createNewPlayer } = require('@guild-state-player-core_state');
 const { setupPlayerEvents } = require('@guild-state-events-core_state');
 const { isAuthorized } = require('@guild-state-auth-core_state');
-const { removeGuildState, cleanupGuildState, cleanupDestroyedConnections } = require('@guild-state-cleanup-core_state');
+const {
+   removeGuildState,
+   cleanupGuildState,
+   cleanupDestroyedConnections,
+} = require('@guild-state-cleanup-core_state');
 
 function getGuildState(guildId) {
    if (!hasGuildState(guildId)) {
@@ -80,12 +93,21 @@ setInterval(async () => {
                   logger.info('Guild ' + guildId + ' Users Detected Starting Playback');
                   try {
                      if (state.playbackMode === 'surah') {
-                        const resource = await global.createSurahResource(state, state.currentSurah - 1, 0, 0, false);
+                        const resource = await global.createSurahResource(
+                           state,
+                           state.currentSurah - 1,
+                           0,
+                           0,
+                           false,
+                        );
                         state.player.play(resource);
                         state.isPaused = false;
                         state.pauseReason = null;
                      } else if (state.currentRadioUrl) {
-                        const resource = await global.createRadioResource(state.currentRadioUrl, 0);
+                        const resource = await global.createRadioResource(
+                           state.currentRadioUrl,
+                           0,
+                        );
                         state.player.play(resource);
                         state.isPaused = false;
                         state.pauseReason = null;

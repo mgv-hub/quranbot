@@ -1,12 +1,26 @@
 require('pathlra-aliaser')();
 const imp = require('@loader-core_bootstrap');
-const NAVIGATION_BUTTONS = ['prev_page', 'next_page', 'prev_reciter_page', 'next_reciter_page'];
+const NAVIGATION_BUTTONS = [
+   'prev_page',
+   'next_page',
+   'prev_reciter_page',
+   'next_reciter_page',
+];
 const PLAYBACK_BUTTONS = ['prev', 'next', 'pause', 'resume'];
 const RADIO_BUTTONS = ['toggle_radio', 'prev_radio_page', 'next_radio_page'];
 const SYSTEM_BUTTONS = ['toggle_control_mode', 'join_vc', 'leave_vc'];
-const ADMIN_SERVER_BUTTONS = ['admin_server_list', 'admin_refresh_servers', 'admin_back_to_servers'];
+const ADMIN_SERVER_BUTTONS = [
+   'admin_server_list',
+   'admin_refresh_servers',
+   'admin_back_to_servers',
+];
 const ADMIN_STATS_BUTTONS = ['admin_bot_stats', 'admin_refresh_stats'];
-const ADMIN_VOICE_BUTTONS = ['admin_voice_channels', 'admin_prev_voice', 'admin_next_voice', 'admin_refresh_voice'];
+const ADMIN_VOICE_BUTTONS = [
+   'admin_voice_channels',
+   'admin_prev_voice',
+   'admin_next_voice',
+   'admin_refresh_voice',
+];
 function getButtonHandler(customId) {
    if (NAVIGATION_BUTTONS.includes(customId)) {
       return imp.navigationButtons;
@@ -67,7 +81,10 @@ async function handleButtonInteraction(interaction) {
    if (!handler) {
       if (customId === 'cancel_support' || customId === 'admin_cancel_kick') {
          await interaction.reply({
-            content: customId === 'cancel_support' ? 'تم إغلاق نافذة الدعم' : 'تم إلغاء عملية الخروج',
+            content:
+               customId === 'cancel_support'
+                  ? 'تم إغلاق نافذة الدعم'
+                  : 'تم إلغاء عملية الخروج',
             flags: 64,
          });
          return true;

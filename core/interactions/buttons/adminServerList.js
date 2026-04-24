@@ -62,7 +62,10 @@ module.exports = {
             .setLabel('Next')
             .setStyle(ButtonStyle.Secondary)
             .setDisabled(currentPage >= totalPages - 1),
-         new ButtonBuilder().setCustomId('admin_refresh_servers').setLabel('Refresh').setStyle(ButtonStyle.Secondary),
+         new ButtonBuilder()
+            .setCustomId('admin_refresh_servers')
+            .setLabel('Refresh')
+            .setStyle(ButtonStyle.Secondary),
       );
       const embed = new EmbedBuilder()
          .setColor(0x1e1f22)

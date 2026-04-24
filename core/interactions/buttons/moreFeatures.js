@@ -13,7 +13,10 @@ module.exports = {
                '**الميزات الإضافية**\nسيتم إضافة خيارات جديدة في المستقبل. حالياً، يتوفر فقط زر مواقيت الصلاة.',
             );
          const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('prayer_times').setLabel('مواقيت الصلاة').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+               .setCustomId('prayer_times')
+               .setLabel('مواقيت الصلاة')
+               .setStyle(ButtonStyle.Secondary),
          );
          await interaction
             .followUp({

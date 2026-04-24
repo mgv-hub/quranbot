@@ -69,17 +69,19 @@ function createRadioRow(state) {
    const currentPage = state.currentRadioPage || 0;
    const startIndex = currentPage * ITEMS_PER_PAGE;
    const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, (global.quranRadios || []).length);
-   let pageOptions = (global.quranRadios || []).slice(startIndex, endIndex).map((radio, index) => {
-      const globalIndex = startIndex + index;
-      let label = `${globalIndex + 1} ${radio.name}`;
-      if (label.length > 95) {
-         label = `${globalIndex + 1} ${radio.name.substring(0, 92 - `${globalIndex + 1} `.length)}`;
-      }
-      return new StringSelectMenuOptionBuilder()
-         .setLabel(truncateText(label, 100))
-         .setValue(truncateText(globalIndex.toString(), 100))
-         .setDescription(truncateText(`محطة ${globalIndex + 1}`, 100));
-   });
+   let pageOptions = (global.quranRadios || [])
+      .slice(startIndex, endIndex)
+      .map((radio, index) => {
+         const globalIndex = startIndex + index;
+         let label = `${globalIndex + 1} ${radio.name}`;
+         if (label.length > 95) {
+            label = `${globalIndex + 1} ${radio.name.substring(0, 92 - `${globalIndex + 1} `.length)}`;
+         }
+         return new StringSelectMenuOptionBuilder()
+            .setLabel(truncateText(label, 100))
+            .setValue(truncateText(globalIndex.toString(), 100))
+            .setDescription(truncateText(`محطة ${globalIndex + 1}`, 100));
+      });
    if (pageOptions.length === 0) {
       if ((global.quranRadios || []).length > 0) {
          state.currentRadioPage = 0;
@@ -95,7 +97,9 @@ function createRadioRow(state) {
    }
    const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('select_radio')
-      .setPlaceholder(truncateText(`اختر راديو قرآن الصفحة ${currentPage + 1}/${totalPages}`, 100))
+      .setPlaceholder(
+         truncateText(`اختر راديو قرآن الصفحة ${currentPage + 1}/${totalPages}`, 100),
+      )
       .addOptions(pageOptions);
    return new ActionRowBuilder().addComponents(selectMenu);
 }
@@ -105,18 +109,20 @@ function createSelectRow(state) {
    const totalPages = Math.ceil((global.surahNames || []).length / OPTIONS_PER_PAGE);
    const startIndex = state.currentPage * OPTIONS_PER_PAGE;
    const endIndex = Math.min(startIndex + OPTIONS_PER_PAGE, (global.surahNames || []).length);
-   let pageOptions = (global.surahNames || []).slice(startIndex, endIndex).map((name, index) => {
-      const globalIndex = startIndex + index;
-      let label = name;
-      if (label.length > 100) {
-         label = label.substring(0, 100);
-      }
-      const value = (globalIndex + 1).toString();
-      return new StringSelectMenuOptionBuilder()
-         .setLabel(truncateText(label, 100))
-         .setValue(truncateText(value, 100))
-         .setDescription(truncateText(`رقم سور ${globalIndex + 1}`, 100));
-   });
+   let pageOptions = (global.surahNames || [])
+      .slice(startIndex, endIndex)
+      .map((name, index) => {
+         const globalIndex = startIndex + index;
+         let label = name;
+         if (label.length > 100) {
+            label = label.substring(0, 100);
+         }
+         const value = (globalIndex + 1).toString();
+         return new StringSelectMenuOptionBuilder()
+            .setLabel(truncateText(label, 100))
+            .setValue(truncateText(value, 100))
+            .setDescription(truncateText(`رقم سور ${globalIndex + 1}`, 100));
+      });
    if (pageOptions.length === 0) {
       if ((global.surahNames || []).length > 0) {
          state.currentPage = 0;
@@ -134,7 +140,9 @@ function createSelectRow(state) {
    const finalTotalPages = Math.ceil((global.surahNames || []).length / OPTIONS_PER_PAGE);
    const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('select_surah')
-      .setPlaceholder(truncateText(`اختر السورة الصفحة ${currentPage}/${finalTotalPages}`, 100))
+      .setPlaceholder(
+         truncateText(`اختر السورة الصفحة ${currentPage}/${finalTotalPages}`, 100),
+      )
       .addOptions(pageOptions);
    return new ActionRowBuilder().addComponents(selectMenu);
 }
@@ -147,8 +155,14 @@ function createButtonRow(state) {
          .setLabel(truncateText('السابقة', 80))
          .setStyle(ButtonStyle.Secondary)
          .setDisabled(!isSurahMode),
-      new ButtonBuilder().setCustomId('pause').setLabel(truncateText('ايقاف', 80)).setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder().setCustomId('resume').setLabel(truncateText('ابدأ', 80)).setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+         .setCustomId('pause')
+         .setLabel(truncateText('ايقاف', 80))
+         .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+         .setCustomId('resume')
+         .setLabel(truncateText('ابدأ', 80))
+         .setStyle(ButtonStyle.Secondary),
       new ButtonBuilder()
          .setCustomId('next')
          .setLabel(truncateText('التالي', 80))
@@ -195,7 +209,9 @@ function createNavigationRow(state, guildId) {
       .setCustomId('toggle_control_mode')
       .setLabel(
          truncateText(
-            state.controlMode === 'everyone' ? 'وضع التحكم تبديل إلى أدمنز فقط' : 'وضع التحكم تبديل إلى الجميع',
+            state.controlMode === 'everyone'
+               ? 'وضع التحكم تبديل إلى أدمنز فقط'
+               : 'وضع التحكم تبديل إلى الجميع',
             80,
          ),
       )
@@ -209,8 +225,14 @@ function createNavigationRow(state, guildId) {
       .setLabel(truncateText('المزيد', 80))
       .setStyle(ButtonStyle.Secondary);
    const entryRow = new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId('join_vc').setLabel(truncateText('دخول', 80)).setStyle(ButtonStyle.Secondary),
-      new ButtonBuilder().setCustomId('leave_vc').setLabel(truncateText('خروج', 80)).setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+         .setCustomId('join_vc')
+         .setLabel(truncateText('دخول', 80))
+         .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+         .setCustomId('leave_vc')
+         .setLabel(truncateText('خروج', 80))
+         .setStyle(ButtonStyle.Secondary),
       toggleControlButton,
       complaintButton,
       moreFeaturesButton,

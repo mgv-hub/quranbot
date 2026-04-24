@@ -93,7 +93,10 @@ function createControlEmbed(state, guildId) {
       let reciterPageField = null;
       let currentDurationText = 'غير متاح';
       let thumbnailUrl = null;
-      const safeSurahIndex = Math.max(0, Math.min(state.currentSurah - 1, global.surahNames.length - 1));
+      const safeSurahIndex = Math.max(
+         0,
+         Math.min(state.currentSurah - 1, global.surahNames.length - 1),
+      );
       if (state.playbackMode === 'surah') {
          try {
             currentFieldValue = global.surahNames[safeSurahIndex] || 'لا شيء';
@@ -126,12 +129,19 @@ function createControlEmbed(state, guildId) {
          };
          reciterPageField = {
             name: 'الصفحة القراء',
-            value: 'صفحة ' + Math.min(state.currentReciterPage + 1, totalReciterPages) + '/' + totalReciterPages,
+            value:
+               'صفحة ' +
+               Math.min(state.currentReciterPage + 1, totalReciterPages) +
+               '/' +
+               totalReciterPages,
             inline: true,
          };
       } else {
          try {
-            const radioIndex = Math.max(0, Math.min(state.currentRadioIndex || 0, global.quranRadios.length - 1));
+            const radioIndex = Math.max(
+               0,
+               Math.min(state.currentRadioIndex || 0, global.quranRadios.length - 1),
+            );
             currentFieldValue = global.quranRadios[radioIndex]?.name || 'راديو قرآن';
          } catch (e) {
             currentFieldValue = 'راديو قرآن';

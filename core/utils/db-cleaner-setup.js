@@ -2,7 +2,10 @@ require('pathlra-aliaser')();
 
 const logger = require('@logger');
 const { ChannelType } = require('discord.js');
-const { loadSetupGuildsFromFirebase, saveSetupGuildsToFirebase } = require('@firebase-core_utils');
+const {
+   loadSetupGuildsFromFirebase,
+   saveSetupGuildsToFirebase,
+} = require('@firebase-core_utils');
 
 async function validateSetupData(guildId, setupData, guild) {
    let hasChanges = false;
@@ -153,7 +156,11 @@ async function cleanSetupGuilds(client) {
          logger.info('Saved Cleaned Setup Guilds: ' + Object.keys(validSetupGuilds).length);
       }
 
-      return { cleaned: removedCount, updated: updatedCount, remaining: Object.keys(validSetupGuilds).length };
+      return {
+         cleaned: removedCount,
+         updated: updatedCount,
+         remaining: Object.keys(validSetupGuilds).length,
+      };
    } catch (error) {
       logger.error('Error Cleaning Setup Guilds', error);
       return { cleaned: 0, error: error.message };

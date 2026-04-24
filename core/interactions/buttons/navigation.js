@@ -1,7 +1,12 @@
 require('pathlra-aliaser')();
 const { getGuildState, isAuthorized } = require('@GuildStateManager-core_state');
 const { createControlEmbed } = require('@controlPanel-core_ui');
-const { createReciterRow, createSelectRow, createButtonRow, createNavigationRow } = require('@components-core_ui');
+const {
+   createReciterRow,
+   createSelectRow,
+   createButtonRow,
+   createNavigationRow,
+} = require('@components-core_ui');
 const { updateControlMessage, saveControlId } = require('@interaction-core_utils');
 const logger = require('@logger');
 const { EmbedBuilder } = require('discord.js');
@@ -39,7 +44,10 @@ module.exports = {
             await sendChannelError(interaction, 'لا توجد صفحة سابقة للقراء');
             return;
          }
-         if (interaction.customId === 'next_reciter_page' && state.currentReciterPage >= totalReciterPages - 1) {
+         if (
+            interaction.customId === 'next_reciter_page' &&
+            state.currentReciterPage >= totalReciterPages - 1
+         ) {
             await sendChannelError(interaction, 'لا توجد صفحة تالية للقراء');
             return;
          }

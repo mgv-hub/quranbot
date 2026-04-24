@@ -1,7 +1,10 @@
 require('pathlra-aliaser')();
 
 const logger = require('@logger');
-const { loadGuildStatesFromFirebase, saveGuildStatesToFirebase } = require('@firebase-core_utils');
+const {
+   loadGuildStatesFromFirebase,
+   saveGuildStatesToFirebase,
+} = require('@firebase-core_utils');
 
 async function cleanGuildStates(client) {
    try {
@@ -32,7 +35,9 @@ async function cleanGuildStates(client) {
          if (stateData.voiceChannelId) {
             let voiceChannel = guild.channels.cache.get(stateData.voiceChannelId);
             if (!voiceChannel) {
-               voiceChannel = await guild.channels.fetch(stateData.voiceChannelId).catch(() => null);
+               voiceChannel = await guild.channels
+                  .fetch(stateData.voiceChannelId)
+                  .catch(() => null);
             }
             if (!voiceChannel) {
                stateData.voiceChannelId = null;

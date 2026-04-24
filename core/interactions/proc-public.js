@@ -2,7 +2,13 @@ require('pathlra-aliaser')();
 const imp = require('@loader-core_bootstrap');
 const { handleInteractionError } = require('@interactionErrors-core_interactions');
 const AZKAR_PREFIX = 'play_azkar_';
-const PRAYER_BUTTONS = ['prayer_times', 'home_prayer', 'refresh_prayer', 'back_country_prayer', 'cancel_prayer'];
+const PRAYER_BUTTONS = [
+   'prayer_times',
+   'home_prayer',
+   'refresh_prayer',
+   'back_country_prayer',
+   'cancel_prayer',
+];
 const PRAYER_MENUS = ['select_country_prayer', 'select_city_prayer'];
 function isAzkarInteraction(interaction) {
    const { customId } = interaction;
@@ -35,7 +41,8 @@ function isPublicFeature(interaction) {
          customId === 'back_country_prayer' ||
          customId === 'cancel_prayer');
    const isPrayerMenu =
-      interaction.isStringSelectMenu() && (customId === 'select_country_prayer' || customId === 'select_city_prayer');
+      interaction.isStringSelectMenu() &&
+      (customId === 'select_country_prayer' || customId === 'select_city_prayer');
    const isMoreFeatures = customId === 'more_features' || customId === 'back_to_main';
    return isAzkar || isPrayer || isPrayerMenu || isMoreFeatures;
 }

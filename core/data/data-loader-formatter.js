@@ -24,7 +24,8 @@ function formatSurahUrl(serverUrl, surahNumber, reciterType) {
 
 function formatDuration(surahNumber) {
    const baseDuration = GLOBAL_CONSTANTS.BASE_DURATION_MS;
-   const estimatedDuration = baseDuration * (1 + surahNumber * GLOBAL_CONSTANTS.DURATION_MULTIPLIER);
+   const estimatedDuration =
+      baseDuration * (1 + surahNumber * GLOBAL_CONSTANTS.DURATION_MULTIPLIER);
    const minutes = Math.floor(estimatedDuration / 60000);
    const seconds = Math.floor((estimatedDuration % 60000) / 1000);
    return `${minutes}:${seconds.toString().padStart(2, '0')}`;

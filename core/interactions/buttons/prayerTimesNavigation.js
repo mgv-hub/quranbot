@@ -206,7 +206,12 @@ module.exports = {
                   flags: MessageFlags.Ephemeral,
                })
                .catch(() => {});
-            const prayerData = await fetchPrayerTimes(city.lat, city.lng, city.name, countryCode);
+            const prayerData = await fetchPrayerTimes(
+               city.lat,
+               city.lng,
+               city.name,
+               countryCode,
+            );
             if (!prayerData) {
                return interaction
                   .followUp({

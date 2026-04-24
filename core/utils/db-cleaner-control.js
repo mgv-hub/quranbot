@@ -1,7 +1,10 @@
 require('pathlra-aliaser')();
 
 const logger = require('@logger');
-const { loadControlIdsFromFirebase, saveControlIdsToFirebase } = require('@firebase-core_utils');
+const {
+   loadControlIdsFromFirebase,
+   saveControlIdsToFirebase,
+} = require('@firebase-core_utils');
 
 async function cleanControlIds(client) {
    try {

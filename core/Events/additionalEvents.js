@@ -10,7 +10,9 @@ client.on('guildCreate', async (guild) => {
    try {
       const owner = await guild.fetchOwner();
       const channel = guild.channels.cache.find(
-         (c) => c.type === ChannelType.GuildText && c.permissionsFor(client.user).has('CreateInstantInvite'),
+         (c) =>
+            c.type === ChannelType.GuildText &&
+            c.permissionsFor(client.user).has('CreateInstantInvite'),
       );
       if (!channel) {
          logger.warn('No Suitable Text Channel Found In Guild ' + guild.id);

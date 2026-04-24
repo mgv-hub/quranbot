@@ -103,14 +103,18 @@ function checkBotVoicePermissions(interaction, state) {
          if (channel) {
             const permissions = channel.permissionsFor(botMember);
             return (
-               permissions.has(PermissionsBitField.Flags.Connect) && permissions.has(PermissionsBitField.Flags.Speak)
+               permissions.has(PermissionsBitField.Flags.Connect) &&
+               permissions.has(PermissionsBitField.Flags.Speak)
             );
          }
       }
       const member = interaction.member;
       if (member?.voice.channel) {
          const permissions = member.voice.channel.permissionsFor(botMember);
-         return permissions.has(PermissionsBitField.Flags.Connect) && permissions.has(PermissionsBitField.Flags.Speak);
+         return (
+            permissions.has(PermissionsBitField.Flags.Connect) &&
+            permissions.has(PermissionsBitField.Flags.Speak)
+         );
       }
       return false;
    } catch (error) {

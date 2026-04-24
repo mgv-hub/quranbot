@@ -11,7 +11,13 @@ async function recoverAzkarTimers(guild, fixedSetupData, guildId) {
             guild.channels.cache.get(fixedSetupData.azkarChannelId) ||
             (await guild.channels.fetch(fixedSetupData.azkarChannelId).catch(() => null));
       } catch (error) {
-         logger.info('Guild ' + guildId + ' Azkar Channel ' + fixedSetupData.azkarChannelId + ' Not Accessible');
+         logger.info(
+            'Guild ' +
+               guildId +
+               ' Azkar Channel ' +
+               fixedSetupData.azkarChannelId +
+               ' Not Accessible',
+         );
       }
       if (azkarChannel && azkarChannel.isTextBased()) {
          const state = getGuildState(guildId);
@@ -25,12 +31,19 @@ async function recoverAzkarTimers(guild, fixedSetupData, guildId) {
 
          try {
             await startAzkarTimerForGuild(guildId, fixedSetupData.azkarChannelId, false);
-            logger.info('Started Azkar Timer For Guild ' + guildId + ' Channel ' + fixedSetupData.azkarChannelId);
+            logger.info(
+               'Started Azkar Timer For Guild ' +
+                  guildId +
+                  ' Channel ' +
+                  fixedSetupData.azkarChannelId,
+            );
          } catch (err) {
             logger.error('Failed To Start Azkar Timer For Guild ' + guildId, err);
          }
       } else {
-         logger.info('Guild ' + guildId + ' Azkar Channel Not Valid Type Or Not Found Skipping');
+         logger.info(
+            'Guild ' + guildId + ' Azkar Channel Not Valid Type Or Not Found Skipping',
+         );
          const state = getGuildState(guildId);
          const persistentState = persistentStateManager.getGuildState(guildId);
          state.azkarChannelId = null;

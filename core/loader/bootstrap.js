@@ -65,9 +65,18 @@ const {
    decrementVoiceConnections,
 } = require('@GuildStateManager-core_state');
 
-const { checkRateLimit, COOLDOWN_TYPES, isUserInGlobalCooldown } = require('@cooldown-core_state');
+const {
+   checkRateLimit,
+   COOLDOWN_TYPES,
+   isUserInGlobalCooldown,
+} = require('@cooldown-core_state');
 
-const { saveControlId, readControlIds, removeControlId, saveDhikrMessageId } = require('@controlIds-core_utils');
+const {
+   saveControlId,
+   readControlIds,
+   removeControlId,
+   saveDhikrMessageId,
+} = require('@controlIds-core_utils');
 
 const { updateControlMessage } = require('@interaction-core_utils');
 
@@ -121,7 +130,10 @@ const {
    COMMAND_NAME_MAP,
 } = require('@commandCooldown-core_utils');
 
-const { incrementCommandStats, getStatisticsTracker } = require('@proc-stats-core_interactions');
+const {
+   incrementCommandStats,
+   getStatisticsTracker,
+} = require('@proc-stats-core_interactions');
 
 module.exports.pingCommand = pingCommand;
 module.exports.joinCommand = joinCommand;

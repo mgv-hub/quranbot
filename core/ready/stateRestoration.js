@@ -9,11 +9,15 @@ let restorationInProgress = false;
 async function restoreGuildStates(client, actualBotGuilds) {
    const allStates = persistentStateManager.getAllStates();
    logger.info(
-      'Attempting To Restore ' + Object.keys(allStates).length + ' Guild States From Persistent State Manager',
+      'Attempting To Restore ' +
+         Object.keys(allStates).length +
+         ' Guild States From Persistent State Manager',
    );
 
    const statesToRestore = Object.keys(allStates).filter((gid) => actualBotGuilds.has(gid));
-   logger.info('Will Restore States For ' + statesToRestore.length + ' Guilds Bot Is Actually In');
+   logger.info(
+      'Will Restore States For ' + statesToRestore.length + ' Guilds Bot Is Actually In',
+   );
 
    if (!restorationInProgress && statesToRestore.length > 0) {
       restorationInProgress = true;
@@ -52,7 +56,11 @@ async function restoreGuildStates(client, actualBotGuilds) {
 
                      if (state.playbackMode === 'surah') {
                         try {
-                           const resource = await global.createSurahResource(guildState, state.currentSurahIndex, 0);
+                           const resource = await global.createSurahResource(
+                              guildState,
+                              state.currentSurahIndex,
+                              0,
+                           );
                            guildState.player.play(resource);
                            guildState.isPaused = false;
                            guildState.playbackStartTime = Date.now();
@@ -60,7 +68,9 @@ async function restoreGuildStates(client, actualBotGuilds) {
                            await new Promise((resolve) => setTimeout(resolve, 3000));
 
                            if (guildState.player.state.status === AudioPlayerStatus.Idle) {
-                              logger.warn('Guild ' + guildId + ' Player Idle After Restore Retrying');
+                              logger.warn(
+                                 'Guild ' + guildId + ' Player Idle After Restore Retrying',
+                              );
                               const retryResource = await global.createSurahResource(
                                  guildState,
                                  state.currentSurahIndex,
@@ -71,7 +81,10 @@ async function restoreGuildStates(client, actualBotGuilds) {
 
                            logger.info('Started Playback On Restore For Guild ' + guildId);
                         } catch (surahError) {
-                           logger.warn('Failed To Play Surah On Restore For Guild ' + guildId, surahError);
+                           logger.warn(
+                              'Failed To Play Surah On Restore For Guild ' + guildId,
+                              surahError,
+                           );
                            guildState.isPaused = true;
                         }
                      }
@@ -81,16 +94,27 @@ async function restoreGuildStates(client, actualBotGuilds) {
                      logger.info('Restored Voice Connection For Guild ' + guildId);
                   } catch (error) {
                      failedCount++;
-                     logger.error('Failed To Restore Voice Connection For Guild ' + guildId, error);
+                     logger.error(
+                        'Failed To Restore Voice Connection For Guild ' + guildId,
+                        error,
+                     );
                   }
                } else {
                   logger.info('Guild ' + guildId + ' Already Has Active Connection Skipping');
 
                   if (guildState.player.state.status === AudioPlayerStatus.Idle) {
-                     logger.info('Guild ' + guildId + ' Connection Exists But Player Idle Starting Playback');
+                     logger.info(
+                        'Guild ' +
+                           guildId +
+                           ' Connection Exists But Player Idle Starting Playback',
+                     );
                      try {
                         if (state.playbackMode === 'surah') {
-                           const resource = await global.createSurahResource(guildState, state.currentSurahIndex, 0);
+                           const resource = await global.createSurahResource(
+                              guildState,
+                              state.currentSurahIndex,
+                              0,
+                           );
                            guildState.player.play(resource);
                            guildState.isPaused = false;
                         }
@@ -108,7 +132,11 @@ async function restoreGuildStates(client, actualBotGuilds) {
 
             if (restoredCount + failedCount === statesToRestore.length) {
                logger.info(
-                  'State Restoration Complete ' + restoredCount + ' Restored ' + failedCount + ' Failed Or Skipped',
+                  'State Restoration Complete ' +
+                     restoredCount +
+                     ' Restored ' +
+                     failedCount +
+                     ' Failed Or Skipped',
                );
                restorationInProgress = false;
             }

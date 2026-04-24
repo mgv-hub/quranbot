@@ -69,8 +69,12 @@ async function checkAllRadios(force = false) {
             newStatus[radio.url] = {
                active: isActive,
                checkedAt: new Date().toISOString(),
-               uptime: isActive ? new Date() - new Date(global.radioHealthStatus[radio.url]?.checkedAt || 0) : 0,
-               firstChecked: global.radioHealthStatus[radio.url]?.firstChecked || new Date().toISOString(),
+               uptime: isActive
+                  ? new Date() - new Date(global.radioHealthStatus[radio.url]?.checkedAt || 0)
+                  : 0,
+               firstChecked:
+                  global.radioHealthStatus[radio.url]?.firstChecked ||
+                  new Date().toISOString(),
             };
 
             if (isActive && newStatus[radio.url].uptime >= MIN_UPTIME_MS) {
@@ -88,10 +92,17 @@ async function checkAllRadios(force = false) {
       }
 
       global.radioHealthStatus = newStatus;
-      global.activeRadios = radios.filter((r) => newStatus[r.url]?.active && newStatus[r.url].uptime >= MIN_UPTIME_MS);
+      global.activeRadios = radios.filter(
+         (r) => newStatus[r.url]?.active && newStatus[r.url].uptime >= MIN_UPTIME_MS,
+      );
 
       logger.info(
-         'Radio Health Check Complete Active ' + activeCount + ' Total ' + radios.length + ' Changed ' + changedCount,
+         'Radio Health Check Complete Active ' +
+            activeCount +
+            ' Total ' +
+            radios.length +
+            ' Changed ' +
+            changedCount,
       );
    } catch (error) {
       logger.error('Radio Health Check Failed ' + error.message);
@@ -119,11 +130,15 @@ function getActiveRadioUrl(fallbackUrl) {
 
 (async () => {
    setTimeout(() => {
-      checkAllRadios().catch((err) => logger.error('Initial Radio Check Failed ' + err.message));
+      checkAllRadios().catch((err) =>
+         logger.error('Initial Radio Check Failed ' + err.message),
+      );
    }, 10000);
 
    setInterval(() => {
-      checkAllRadios().catch((err) => logger.error('Periodic Radio Check Failed ' + err.message));
+      checkAllRadios().catch((err) =>
+         logger.error('Periodic Radio Check Failed ' + err.message),
+      );
    }, RADIO_CHECK_INTERVAL_MS);
 
    try {

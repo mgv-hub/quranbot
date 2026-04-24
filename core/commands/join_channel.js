@@ -31,7 +31,8 @@ module.exports = {
       const botPermissions = selectedChannel.permissionsFor(interaction.guild.members.me);
       if (!botPermissions.has(imp.PermissionsBitField.Flags.Connect)) {
          return interaction.reply({
-            content: 'البوت ليس لديه الصلاحيات الكاملة للانضمام إلى هذه الغرفة الصوتية يرجى التحقق من الصلاحيات',
+            content:
+               'البوت ليس لديه الصلاحيات الكاملة للانضمام إلى هذه الغرفة الصوتية يرجى التحقق من الصلاحيات',
             flags: 64,
          });
       }
@@ -72,7 +73,8 @@ module.exports = {
             state.player.play(resource);
          } else if (state.currentRadioUrl) {
             const activeUrl =
-               global.radioHealthChecker?.getActiveRadioUrl(state.currentRadioUrl) || state.currentRadioUrl;
+               global.radioHealthChecker?.getActiveRadioUrl(state.currentRadioUrl) ||
+               state.currentRadioUrl;
             imp.logger.info(`Guild ${guildId} Playing radio stream ${activeUrl}`);
             const resource = await imp.createRadioResource(activeUrl);
             state.player.play(resource);
@@ -86,7 +88,8 @@ module.exports = {
                {
                   color: 0x1e1f22,
                   title: `تم الانضمام إلى ${selectedChannel.name}`,
-                  description: 'جاري تشغيل سورة عشوائية بقارئ عشوائي استخدم تحكم لعرض لوحة التحكم',
+                  description:
+                     'جاري تشغيل سورة عشوائية بقارئ عشوائي استخدم تحكم لعرض لوحة التحكم',
                },
             ],
          };
@@ -96,12 +99,14 @@ module.exports = {
          imp.logger.error(`Joining Error ${error.message}`);
          if (error.message.includes('No compatible encryption modes')) {
             await interaction.editReply({
-               content: 'تعذر الاتصال بخادم الصوت الحالي يرجى المحاولة لاحقا أو التواصل مع الدعم الفني',
+               content:
+                  'تعذر الاتصال بخادم الصوت الحالي يرجى المحاولة لاحقا أو التواصل مع الدعم الفني',
                flags: 64,
             });
          } else {
             await interaction.editReply({
-               content: 'حدث خطأ أثناء الانضمام إلى القناة الصوتية سيتم الحفاظ على الاتصال الحالي',
+               content:
+                  'حدث خطأ أثناء الانضمام إلى القناة الصوتية سيتم الحفاظ على الاتصال الحالي',
                flags: 64,
             });
          }

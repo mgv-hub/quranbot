@@ -22,7 +22,11 @@ async function loadAzkarData() {
       logger.info(`Total adhkar entries: ${totalAdhkar}`);
       return true;
    } catch (error) {
-      logger.warn('Failed to load new adhkar data from adhkar.json ' + error.message + ' using fallback data');
+      logger.warn(
+         'Failed to load new adhkar data from adhkar.json ' +
+            error.message +
+            ' using fallback data',
+      );
       global.azkarData = ADHKAR_FALLBACK_DATA;
       return true;
    }

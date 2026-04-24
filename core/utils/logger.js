@@ -48,9 +48,16 @@ async function ensureLogDir() {
 
 function getLogFilePath(level) {
    const now = new Date();
-   const dateStr = now.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }).replace(/\//g, '-');
+   const dateStr = now
+      .toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' })
+      .replace(/\//g, '-');
 
-   const suffix = level === 'error' || level === 'fatal' ? 'errors' : level === 'warn' ? 'warnings' : 'general';
+   const suffix =
+      level === 'error' || level === 'fatal'
+         ? 'errors'
+         : level === 'warn'
+           ? 'warnings'
+           : 'general';
 
    return pathlra.join(LOG_DIR, `logs-${suffix}-${dateStr}.log`);
 }
@@ -411,7 +418,11 @@ const logger = new Logger();
          const err = args.find((arg) => arg instanceof Error);
          const msg = args
             .filter((arg) => !(arg instanceof Error))
-            .map((arg) => (typeof arg === 'object' && arg !== null ? JSON.stringify(arg, null, 2) : String(arg)))
+            .map((arg) =>
+               typeof arg === 'object' && arg !== null
+                  ? JSON.stringify(arg, null, 2)
+                  : String(arg),
+            )
             .join(' ');
          logger.error(msg, err || null);
       } catch {}
@@ -421,7 +432,11 @@ const logger = new Logger();
    console.debug = (...args) => {
       try {
          const msg = args
-            .map((arg) => (typeof arg === 'object' && arg !== null ? JSON.stringify(arg, null, 2) : String(arg)))
+            .map((arg) =>
+               typeof arg === 'object' && arg !== null
+                  ? JSON.stringify(arg, null, 2)
+                  : String(arg),
+            )
             .join(' ');
          logger.debug(msg);
       } catch {}

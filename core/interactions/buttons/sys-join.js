@@ -3,9 +3,15 @@ require('pathlra-aliaser');
 const { joinVoiceChannel } = require('@discordjs/voice');
 const logger = require('@logger');
 const persistentStateManager = require('@PersistentStateManager-core_state');
-const { getVoiceChannel, checkBotPermissions } = require('@sys-voice-core_interactions_buttons');
+const {
+   getVoiceChannel,
+   checkBotPermissions,
+} = require('@sys-voice-core_interactions_buttons');
 const { resetPlayerState } = require('@sys-player-core_interactions_buttons');
-const { getAvailableSurahIndex, getReciterInfo } = require('@sys-surah-core_interactions_buttons');
+const {
+   getAvailableSurahIndex,
+   getReciterInfo,
+} = require('@sys-surah-core_interactions_buttons');
 const { startPlayback } = require('@sys-playback-core_interactions_buttons');
 const { ERRORS } = require('@sys-config-core_interactions_buttons');
 

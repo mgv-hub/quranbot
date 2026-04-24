@@ -1,7 +1,10 @@
 require('pathlra-aliaser')();
 
 const logger = require('@logger');
-const { loadSetupGuildsFromFirebase, saveSetupGuildsToFirebase } = require('@firebase-core_utils');
+const {
+   loadSetupGuildsFromFirebase,
+   saveSetupGuildsToFirebase,
+} = require('@firebase-core_utils');
 
 let setupGuilds = {};
 

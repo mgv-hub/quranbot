@@ -40,7 +40,11 @@
    --btn-ghost-bg-hover: rgba(255, 255, 255, 0.14);
    --btn-ghost-text: #fdfdfd;
    --shadow-soft: 0 5px 26px rgba(158, 127, 245, 0.28), 0 3px 10px rgba(0, 0, 0, 0.12);
-   --glow-base: radial-gradient(50% 50% at 50% 50%, rgba(158, 127, 245, 0.42) 0%, transparent 100%);
+   --glow-base: radial-gradient(
+      50% 50% at 50% 50%,
+      rgba(158, 127, 245, 0.42) 0%,
+      transparent 100%
+   );
 }
 
 *,

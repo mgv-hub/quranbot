@@ -53,7 +53,10 @@ module.exports = {
             .setCustomId('admin_back_to_panel')
             .setLabel('Back to Panel')
             .setStyle(ButtonStyle.Secondary),
-         new ButtonBuilder().setCustomId('admin_refresh_stats').setLabel('Refresh').setStyle(ButtonStyle.Secondary),
+         new ButtonBuilder()
+            .setCustomId('admin_refresh_stats')
+            .setLabel('Refresh')
+            .setStyle(ButtonStyle.Secondary),
       );
 
       await interaction.followUp({

@@ -25,12 +25,16 @@ package-lock.json
 .vscode/*
 !.vscode/extensions.json
 .idea/
+serviceAccountKey.json
 
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.zip
+*.7z
+*.rar
 
 ui-*.css
 
@@ -38,5 +42,7 @@ ui-*.css
 .env
 production.env
 development.env
+
+env.local
 development.env.local
 production.env.local

@@ -1,12 +1,19 @@
 require('pathlra-aliaser')();
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+const {
+   ModalBuilder,
+   TextInputBuilder,
+   TextInputStyle,
+   ActionRowBuilder,
+} = require('discord.js');
 const logger = require('@logger');
 
 module.exports = {
    customId: 'open_complaint_modal',
    async execute(interaction) {
       try {
-         const modal = new ModalBuilder().setCustomId('complaint_modal').setTitle('تقديم شكوى او اقتراح');
+         const modal = new ModalBuilder()
+            .setCustomId('complaint_modal')
+            .setTitle('تقديم شكوى او اقتراح');
 
          const reasonInput = new TextInputBuilder()
             .setCustomId('complaint_reason')

@@ -3,7 +3,10 @@ require('pathlra-aliaser')();
 const imp = require('@loader-core_bootstrap');
 const { handleInteractionError } = require('@interactionErrors-core_interactions');
 const { checkGlobalCooldown } = require('@interactionCooldown-core_interactions');
-const { checkDuplicateInteraction, addToInteractionCache } = require('@proc-cache-core_interactions');
+const {
+   checkDuplicateInteraction,
+   addToInteractionCache,
+} = require('@proc-cache-core_interactions');
 const { handleCommandInteraction } = require('@proc-commands-core_interactions');
 const { isModalSubmit, handleModalInteraction } = require('@proc-modals-core_interactions');
 const { isPublicFeature, handlePublicInteraction } = require('@proc-public-core_interactions');
@@ -53,7 +56,9 @@ async function handleInteraction(interaction) {
          return;
       }
 
-      const interactionType = interaction.isButton() ? interaction.customId : interaction.customId;
+      const interactionType = interaction.isButton()
+         ? interaction.customId
+         : interaction.customId;
 
       const voiceValid = await checkVoiceState(interaction, state, interactionType);
       if (!voiceValid) {
@@ -65,7 +70,12 @@ async function handleInteraction(interaction) {
          return;
       }
 
-      const cooldownValid = await checkVoiceCooldown(interaction, state, interactionType, guildId);
+      const cooldownValid = await checkVoiceCooldown(
+         interaction,
+         state,
+         interactionType,
+         guildId,
+      );
       if (!cooldownValid) {
          return;
       }

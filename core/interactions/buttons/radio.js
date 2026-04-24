@@ -40,13 +40,20 @@ module.exports = {
             if (state.playbackMode === 'surah') {
                state.playbackMode = 'radio';
                state.currentRadioIndex = state.currentRadioIndex ?? 0;
-               state.currentRadioUrl = global.quranRadios[state.currentRadioIndex]?.url ?? global.quranRadios[0]?.url;
+               state.currentRadioUrl =
+                  global.quranRadios[state.currentRadioIndex]?.url ??
+                  global.quranRadios[0]?.url;
                state.currentRadioPage = Math.floor(state.currentRadioIndex / 25);
                if (state.currentRadioUrl) {
-                  const safeUrl = require('@radioHealthChecker-core_utils').getActiveRadioUrl(state.currentRadioUrl);
+                  const safeUrl = require('@radioHealthChecker-core_utils').getActiveRadioUrl(
+                     state.currentRadioUrl,
+                  );
                   if (!safeUrl) {
                      state.playbackMode = 'surah';
-                     const surahResource = await createSurahResource(state, state.currentSurah - 1);
+                     const surahResource = await createSurahResource(
+                        state,
+                        state.currentSurah - 1,
+                     );
                      state.player.play(surahResource);
                      state.isPaused = false;
                      state.pauseReason = null;

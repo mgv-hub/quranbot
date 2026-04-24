@@ -40,7 +40,10 @@ module.exports = {
                .setStyle(ButtonStyle.Secondary),
          );
          const adminRow2 = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('admin_close_panel').setLabel('Close').setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+               .setCustomId('admin_close_panel')
+               .setLabel('Close')
+               .setStyle(ButtonStyle.Secondary),
          );
          const adminEmbed = new EmbedBuilder()
             .setColor(0x1e1f22)
@@ -95,7 +98,10 @@ module.exports = {
          const supportEmbed = new EmbedBuilder()
             .setColor(0x1e1f22)
             .setTitle('مركز الدعم والمساعدة')
-            .setDescription('**نقدر اهتمامك بالبوت ونسعد بمساعدتك**\n\n' + 'يمكنك التواصل معنا عبر إحدى الطرق التالية:')
+            .setDescription(
+               '**نقدر اهتمامك بالبوت ونسعد بمساعدتك**\n\n' +
+                  'يمكنك التواصل معنا عبر إحدى الطرق التالية:',
+            )
             .addFields(
                {
                   name: 'تقديم شكوى أو اقتراح',

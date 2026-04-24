@@ -75,12 +75,15 @@ module.exports = {
          state.channelId = voiceChannel.id;
          state.connection.subscribe(state.player);
          if (state.playbackMode === 'surah') {
-            logger.info(`Guild ${guildId} Playing surah ${state.currentSurah} with reciter ${state.currentReciter}`);
+            logger.info(
+               `Guild ${guildId} Playing surah ${state.currentSurah} with reciter ${state.currentReciter}`,
+            );
             const resource = await imp.createSurahResource(state, state.currentSurah - 1);
             state.player.play(resource);
          } else if (state.currentRadioUrl) {
             const activeUrl =
-               global.radioHealthChecker?.getActiveRadioUrl(state.currentRadioUrl) || state.currentRadioUrl;
+               global.radioHealthChecker?.getActiveRadioUrl(state.currentRadioUrl) ||
+               state.currentRadioUrl;
             logger.info(`Guild ${guildId} Playing radio stream ${activeUrl}`);
             const resource = await imp.createRadioResource(activeUrl);
             state.player.play(resource);

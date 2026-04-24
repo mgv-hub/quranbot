@@ -3,7 +3,11 @@ const { getGuildState, isAuthorized } = require('@GuildStateManager-core_state')
 const { createRadioResource } = require('@audioUtils-core_utils');
 const { createSurahResource } = require('@audioUtils-core_utils');
 const { createControlEmbed } = require('@embeds-core_ui');
-const { createRadioRow, createButtonRow, createNavigationRow } = require('@components-core_ui');
+const {
+   createRadioRow,
+   createButtonRow,
+   createNavigationRow,
+} = require('@components-core_ui');
 const { updateControlMessage, saveControlId } = require('@interaction-core_utils');
 const logger = require('@logger');
 module.exports = {
@@ -34,7 +38,12 @@ module.exports = {
             await interaction.deferUpdate();
          }
          if (state.playbackMode !== 'radio') {
-            logger.warn('Radio Menu Accessed In Surah Mode Guild ' + guildId + ' Mode ' + state.playbackMode);
+            logger.warn(
+               'Radio Menu Accessed In Surah Mode Guild ' +
+                  guildId +
+                  ' Mode ' +
+                  state.playbackMode,
+            );
             return interaction.editReply({
                content: 'اختيار الراديو غير متاح في وضع السور',
                flags: 64,
@@ -45,7 +54,9 @@ module.exports = {
          if (index >= 0 && index < global.quranRadios.length) {
             state.currentRadioIndex = index;
             state.currentRadioUrl = global.quranRadios[index].url;
-            const safeUrl = require('@radioHealthChecker-core_utils').getActiveRadioUrl(state.currentRadioUrl);
+            const safeUrl = require('@radioHealthChecker-core_utils').getActiveRadioUrl(
+               state.currentRadioUrl,
+            );
 
             if (!safeUrl) {
                state.playbackMode = 'surah';
@@ -62,7 +73,8 @@ module.exports = {
                   state.pauseReason = null;
                } catch (radioError) {
                   logger.warn('Radio Stream Failed Trying Fallback Radio', radioError);
-                  const fallbackUrl = require('@radioHealthChecker-core_utils').getActiveRadioUrl(null);
+                  const fallbackUrl =
+                     require('@radioHealthChecker-core_utils').getActiveRadioUrl(null);
                   if (fallbackUrl && fallbackUrl !== state.currentRadioUrl) {
                      try {
                         const fallbackResource = await createRadioResource(fallbackUrl);
@@ -72,16 +84,25 @@ module.exports = {
                         state.isPaused = false;
                         state.pauseReason = null;
                      } catch (fallbackError) {
-                        logger.warn('Fallback Radio Also Failed Switching To Surah Mode', fallbackError);
+                        logger.warn(
+                           'Fallback Radio Also Failed Switching To Surah Mode',
+                           fallbackError,
+                        );
                         state.playbackMode = 'surah';
-                        const surahResource = await createSurahResource(state, state.currentSurah - 1);
+                        const surahResource = await createSurahResource(
+                           state,
+                           state.currentSurah - 1,
+                        );
                         state.player.play(surahResource);
                         state.isPaused = false;
                         state.pauseReason = null;
                      }
                   } else {
                      state.playbackMode = 'surah';
-                     const surahResource = await createSurahResource(state, state.currentSurah - 1);
+                     const surahResource = await createSurahResource(
+                        state,
+                        state.currentSurah - 1,
+                     );
                      state.player.play(surahResource);
                      state.isPaused = false;
                      state.pauseReason = null;

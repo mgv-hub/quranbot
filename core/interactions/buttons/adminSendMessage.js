@@ -1,5 +1,10 @@
 require('pathlra-aliaser')();
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+const {
+   ModalBuilder,
+   TextInputBuilder,
+   TextInputStyle,
+   ActionRowBuilder,
+} = require('discord.js');
 const logger = require('@logger');
 
 module.exports = {
@@ -15,7 +20,9 @@ module.exports = {
          });
       }
 
-      const modal = new ModalBuilder().setCustomId('admin_send_msg_modal').setTitle('Send Administrative Message');
+      const modal = new ModalBuilder()
+         .setCustomId('admin_send_msg_modal')
+         .setTitle('Send Administrative Message');
 
       const guildIdInput = new TextInputBuilder()
          .setCustomId('admin_msg_guild_id')

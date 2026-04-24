@@ -1,7 +1,10 @@
 require('pathlra-aliaser')();
 const { ChannelType } = require('discord.js');
 const logger = require('@logger');
-const { loadTrackedGuildsFromFirebase, saveTrackedGuildsToFirebase } = require('@firebase-core_utils');
+const {
+   loadTrackedGuildsFromFirebase,
+   saveTrackedGuildsToFirebase,
+} = require('@firebase-core_utils');
 const client = global.client;
 let trackedGuilds = [];
 async function loadTrackedGuilds() {

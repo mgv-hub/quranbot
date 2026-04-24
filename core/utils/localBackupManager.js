@@ -86,14 +86,20 @@ async function sendBackupToDiscord(backupPath, backupFilename) {
       const serverId = getBackupServerId();
       const env = getCurrentEnv();
       const channel =
-         client.channels.cache.get(channelId) || (await client.channels.fetch(channelId).catch(() => null));
+         client.channels.cache.get(channelId) ||
+         (await client.channels.fetch(channelId).catch(() => null));
       if (!channel) {
          logger.warn('Backup Channel Not Found ' + channelId);
          return;
       }
       const guild = channel.guild;
       if (!guild || guild.id !== serverId) {
-         logger.warn('Backup Channel Not In Expected Server Expected ' + serverId + ' Got ' + (guild?.id || 'none'));
+         logger.warn(
+            'Backup Channel Not In Expected Server Expected ' +
+               serverId +
+               ' Got ' +
+               (guild?.id || 'none'),
+         );
          return;
       }
       const fileBuffer = await fsPromises.readFile(backupPath);
@@ -103,7 +109,12 @@ async function sendBackupToDiscord(backupPath, backupFilename) {
       };
       await channel.send({
          content:
-            '**Backup Created**\nEnvironment: ' + env + '\nServer: ' + serverId + '\nTime: ' + new Date().toISOString(),
+            '**Backup Created**\nEnvironment: ' +
+            env +
+            '\nServer: ' +
+            serverId +
+            '\nTime: ' +
+            new Date().toISOString(),
          files: [attachment],
       });
       logger.info('Backup Sent To Discord Channel ' + channelId + ' In Server ' + serverId);

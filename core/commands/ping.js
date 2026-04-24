@@ -214,7 +214,12 @@ function getConnectedVoiceCount() {
    if (!client) return 0;
    if (client.guilds && client.guilds.cache) {
       client.guilds.cache.forEach((guild) => {
-         if (guild.members && guild.members.me && guild.members.me.voice && guild.members.me.voice.channelId) {
+         if (
+            guild.members &&
+            guild.members.me &&
+            guild.members.me.voice &&
+            guild.members.me.voice.channelId
+         ) {
             count++;
          }
       });

@@ -32,7 +32,11 @@ function getErrorType(error) {
    ) {
       return 'STATE_ERROR';
    }
-   if (error.message?.includes('Unknown Message') || error.message?.includes('10008') || error.code === 10008) {
+   if (
+      error.message?.includes('Unknown Message') ||
+      error.message?.includes('10008') ||
+      error.code === 10008
+   ) {
       return 'MESSAGE_NOT_FOUND';
    }
    if (
@@ -67,7 +71,9 @@ async function handleInteractionError(interaction, error, context) {
    try {
       const errorType = getErrorType(error);
       if (errorType === 'INTERACTION_EXPIRED' || errorType === 'MESSAGE_NOT_FOUND') {
-         imp.logger.debug(`Interaction Expired Or Message Not Found In ${context} Skipping Error Message`);
+         imp.logger.debug(
+            `Interaction Expired Or Message Not Found In ${context} Skipping Error Message`,
+         );
          return;
       }
       if (errorType !== 'PERMISSION_DENIED') {
@@ -109,7 +115,10 @@ async function handleInteractionError(interaction, error, context) {
          }
       } catch (replyError) {
          const replyErrorType = getErrorType(replyError);
-         if (replyErrorType === 'INTERACTION_EXPIRED' || replyErrorType === 'MESSAGE_NOT_FOUND') {
+         if (
+            replyErrorType === 'INTERACTION_EXPIRED' ||
+            replyErrorType === 'MESSAGE_NOT_FOUND'
+         ) {
             imp.logger.debug('Cannot Send Error Message Interaction Or Message Expired');
             return;
          }

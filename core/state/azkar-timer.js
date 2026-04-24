@@ -2,7 +2,11 @@ require('pathlra-aliaser')();
 
 const logger = require('@logger');
 const { AZKAR_INTERVAL_MS } = require('@azkar-config-core_state');
-const { setFirstMessage, getFirstMessage, deleteFirstMessage } = require('@azkar-cache-core_state');
+const {
+   setFirstMessage,
+   getFirstMessage,
+   deleteFirstMessage,
+} = require('@azkar-cache-core_state');
 const { sendRandomAzkar } = require('@azkar-sender-core_state');
 
 function startAzkarTimerForGuild(guildId, azkarChannelId, isFirstSetup = true) {
@@ -22,7 +26,10 @@ function startAzkarTimerForGuild(guildId, azkarChannelId, isFirstSetup = true) {
    }
    logger.info('Azkar Starting Timer For Guild ' + guildId + ' Channel ' + azkarChannelId);
    sendRandomAzkar(azkarChannelId, guildId, 5, isFirstSetup);
-   state.azkarTimer = setInterval(() => sendRandomAzkar(azkarChannelId, guildId, 5, false), AZKAR_INTERVAL_MS);
+   state.azkarTimer = setInterval(
+      () => sendRandomAzkar(azkarChannelId, guildId, 5, false),
+      AZKAR_INTERVAL_MS,
+   );
    logger.info('Azkar Timer Started For Guild ' + guildId + ' Interval 30 Minutes');
    return { success: true, channelId: azkarChannelId };
 }

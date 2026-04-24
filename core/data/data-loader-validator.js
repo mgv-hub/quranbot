@@ -30,7 +30,9 @@ function normalizeSurahCount(surahNames) {
    if (surahNames.length < GLOBAL_CONSTANTS.TOTAL_SURAHS) {
       const completed = [...surahNames];
       while (completed.length < GLOBAL_CONSTANTS.TOTAL_SURAHS) {
-         completed.push(`${GLOBAL_CONSTANTS.DEFAULT_SURAH_NAME_PREFIX}${completed.length + 1}`);
+         completed.push(
+            `${GLOBAL_CONSTANTS.DEFAULT_SURAH_NAME_PREFIX}${completed.length + 1}`,
+         );
       }
       return completed;
    }

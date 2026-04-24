@@ -7,7 +7,8 @@ function checkInteractionAuth(interaction, state, customId) {
    if (!isAuthorized(interaction, state, customId)) {
       return {
          authorized: false,
-         message: state.controlMode === 'everyone' ? ERRORS.ACTION_DENIED : ERRORS.ADMIN_REQUIRED,
+         message:
+            state.controlMode === 'everyone' ? ERRORS.ACTION_DENIED : ERRORS.ADMIN_REQUIRED,
       };
    }
    return { authorized: true, message: null };
