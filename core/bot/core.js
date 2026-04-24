@@ -13,17 +13,6 @@ require('@topgg-core_web');
 require('@globalAll');
 const { ActivityType } = require('discord.js');
 const { client, logger } = global;
-let activityIndex = 0;
-
-function getCairoHour() {
-   const now = new Date();
-   return (now.getUTCHours() + 2) % 24;
-}
-
-function getCairoMinutes() {
-   const now = new Date();
-   return now.getUTCMinutes();
-}
 
 function getConnectedVoiceCount() {
    let count = 0;
@@ -61,31 +50,19 @@ function getTotalListeners() {
 }
 
 async function updateStatus() {
-   const hour = getCairoHour();
+   const hour = (new Date().getUTCHours() + 2) % 24;
    const guildCount = client.guilds.cache.size;
    const voiceCount = getConnectedVoiceCount();
    const listenerCount = getTotalListeners();
-   let status;
-   let activity;
-   if (activityIndex % 3 === 0) {
-      activity = {
-         name: 'صلِّ على النبي ﷺ',
-         type: ActivityType.Watching,
-      };
-   } else if (activityIndex % 3 === 1) {
-      activity = {
-         name: `${guildCount} servers | ${voiceCount} Voice | ${listenerCount} Listeners`,
-         type: ActivityType.Watching,
-      };
-   } else {
-      activity = {
-         name: 'مفتوح المصدر | github.com/hub-mgv/quranbot',
-         type: ActivityType.Watching,
-      };
-   }
-   status = hour >= 6 && hour < 12 ? 'online' : hour >= 12 && hour < 18 ? 'idle' : 'dnd';
+
+   const activity = {
+      name: 'Live Quran 24/7',
+      type: ActivityType.Streaming,
+      url: 'https://www.twitch.tv/quran_live24'
+   };
+
+   const status = hour >= 6 && hour < 12 ? 'online' : hour >= 12 && hour < 18 ? 'idle' : 'dnd';
    client.user?.setPresence({ status, activities: [activity] });
-   activityIndex++;
 }
 
 client.once('clientReady', () => {
@@ -116,13 +93,14 @@ process.on('uncaughtException', (err) => {
             status: 'dnd',
             activities: [
                {
-                  name: `${guildCount} servers | ${voiceCount} Voice | ${listenerCount} Listeners`,
-                  type: ActivityType.Watching,
+                  name: 'https://www.twitch.tv/alquranhd Live',
+                  type: ActivityType.Streaming,
+                  url: 'https://www.twitch.tv/quran_live24'
                },
             ],
          });
       }
-   } catch {}
+   } catch { }
 });
 
 setInterval(() => {
