@@ -321,6 +321,8 @@ const CHANNEL_NAMES = {
    AZKAR: '🌙︱الأذكار',
 };
 
+
+
 module.exports.TIME_CONSTANTS = TIME_CONSTANTS;
 module.exports.LIMITS = LIMITS;
 module.exports.PATHS = PATHS;
@@ -342,4 +344,3 @@ module.exports.FIREBASE_CONFIG = FIREBASE_CONFIG;
 module.exports.HTTP_CONFIG = HTTP_CONFIG;
 module.exports.PERMISSIONS_CONFIG = PERMISSIONS_CONFIG;
 module.exports.CHANNEL_NAMES = CHANNEL_NAMES;
-module.exports.VERSION_INFO = VERSION_INFO;
