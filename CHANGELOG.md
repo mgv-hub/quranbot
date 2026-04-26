@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.81.13](https://github.com/mgv-hub/quranbot/compare/v0.81.12...v0.81.13) (2026-04-26)
+
+
+### Features
+
+* **ping:** add GitHub source link to embed ([df3220f](https://github.com/mgv-hub/quranbot/commit/df3220fc0426b49fc4594ff4bbf94366c5a84e65))
+
 ### [0.81.12](https://github.com/mgv-hub/quranbot/compare/v0.81.11...v0.81.12) (2026-04-24)
 
 ### [0.81.11](https://github.com/mgv-hub/quranbot/compare/v0.81.10...v0.81.11) (2026-04-24)
