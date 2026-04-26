@@ -313,8 +313,6 @@ const CHANNEL_NAMES = {
    AZKAR: '🌙︱الأذكار',
 };
 
-
-
 module.exports.TIME_CONSTANTS = TIME_CONSTANTS;
 module.exports.LIMITS = LIMITS;
 module.exports.PATHS = PATHS;

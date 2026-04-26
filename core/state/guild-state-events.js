@@ -43,11 +43,11 @@ function setupPlayerEvents(guildId, player) {
             } catch (surahError) {
                logger.warn(
                   'Guild ' +
-                  guildId +
-                  ' Surah ' +
-                  state.currentSurah +
-                  ' Failed: ' +
-                  surahError.message,
+                     guildId +
+                     ' Surah ' +
+                     state.currentSurah +
+                     ' Failed: ' +
+                     surahError.message,
                );
                const workingReciter = findWorkingReciter(state.currentReciter);
                if (workingReciter) {
@@ -57,11 +57,11 @@ function setupPlayerEvents(guildId, player) {
                   state.playbackStartTime = Date.now();
                   logger.info(
                      'Guild ' +
-                     guildId +
-                     ' Reciter ' +
-                     state.currentReciter +
-                     ' Failed Switched To ' +
-                     workingReciter,
+                        guildId +
+                        ' Reciter ' +
+                        state.currentReciter +
+                        ' Failed Switched To ' +
+                        workingReciter,
                   );
                   try {
                      resource = await global.createSurahResource(state, 0, 0, 0, true);
@@ -90,11 +90,11 @@ function setupPlayerEvents(guildId, player) {
                      state.currentSurah = alternativeIndex + 1;
                      logger.info(
                         'Guild ' +
-                        guildId +
-                        ' Surah ' +
-                        (state.currentSurah - 1) +
-                        ' Failed Switched To Surah ' +
-                        state.currentSurah,
+                           guildId +
+                           ' Surah ' +
+                           (state.currentSurah - 1) +
+                           ' Failed Switched To Surah ' +
+                           state.currentSurah,
                      );
                      resource = await global.createSurahResource(
                         state,
