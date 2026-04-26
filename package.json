@@ -2,8 +2,8 @@
    "name": "quranbot",
    "version": "0.81.13",
    "description": "QuranBot is an advanced Discord bot for Quran recitation, Azkar, prayer times, and Islamic radio streaming with a control panel and stable voice.",
-   "lastUpdated": "2026-04-24",
-   "lastUpdateNote": "update bot status system",
+   "lastUpdated": "2026-04-26",
+   "lastUpdateNote": "major voice system refactor: introduced recovery manager, state machine, retry policy, activity monitoring, and scalable fault-tolerant audio pipeline",
    "main": "core/bot/core.js",
    "packageManager": "pnpm@8.15.0",
    "scripts": {
@@ -205,7 +205,8 @@
       "@data-juz-map-core_data": "./core/data/data-azkar.js",
       "@moreFeatures-core_interactions_buttons": "./core/interactions/buttons/moreFeatures.js",
       "@backToMain-core_interactions_buttons": "./core/interactions/buttons/backToMain.js",
-      "@logSetup-core_interactions_buttons": "./core/interactions/buttons/logSetup.js"
+      "@logSetup-core_interactions_buttons": "./core/interactions/buttons/logSetup.js",
+      "@voiceWatchdog-core_state": "./core/state/voiceWatchdog.js"
    },
    "_moduleDirectories": [
       "node_modules",

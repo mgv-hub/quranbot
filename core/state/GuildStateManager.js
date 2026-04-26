@@ -21,6 +21,7 @@ const {
    cleanupGuildState,
    cleanupDestroyedConnections,
 } = require('@guild-state-cleanup-core_state');
+const { startVoiceWatchdog } = require('@voiceWatchdog-core_state');
 
 function getGuildState(guildId) {
    if (!hasGuildState(guildId)) {
@@ -51,6 +52,7 @@ function getGuildState(guildId) {
          humanCount: 0,
          playbackStartTime: 0,
          playedOffset: 0,
+         recoveryAttempts: 0,
       };
       setGuildState(guildId, newState);
       setupPlayerEvents(guildId, player);
@@ -89,31 +91,48 @@ setInterval(async () => {
                const membersInChannel = voiceChannel.members.filter((m) => !m.user.bot).size;
                state.humanCount = membersInChannel;
 
-               if (membersInChannel > 0 && state.isPaused && state.pauseReason === 'initial') {
-                  logger.info('Guild ' + guildId + ' Users Detected Starting Playback');
-                  try {
-                     if (state.playbackMode === 'surah') {
-                        const resource = await global.createSurahResource(
-                           state,
-                           state.currentSurah - 1,
-                           0,
-                           0,
-                           false,
-                        );
-                        state.player.play(resource);
+               if (membersInChannel > 0 && state.isPaused) {
+                  const autoResumeReasons = [
+                     'initial',
+                     'player_error',
+                     'auto_resume_failed',
+                     'watchdog_timeout',
+                     'watchdog_error_limit',
+                     'idle_timeout',
+                     'buffer_timeout',
+                  ];
+                  const canResume = autoResumeReasons.includes(state.pauseReason);
+                  const maxRetries = 3;
+
+                  if (canResume && (state.recoveryAttempts || 0) < maxRetries) {
+                     logger.info('Guild ' + guildId + ' Users Detected Starting Playback');
+                     try {
+                        if (state.playbackMode === 'surah') {
+                           const resource = await global.createSurahResource(
+                              state,
+                              state.currentSurah - 1,
+                              0,
+                              0,
+                              false,
+                           );
+                           state.player.play(resource);
+                        } else if (state.currentRadioUrl) {
+                           const resource = await global.createRadioResource(
+                              state.currentRadioUrl,
+                              0,
+                           );
+                           state.player.play(resource);
+                        }
                         state.isPaused = false;
                         state.pauseReason = null;
-                     } else if (state.currentRadioUrl) {
-                        const resource = await global.createRadioResource(
-                           state.currentRadioUrl,
-                           0,
+                        state.recoveryAttempts = (state.recoveryAttempts || 0) + 1;
+                        state.playbackStartTime = Date.now();
+                        state.lastActivity = Date.now();
+                     } catch (error) {
+                        logger.error(
+                           'Guild ' + guildId + ' Auto Start Failed ' + error.message,
                         );
-                        state.player.play(resource);
-                        state.isPaused = false;
-                        state.pauseReason = null;
                      }
-                  } catch (error) {
-                     logger.error('Guild ' + guildId + ' Auto Start Failed', error);
                   }
                }
 
@@ -125,6 +144,8 @@ setInterval(async () => {
       }
    }
 }, 10000);
+
+startVoiceWatchdog();
 
 module.exports.getGuildState = getGuildState;
 module.exports.removeGuildState = removeGuildState;

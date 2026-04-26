@@ -203,7 +203,11 @@ module.exports = {
             { name: 'OS Type', value: `${osType} ${osRelease}`, inline: true },
             { name: 'Commands Used', value: `${commandsUsed}`, inline: true },
             { name: 'Azkar Sent', value: `${azkarSent}`, inline: true },
-            { name: 'Source Code', value: '[GitHub](https://github.com/mgv-hub/quranbot)', inline: true },
+            {
+               name: 'Source Code',
+               value: '[GitHub](https://github.com/mgv-hub/quranbot)',
+               inline: true,
+            },
          );
       await interaction.editReply({ content: null, embeds: [embed] });
    },
