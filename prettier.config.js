@@ -15,6 +15,7 @@ export default {
    // This is important for arrow functions with a single parameter
    // Always include parentheses for consistency and to avoid confusion
    arrowParens: 'always',
+   endOfLine: 'lf',
 
    overrides: [
       {

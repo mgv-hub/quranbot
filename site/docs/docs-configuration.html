@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot Advanced Configuration Guide - Environment setup, Lavalink, Redis, Firebase, and production deployment"
+        />
+        <title>QuranBot Advanced Configuration</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link">Development</a>
+                    <a href="docs-configuration.html" class="nav-link active">Configuration</a>
+                    <a href="docs-security.html" class="nav-link">Security</a>
+                    <a href="docs-resources.html" class="nav-link">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">Advanced Configuration</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For System Administrators & DevOps</p>
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Overview</h3>
+                    <p>This guide covers production configuration, external service integration, and deployment strategies for QuranBot.</p>
+                    <ul>
+                        <li><i class="fas fa-cog"></i> Environment variable management</li>
+                        <li><i class="fas fa-wave-square"></i> Lavalink node configuration</li>
+                        <li><i class="fas fa-database"></i> Redis + Firebase setup</li>
+                        <li><i class="fas fa-server"></i> PM2 deployment & scaling</li>
+                    </ul>
+                </div>
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#env" class="active">Environment Variables</a></li>
+                            <li><a href="#env-switcher">Environment Switcher</a></li>
+                            <li><a href="#lavalink">Lavalink Configuration</a></li>
+                            <li><a href="#lavalink-nodes">Node Management</a></li>
+                            <li><a href="#redis">Redis Setup</a></li>
+                            <li><a href="#firebase">Firebase Integration</a></li>
+                            <li><a href="#deployment">Deployment with PM2</a></li>
+                            <li><a href="#sharding">Sharding Strategy</a></li>
+                            <li><a href="#monitoring">Health Checks & Monitoring</a></li>
+                            <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        </ul>
+                    </aside>
+                    <div class="doc-main">
+                        <section id="env" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-sliders-h"></i> Environment Variables</h2>
+                            <p>
+                                QuranBot uses a dual-environment system with <code>development.env</code> and <code>production.env</code>.
+                                The active environment is determined by <code>NODE_ENV</code> in the base <code>.env</code> file.
+                            </p>
+                            <h3>Core Variables (Required)</h3>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>DISCORD_TOKEN</code></td>
+                                        <td>Bot authentication token from Discord Developer Portal</td>
+                                        <td><code>MTEyMz...xyz</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>CLIENT_ID</code></td>
+                                        <td>Discord application client ID (snowflake)</td>
+                                        <td><code>1505646575962292314</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>SPE_USER_ID</code></td>
+                                        <td>Comma-separated list of developer user IDs with admin access</td>
+                                        <td><code>123456789,987654321</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>BACKUP_INTERVAL_MS</code></td>
+                                        <td>Interval for automatic Firebase backups (milliseconds)</td>
+                                        <td><code>600000</code> (10 minutes)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Environment-Specific Variables</h3>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Development</th>
+                                        <th>Production</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>DEVELOPMENT_SERVER_ID</code></td>
+                                        <td>Test server ID for backup channel</td>
+                                        <td><em>Not used</em></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>DEVELOPMENT_CHANNEL_ID</code></td>
+                                        <td>Channel ID for receiving backup files</td>
+                                        <td><em>Not used</em></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>PRODUCTION_SERVER_ID</code></td>
+                                        <td><em>Not used</em></td>
+                                        <td>Production server ID for backups</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>PRODUCTION_CHANNEL_ID</code></td>
+                                        <td><em>Not used</em></td>
+                                        <td>Production backup channel ID</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>TOPGG_TOKEN</code></td>
+                                        <td><em>Removed automatically</em></td>
+                                        <td>top.gg API token for bot listing</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="warning-box">
+                                <strong>Security Note</strong>
+                                <p>
+                                    In development mode, <code>TOPGG_TOKEN</code> is automatically removed from <code>process.env</code> to
+                                    prevent accidental use of production API keys during testing. Never commit real tokens to version
+                                    control.
+                                </p>
+                            </div>
+                        </section>
+                        <section id="env-switcher" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-exchange-alt"></i> Environment Switcher</h2>
+                            <p>The <code>src/config/envSwitcher.js</code> module handles environment selection at startup:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">
+require('pathlra-aliaser')();
+
+const path = require('path');
+const dotenv = require('dotenv');
+const logger = require('@logging/logger');
+const fs = require('fs');
+
+const baseEnvFilePath = path.resolve(__dirname, '../../.env');
+let baseEnvConfig = {};
+
+if (fs.existsSync(baseEnvFilePath)) {
+    const rawBaseEnv = fs.readFileSync(baseEnvFilePath, 'utf8');
+    baseEnvConfig = dotenv.parse(rawBaseEnv);
+}
+
+const activeEnv = baseEnvConfig.NODE_ENV;
+const targetedEnvPath = path.resolve(__dirname, `../../${activeEnv}.env`);
+
+const loadResult = dotenv.config({ path: targetedEnvPath });
+
+if (loadResult.error) {
+    logger.error(`Could Not Load ${activeEnv} Env File`, loadResult.error.message);
+    process.exit(1);
+} else {
+    logger.info(`Loaded ${activeEnv} Env`);
+}
+
+// Remove TOPGG_TOKEN in development to prevent accidental use of production API key during dev
+if (activeEnv === 'development') {
+    if (process.env.TOPGG_TOKEN) {
+        delete process.env.TOPGG_TOKEN;
+        logger.info('Development Mode TOPGG_TOKEN Removed');
+    }
+}
+
+module.exports.isDevelopment = activeEnv === 'development';
+module.exports.isProduction = activeEnv === 'production';
+module.exports.currentEnv = activeEnv;
+</code></pre>
+                            </div>
+                            <h3>Setup Steps:</h3>
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px">
+                                    Copy <code>development.env.example</code> → <code>development.env</code>
+                                </li>
+                                <li style="margin-bottom: 12px">Copy <code>production.env.example</code> → <code>production.env</code></li>
+                                <li>Set <code>NODE_ENV=production</code> (or <code>development</code>) in base <code>.env</code></li>
+                            </ol>
+                        </section>
+                        <section id="lavalink" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wave-square"></i> Lavalink Configuration</h2>
+                            <p>
+                                QuranBot uses Lavalink v4 for scalable, low-latency audio processing. Configuration is managed via
+                                <code>LAVALINK_NODES_</code> environment variable.
+                            </p>
+                            <h3>JSON Format (Recommended)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript"># Lavalink Audio Server
+LAVALINK_NODES_='[
+  {
+    "host": "ip",
+    "port": 2022,
+    "password": "123",
+    "secure": false,
+    "maxPlayers": 60,
+    "location": "India, Pune",
+    "flag": "🇮🇳",
+    "playerCreateDelay": 100
+  },
+  {
+    "host": "ip",
+    "port": 2022,
+    "password": "123",
+    "secure": false,
+    "maxPlayers": 500,
+    "location": "Mexico, Santiago de Querétaro",
+    "flag": "🇲🇽",
+    "playerCreateDelay": 100
+  }
+]'</code></pre>
+                            </div>
+                            <h3>Node Selection Logic</h3>
+                            <p>The bot selects nodes using <code>getBestNode()</code> in <code>src/startup/botSetup.js</code>:</p>
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px">Filter nodes: connected + under <code>maxPlayers</code> limit</li>
+                                <li style="margin-bottom: 12px">Sort by current player count (least loaded first)</li>
+                                <li>Return first available node; <code>null</code> if all full</li>
+                            </ol>
+                            <div class="highlight-box">
+                                <p><strong>Key Parameters:</strong></p>
+                                <ul style="margin-top: 8px">
+                                    <li><code>maxPlayers</code>: Max concurrent players per node (prevents overload)</li>
+                                    <li><code>playerCreateDelay</code>: Artificial delay (ms) for load distribution</li>
+                                    <li><code>secure</code>: Use HTTPS/WSS for node communication</li>
+                                    <li><code>location/flag</code>: Display metadata for admin UI</li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section id="lavalink-nodes" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-server"></i> Node Management & Failover</h2>
+                            <h3>Runtime Node Switching</h3>
+                            <p>
+                                Users can manually select nodes via the control panel. The <code>select_lavalink_node</code> menu handler in
+                                <code>src/interactions/menus/lavalinkNodes.js</code> manages migration:
+                            </p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Key steps during node switch:
+const currentPosition = guildState.player.position || 0;
+const wasPaused = guildState.player.paused || false;
+
+// 1. Reconnect to new node
+await initializeConnection(guildId, guildState, targetChannel, adapter);
+
+// 2. Recreate audio resource
+const track = await createSurahResource(guildState, index);
+
+// 3. Resume playback at exact position
+await guildState.player.play({ track });
+if (currentPosition > 0) {
+    await guildState.player.seek(currentPosition);
+}
+if (wasPaused) await guildState.player.pause(true);</code></pre>
+                            </div>
+                            <h3>Automatic Failover</h3>
+                            <p>If a node disconnects during playback:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">
+                                    Lavalink client auto-reconnects per <code>retryAmount</code>/<code>retryDelay</code>
+                                </li>
+                                <li style="margin-bottom: 8px">Bot listens for <code>nodeManager.on('disconnect')</code> events</li>
+                                <li>State persistence ensures playback resumes after reconnection</li>
+                            </ul>
+                            <div class="doc-alert">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="doc-alert-content">
+                                    <strong>Legacy Format Support</strong>
+                                    <p>
+                                        For backward compatibility, the bot still supports numbered variables like
+                                        <code>LAVALINK_NODE_1_HOST</code>, but the JSON format is recommended for maintainability.
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="redis" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-database"></i> Redis Setup</h2>
+                            <p>Redis provides hot caching for guild states, enabling stateless sharding and sub-millisecond lookups.</p>
+                            <h3>Configuration</h3>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Default</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>REDIS_URL</code></td>
+                                        <td><code>redis://127.0.0.1:6379</code></td>
+                                        <td>Redis connection string (supports auth, TLS)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Connection String Examples</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript"># Local development
+REDIS_URL=redis://localhost:6379
+
+# With password authentication
+REDIS_URL=redis://:my_password@localhost:6379
+
+# Redis Cloud / Managed service
+REDIS_URL=rediss://default:password@redis-12345.c1.us-east-1-2.ec2.redns.redis-cloud.com:12345
+
+# With database selection
+REDIS_URL=redis://localhost:6379/2</code></pre>
+                            </div>
+
+                            <div class="code-block">
+                                <pre><code class="language-javascript">async function get(key) {
+    try {
+        if (clientManager.isRedisReady && client) {
+            const result = await client.get(key);
+            return result ? JSON.parse(result) : result;
+        }
+    } catch (error) {
+        logger.error(`Redis get failed: ${error.message}`);
+    }
+    
+    // Fallback to memory
+    return memoryFallbackMap.get(key) || null;
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="firebase" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-fire"></i> Firebase Integration</h2>
+                            <p>
+                                Firebase Realtime Database serves as the cold storage layer for persistent state, complaints, and
+                                statistics.
+                            </p>
+                            <h3>Service Account Setup</h3>
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px">
+                                    Go to
+                                    <a href="https://console.firebase.google.com/" target="_blank" style="color: var(--text-accent)"
+                                        >Firebase Console</a
+                                    >
+                                    → Project Settings → Service Accounts
+                                </li>
+                                <li style="margin-bottom: 12px">Generate new private key → Download JSON file</li>
+                                <li style="margin-bottom: 12px">Extract values into environment variables (see table below)</li>
+                            </ol>
+                            <h3>Required Firebase Variables</h3>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Source in JSON</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>FIREBASE_ADMIN_TYPE</code></td>
+                                        <td><code>type</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>FIREBASE_ADMIN_PROJECT_ID</code></td>
+                                        <td><code>project_id</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>FIREBASE_ADMIN_PRIVATE_KEY</code></td>
+                                        <td><code>private_key</code> (see note below)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>FIREBASE_ADMIN_PRIVATE_KEY_ID</code></td>
+                                        <td><code>private_key_id</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>FIREBASE_ADMIN_CLIENT_EMAIL</code></td>
+                                        <td><code>client_email</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>FIREBASE_ADMIN_CLIENT_ID</code></td>
+                                        <td><code>client_id</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>FIREBASE_DATABASE_URL</code></td>
+                                        <td><code>https://your-project.firebaseio.com</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="warning-box">
+                                <strong>Private Key Formatting</strong>
+                                <p>
+                                    The <code>FIREBASE_ADMIN_PRIVATE_KEY</code> value must preserve newlines. In <code>.env</code> files,
+                                    wrap the key in quotes and escape newlines as <code>\n</code>, or use a multi-line string if your
+                                    environment supports it. The bot's <code>getSanitizedPrivateKey()</code> function handles common
+                                    formatting issues.
+                                </p>
+                            </div>
+                            <h3>Database Rules</h3>
+                            <p>Ensure your <code>firebase.rules.json</code> denies public access:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">{
+  "rules": {
+    ".read": false,
+    ".write": false
+  }
+}</code></pre>
+                            </div>
+                            <p>
+                                The bot uses server-side <code>firebase-admin</code> with service account credentials, which bypasses these
+                                rules for authenticated operations.
+                            </p>
+                        </section>
+                        <section id="deployment" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-rocket"></i> Deployment with PM2</h2>
+                            <p>QuranBot is optimized for process management via PM2, supporting auto-restart, logging, and clustering.</p>
+                            <h3>PM2 Configuration (<code>ecosystem.config.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">module.exports = {
+  apps: [{
+    name: 'QuranBot',
+    script: 'src/bot/core.js',
+    node_args: '--trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps',
+    autorestart: true,
+    watch: false,
+    ignore_watch: ['node_modules', 'storage/logs', 'logs', '.git', '.test'],
+    instances: 1,
+    exec_mode: 'fork',
+    env: {
+      merge_logs: true,
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      error_file: 'storage/pm2/logs/pm2-error.log',
+      out_file: 'storage/pm2/logs/pm2-out.log',
+      restart_delay: 7000,
+    },
+  }],
+};</code></pre>
+                            </div>
+                            <h3>Deployment Commands</h3>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>pnpm run pm2:start</code></td>
+                                        <td>Start bot with PM2 using <code>ecosystem.config.js</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>pnpm run pm2:logs</code></td>
+                                        <td>View last 500 lines of PM2 logs</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>pnpm run pm2:restart</code></td>
+                                        <td>Graceful restart with 7s delay</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>pnpm run pm2:stop</code></td>
+                                        <td>Stop the bot process</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>pnpm run pm2:delete</code></td>
+                                        <td>Remove bot from PM2 process list</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Production Startup Script</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">#!/bin/bash
+# deploy.sh - Production deployment script
+set -e
+
+# Load environment
+export NODE_ENV=production
+source .env
+
+# Install dependencies
+pnpm install --prod
+
+# Run database migrations if needed
+# pnpm run migrate
+
+# Start with PM2
+pnpm run pm2:start
+
+# Save PM2 process list for auto-start on reboot
+pm2 save
+
+echo "QuranBot deployed successfully"</code></pre>
+                            </div>
+                        </section>
+                        <section id="sharding" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-project-diagram"></i> Sharding Strategy</h2>
+                            <p>
+                                For large-scale deployments, QuranBot supports Discord's sharding via <code>discord-hybrid-sharding</code>.
+                            </p>
+                            <h3>Shard Configuration Variables</h3>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Default</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>TOTAL_SHARDS</code></td>
+                                        <td><code>auto</code></td>
+                                        <td>Number of shards (or <code>auto</code> for Discord recommendation)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>SHARD_LIST</code></td>
+                                        <td><em>undefined</em></td>
+                                        <td>Comma-separated list of shard IDs for this instance</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>SHARDS_PER_CLUSTER</code></td>
+                                        <td><code>2</code></td>
+                                        <td>Shards per PM2 cluster process</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Example: Multi-Instance Setup</h3>
+                            <p>For a bot serving 10,000+ servers, you might run 4 instances with 2 shards each:</p>
+                            <div class="code-block">
+                                <pre><code class="language-properties"># Instance 1 (.env.cluster1)
+NODE_ENV=production
+TOTAL_SHARDS=8
+SHARD_LIST=0,1
+SHARDS_PER_CLUSTER=2
+
+# Instance 2 (.env.cluster2)
+NODE_ENV=production
+TOTAL_SHARDS=8
+SHARD_LIST=2,3
+SHARDS_PER_CLUSTER=2
+
+# ... instances 3 and 4 for shards 4-7
+
+# Start each with:
+NODE_ENV=production pnpm run run:shard</code></pre>
+                            </div>
+                            <div class="highlight-box">
+                                <p>
+                                    <strong>Stateless Design:</strong> With Redis caching, each shard instance operates independently. Guild
+                                    state is fetched from Redis on demand, enabling horizontal scaling without sticky sessions.
+                                </p>
+                            </div>
+                        </section>
+                        <section id="monitoring" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-heartbeat"></i> Health Checks & Monitoring</h2>
+                            <h3>Built-in Health Endpoint</h3>
+                            <p>
+                                The bot exposes a lightweight HTTP health check on port <code>HH_CH_PORT</code> (default:
+                                <code>3000</code>):
+                            </p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript"># Example request
+curl http://localhost:3000/health
+
+# Response
+{
+  "status": "ok",
+  "voiceConnections": 42,
+  "uptime": 86400.123,
+  "memory": {
+    "rss": 256000000,
+    "heapTotal": 128000000,
+    "heapUsed": 96000000
+  },
+  "timestamp": "2026-05-24T12:00:00.000Z"
+}</code></pre>
+                            </div>
+                            <h3>Key Metrics to Monitor</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">
+                                    <strong>Memory Usage</strong>: Alert if <code>heapUsed</code> > 1.5GB (triggers aggressive GC)
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Voice Connections</strong>: Sudden drops may indicate Lavalink issues
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Uptime</strong>: Track restarts via <code>pm2 logs</code> or health endpoint
+                                </li>
+                                <li><strong>Log Volume</strong>: Spike in <code>error</code> logs may indicate external API failures</li>
+                            </ul>
+                            <h3>Log Rotation</h3>
+                            <p>Logs are automatically archived daily at Cairo midnight:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">Location: <code>storage/logs/archive/</code></li>
+                                <li style="margin-bottom: 8px">Format: <code>logs-general-YYYY-MM-DD.zip</code></li>
+                                <li>Retention: 60 days (configurable in <code>logging_config</code>)</li>
+                            </ul>
+                        </section>
+                        <section id="troubleshooting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wrench"></i> Troubleshooting Guide</h2>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Bot fails to start with "Firebase Private Key Format Invalid"
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    This indicates newline escaping issues in the <code>.env</code> file. Solutions:
+                                </p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Use <code>echo -n "$PRIVATE_KEY" | base64</code> to encode, then decode at runtime</li>
+                                    <li>Wrap the key in triple quotes if your shell supports it</li>
+                                    <li>Use a secrets manager (e.g., HashiCorp Vault) instead of env files</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    The bot's <code>getSanitizedPrivateKey()</code> handles common cases, but complex keys may require
+                                    preprocessing.
+                                </p>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Lavalink nodes show "No compatible encryption modes"
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    This Discord voice encryption mismatch occurs when:
+                                </p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Lavalink version is incompatible with Discord's current encryption suite</li>
+                                    <li>Node is behind a proxy that strips TLS headers</li>
+                                    <li>Bot and Lavalink have mismatched <code>secure</code> settings</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Verify Lavalink is v4.x and <code>secure</code> matches your deployment (false for HTTP, true for
+                                    HTTPS).
+                                </p>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    High memory usage after several days
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">The bot includes automatic memory management:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Every 5 minutes: Check if heap > 250MB → trigger GC</li>
+                                    <li>Every hour: Clean destroyed voice connections from state maps</li>
+                                    <li>On interaction cache TTL expiry: Remove stale entries</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">If memory still grows, check for:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Large guilds with many channels (state maps scale linearly)</li>
+                                    <li>Long-running intervals without cleanup</li>
+                                    <li>Event listeners not properly removed on guild leave</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Use <code>/سرعة</code> command to view real-time memory stats.
+                                </p>
+                            </details>
+                            <h3>Diagnostic Commands</h3>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Use Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>/سرعة</code></td>
+                                        <td>View bot latency, uptime, memory, and Lavalink node status</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>pnpm run pm2:logs --lines 100</code></td>
+                                        <td>Inspect recent logs for error patterns</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>redis-cli ping</code></td>
+                                        <td>Verify Redis connectivity</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>curl https://your-lavalink-host/v4/stats</code></td>
+                                        <td>Check Lavalink node health directly</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Links</h4>
+                    <div class="footer-links">
+                        <a href="../../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="../docs.html" class="footer-link"><i class="fas fa-book"></i> Developer Docs</a>
+                        <a href="./docs-configuration.html" class="footer-link"><i class="fas fa-cog"></i> Advanced Config</a>
+                        <a href="../privacy.html" class="footer-link"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-cog"></i> Operations</h4>
+                    <div class="footer-links">
+                        <a href="https://github.com/mgv-hub/quranbot/issues" class="footer-link">
+                            <i class="fas fa-bug"></i>
+                            Report Issue
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version">
+                    <i class="fas fa-code-branch"></i>
+                    Docs <span data-app-version></span>
+                </p>
+            </div>
+        </footer>
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

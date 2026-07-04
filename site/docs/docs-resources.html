@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot Resource & Customization Guide - Managing reciters, radio stations, azkar data, UI components, and performance optimization"
+        />
+        <title>QuranBot Resource & Customization Guide</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link">Development</a>
+                    <a href="docs-configuration.html" class="nav-link">Configuration</a>
+                    <a href="docs-security.html" class="nav-link">Security</a>
+                    <a href="docs-resources.html" class="nav-link active">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">Resource & Customization Guide</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For Data Managers & UI Customizers</p>
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Overview</h3>
+                    <p>
+                        This guide covers data sourcing, resource configuration, UI component customization, and performance tuning for
+                        QuranBot's core systems.
+                    </p>
+                    <ul>
+                        <li><i class="fas fa-microphone-alt"></i> Reciter & audio source management</li>
+                        <li><i class="fas fa-broadcast-tower"></i> Radio station configuration & health checks</li>
+                        <li><i class="fas fa-clock"></i> Azkar scheduling & content updates</li>
+                        <li><i class="fas fa-palette"></i> UI, embed, and component customization</li>
+                    </ul>
+                </div>
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#reciters" class="active">Reciter & Audio Management</a></li>
+                            <li><a href="#audio-structure">Audio Data Structure</a></li>
+                            <li><a href="#radio">Radio Station Configuration</a></li>
+                            <li><a href="#radio-health">Health Check & Fallback</a></li>
+                            <li><a href="#azkar">Azkar & Reminder System</a></li>
+                            <li><a href="#azkar-delivery">Delivery & Expiry Handling</a></li>
+                            <li><a href="#prayer-times">Prayer Times Data</a></li>
+                            <li><a href="#ui">UI & Embed Customization</a></li>
+                            <li><a href="#components">Component & Pagination</a></li>
+                            <li><a href="#performance">Performance & Caching</a></li>
+                            <li><a href="#troubleshooting">Resource Troubleshooting</a></li>
+                        </ul>
+                    </aside>
+                    <div class="doc-main">
+                        <section id="reciters" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-microphone-alt"></i> Reciter & Audio Management</h2>
+                            <p>
+                                Reciter data is loaded at startup from remote CDN endpoints and cached in memory for fast access. The system
+                                supports dynamic URL generation, duration estimation, and Lavalink-based stream validation.
+                            </p>
+                            <h3>Loading Pipeline (<code>src/data/data-loader-reciters.js</code>)</h3>
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px">
+                                    Fetch cached dataset from <code>https://hub-mgv.github.io/QuranBotData/data_quran.json</code>
+                                </li>
+                                <li style="margin-bottom: 12px">
+                                    Parse <code>reciters.reciters</code> array and validate required fields (<code>id</code>,
+                                    <code>name</code>, <code>server</code>)
+                                </li>
+                                <li style="margin-bottom: 12px">
+                                    Generate MP3 URLs for all 114 surahs per reciter using <code>formatSurahUrl()</code>
+                                </li>
+                                <li>Estimate durations and assign to <code>global.reciters</code> Map</li>
+                            </ol>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/data/data-loader-formatter.js - URL generation
+function formatSurahUrl(serverUrl, surahNumber, reciterType) {
+    const padded = surahNumber.toString().padStart(3, '0');
+    
+    // CDN-specific path patterns
+    if (serverUrl.includes('everyayah.com')) {
+        return `${serverUrl}Alafasy/mp3/${surahNumber}.mp3`;
+    }
+    
+    return `${serverUrl}${padded}.mp3`;
+}</code></pre>
+                            </div>
+                            <h3>Adding a New Reciter</h3>
+                            <p>Update the remote JSON source or local cache. The structure must match:</p>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>id</code></td>
+                                        <td><code>number</code></td>
+                                        <td>Unique numeric identifier</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>name</code></td>
+                                        <td><code>string</code></td>
+                                        <td>Display name (supports Arabic)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>server</code></td>
+                                        <td><code>string</code></td>
+                                        <td>Base CDN URL (must end with <code>/</code>)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>rewaya_id</code></td>
+                                        <td><code>string</code></td>
+                                        <td>Recitation style (Hafs, Warsh, etc.)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>photo</code></td>
+                                        <td><code>string</code></td>
+                                        <td>Thumbnail URL (optional)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <section id="audio-structure" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-database"></i> Audio Data Structure</h2>
+                            <p>At runtime, each reciter is stored in <code>global.reciters</code> with this structure:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Runtime object per reciter
+{
+    id: 1,
+    name: 'Abdul Basit Abdul Samad',
+    rewaya: 'hafs',
+    photo: 'https://cdn.example.com/photo.jpg',
+    links: ['https://server/001.mp3', 'https://server/002.mp3', ...], // 114 entries
+    durations: ['12:34', '08:15', ...] // Estimated MM:SS
+}</code></pre>
+                            </div>
+                            <h3>Stream Validation & Fallback</h3>
+                            <p>Before playback, <code>createSurahResource()</code> in <code>src/audio/resource.js</code> validates URLs:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">Searches via Lavalink node using <code>source: 'http'</code></li>
+                                <li style="margin-bottom: 8px">If track not found, tries alternate surah for same reciter</li>
+                                <li style="margin-bottom: 8px">If all fail, switches to next reciter with valid HTTP links</li>
+                                <li>Max fallback attempts: <code>5</code> per request</li>
+                            </ul>
+                            <div class="info-box">
+                                <strong>Duration Estimation</strong>
+                                <p>
+                                    Durations are calculated algorithmically at load time using <code>formatDuration()</code> in
+                                    <code>data-loader-formatter.js</code>. Actual stream lengths may vary slightly. The bot relies on
+                                    Lavalink's real-time position tracking for accurate seek/resume operations.
+                                </p>
+                            </div>
+                        </section>
+                        <section id="radio" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-broadcast-tower"></i> Radio Station Configuration</h2>
+                            <p>
+                                Radio stations are loaded from the same CDN dataset and stored in <code>global.quranRadios</code>. Each
+                                entry contains name, URL, and metadata for display.
+                            </p>
+                            <h3>Structure (<code>src/data/data-loader-radios.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Radio entry format
+{
+    name: 'Quran Radio Makkah',
+    url: 'https://stream.example.com/quran-makkah'
+}</code></pre>
+                            </div>
+                            <p>
+                                Radio pages display <code>25</code> items per page (configurable via
+                                <code>pagination.radio_items_per_page</code>). Navigation updates
+                                <code>guildState.currentRadioPage</code> and recalculates <code>currentRadioIndex</code>.
+                            </p>
+                            <h3>Playback Logic</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">Radio streams are treated as continuous tracks</li>
+                                <li style="margin-bottom: 8px">No surah index or offset tracking applies</li>
+                                <li style="margin-bottom: 8px">
+                                    Switching radio stations calls <code>createRadioResource()</code> which validates the URL via Lavalink
+                                </li>
+                                <li>Auto-fallback to next station or surah mode if stream fails</li>
+                            </ul>
+                        </section>
+                        <section id="radio-health" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-heartbeat"></i> Health Check & Fallback</h2>
+                            <p>The bot implements automatic stream validation before playback to prevent silent failures or dead links.</p>
+                            <h3>Validation Flow (<code>src/audio/resource.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Radio stream validation
+async function createRadioResource(url) {
+    if (!url?.startsWith('http')) throw new Error('Invalid Radio URL');
+    
+    const client = require('@startup/botSetup').client;
+    const searchNode = getBestNode(client.lavalink);
+    const result = await searchNode.search({ query: url, source: 'http' }, null);
+    
+    if (!result || !result.tracks || result.tracks.length === 0) {
+        throw new Error('Radio stream invalid');
+    }
+    
+    return result.tracks[0];
+}</code></pre>
+                            </div>
+                            <h3>Fallback Chain</h3>
+                            <p>If validation fails during playback:</p>
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px">Try next radio station in list (max 3 attempts)</li>
+                                <li style="margin-bottom: 12px">Switch to surah mode with fallback reciter</li>
+                                <li>Log warning and update <code>guildState.isPaused</code> if all fail</li>
+                            </ol>
+                        </section>
+                        <section id="azkar" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-clock"></i> Azkar & Reminder System</h2>
+                            <p>
+                                The azkar system delivers scheduled reminders every 30 minutes with support for text, images, and audio
+                                playback. Data is fetched from a remote JSON endpoint with graceful fallback.
+                            </p>
+                            <h3>Configuration (<code>src/state/azkar-config.js</code>)</h3>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Constant</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>azkar_interval_ms</code></td>
+                                        <td><code>1800000</code></td>
+                                        <td>30-minute delivery interval</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>azkar_expiry_ms</code></td>
+                                        <td><code>864000000</code></td>
+                                        <td>10-day expiry for azkar buttons</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>azkar_max_retry_attempts</code></td>
+                                        <td><code>5</code></td>
+                                        <td>Max send retries per delivery</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>azkar_retry_delay_ms</code></td>
+                                        <td><code>2000</code></td>
+                                        <td>Exponential backoff base delay</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Remote Data Structure</h3>
+                            <p>Expected from <code>https://hub-mgv.github.io/QuranBotData/adhkar.json</code>:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">[
+  {
+    "id": 1,
+    "category": "أدكار الصباح",
+    "audio": "/audio/morning.mp3",
+    "array": [
+      {
+        "id": 1,
+        "text": "أصبحنا وأصبح الملك لله...",
+        "count": 1,
+        "audio": "/audio/1.mp3"
+      }
+    ]
+  }
+]</code></pre>
+                            </div>
+                        </section>
+                        <section id="azkar-delivery" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-paper-plane"></i> Delivery & Expiry Handling</h2>
+                            <p>
+                                Azkar messages are sent via <code>src/state/azkar-sender.js</code> with retry logic and automatic cleanup.
+                            </p>
+                            <h3>Delivery Methods</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px"><strong>Image Mode</strong> - Embeds azkar image with text overlay</li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Audio Mode</strong> - Sends text embed with "استماع" button linking to MP3
+                                </li>
+                                <li><strong>Category Audio</strong> - Plays full section audio when individual tracks unavailable</li>
+                            </ul>
+                            <h3>Button Expiry & Cleanup</h3>
+                            <p>Audio buttons include a timestamp to prevent playback of stale messages:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Azkar expiry check (azkarAudio.js)
+const buttonId = interaction.customId;
+const timestamp = parseInt(buttonId.split('_').pop());
+
+if (timestamp && Date.now() - timestamp > azkar_request_expiry) {
+    await safeError(interaction, 'هذا الذكر قديم جداً (أكثر من 10 أيام)');
+    return;
+}</code></pre>
+                            </div>
+                            <p>
+                                Expired messages are automatically pruned via <code>deleteMessageTimestamp()</code> after 10 days. Failed
+                                deliveries increment <code>azkarFail</code> counter; after 10 failures, the timer is disabled and
+                                <code>azkarChannelId</code> is cleared.
+                            </p>
+                        </section>
+                        <section id="prayer-times" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-mosque"></i> Prayer Times Data</h2>
+                            <p>
+                                Prayer times are fetched from the Aladhan API with region-specific calculation methods and timezone
+                                awareness.
+                            </p>
+                            <h3>API Integration (<code>src/interactions/buttons/prayer-times-navigation.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Calculation method selection
+let calculationMethod = 2; // ISNA (default)
+
+if (countryCode === 'EG') calculationMethod = 5;    // Egyptian Authority
+else if (countryCode === 'SA') calculationMethod = 4; // Umm Al-Qura
+else if (countryCode === 'KW' || countryCode === 'QA') calculationMethod = 3; // Kuwait
+
+const apiUrl = `https://api.aladhan.com/v1/timings/${unixTimestamp}?latitude=${lat}&longitude=${lng}&method=${calculationMethod}`;</code></pre>
+                            </div>
+                            <h3>Time Formatting</h3>
+                            <p>
+                                Countries in <code>prayer_times_config.time_format_12h_countries</code> display times in 12-hour AM/PM
+                                format. Others use 24-hour format. The formatter handles edge cases like midnight conversion.
+                            </p>
+                        </section>
+                        <section id="ui" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-palette"></i> UI & Embed Customization</h2>
+                            <p>
+                                The control panel UI is generated dynamically via <code>src/ui/embeds.js</code> and
+                                <code>src/ui/components.js</code>. All styling follows Discord's native embed limits.
+                            </p>
+                            <h3>Embed Caching Strategy</h3>
+                            <p>Control embeds are cached to reduce API rate limits and improve response time:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Cache key generation (embeds.js)
+const key = `control_embed_${guildId}_${st.currentSurah}_${st.currentReciter}_${st.currentPage}_${st.playbackMode}_${st.controlMode}`;
+
+if (cache.has(key)) {
+    const c = cache.get(key);
+    c.active = true;
+    c.timestamp = Date.now();
+    return c.embed;
+}
+
+// Auto-cleanup: 30s TTL for active, 60s for inactive
+const ttl = active ? 30000 : 60000;</code></pre>
+                            </div>
+                            <h3>Customizing Colors & Footer</h3>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Element</th>
+                                        <th>File</th>
+                                        <th>Customization</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Embed Color</td>
+                                        <td><code>embeds.js</code></td>
+                                        <td>Change <code>0x1e1f22</code> to any hex value</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Footer Text</td>
+                                        <td><code>embeds.js</code></td>
+                                        <td>Pulled from <code>package.json</code> metadata</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Emojis</td>
+                                        <td><code>helpers/emojis.js</code></td>
+                                        <td>Replace custom emoji IDs per environment</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Button Labels</td>
+                                        <td><code>components.js</code></td>
+                                        <td>Modify <code>setLabel()</code> calls</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <section id="components" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-layer-group"></i> Component & Pagination</h2>
+                            <p>UI components follow Discord's 5-row limit. The bot dynamically builds rows based on playback mode.</p>
+                            <h3>Row Allocation</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">Row 1: Reciter/Radio dropdown</li>
+                                <li style="margin-bottom: 8px">Row 2: Surah dropdown</li>
+                                <li style="margin-bottom: 8px">Row 3: Playback controls (prev/pause/resume/next/toggle)</li>
+                                <li style="margin-bottom: 8px">Row 4: Navigation (page prev/next + Lavalink status)</li>
+                                <li>Row 5: Entry controls (join/leave/mode toggle/support)</li>
+                            </ul>
+                            <h3>Pagination Limits</h3>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Items per Page</th>
+                                        <th>Source</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Reciters</td>
+                                        <td><code>25</code></td>
+                                        <td><code>pagination.default_items</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Surahs</td>
+                                        <td><code>25</code></td>
+                                        <td><code>pagination.default_items</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Radio Stations</td>
+                                        <td><code>25</code></td>
+                                        <td><code>pagination.radio_items_per_page</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Prayer Countries</td>
+                                        <td><code>25</code></td>
+                                        <td><code>prayer_times_config.cities_per_page</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <section id="performance" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-tachometer-alt"></i> Performance & Caching</h2>
+                            <p>QuranBot uses a multi-tier caching strategy to minimize latency and API overhead.</p>
+                            <h3>Cache Tiers</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/config/constants.js - Cache configuration
+const cache_config = {
+    interaction: { max_size: 500, ttl_ms: 3000 },
+    embed: { ttl_ms: 30000, max_entries: 100 },
+    data: { ttl_ms: 300000, file_path: 'storage/database/data_url.json' },
+    dhikr: { ttl_ms: 300000, save_debounce_ms: 10000 },
+    guild_state: { save_debounce_ms: 60000 }
+};</code></pre>
+                            </div>
+                            <h3>Memory Management</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">Heap threshold: <code>1500MB</code> triggers aggressive cleanup</li>
+                                <li style="margin-bottom: 8px">Cache pruning removes oldest 50% of entries when threshold exceeded</li>
+                                <li style="margin-bottom: 8px">
+                                    Manual <code>global.gc()</code> called if available (Node.js <code>--expose-gc</code>)
+                                </li>
+                                <li>Destroyed voice connections cleaned hourly</li>
+                            </ul>
+                            <h3>Debounce & Throttle</h3>
+                            <p>State persistence uses debounced saves to prevent Firebase rate limits:</p>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Operation</th>
+                                        <th>Delay</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Single guild save</td>
+                                        <td><code>60000ms</code></td>
+                                        <td>Batch updates before persisting</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Save throttle</td>
+                                        <td><code>10000ms</code></td>
+                                        <td>Prevent rapid sequential saves</td>
+                                    </tr>
+                                    <tr>
+                                        <td>All states save</td>
+                                        <td><code>15000ms</code></td>
+                                        <td>Rate limit bulk persistence</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <section id="troubleshooting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wrench"></i> Resource Troubleshooting</h2>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Reciter links showing as unavailable
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Check:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Server URL in dataset ends with <code>/</code></li>
+                                    <li>MP3 files follow <code>001.mp3</code> to <code>114.mp3</code> naming</li>
+                                    <li>CDN allows cross-origin requests</li>
+                                    <li>Lavalink node can reach external URLs</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Use <code>/سرعة</code> to verify node connectivity and test stream resolution.
+                                </p>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Azkar timer stops after restart
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    The timer state is not persisted by design. It's re-initialized during <code>readyHandler.js</code> via
+                                    <code>recoverAzkarTimers()</code>. Ensure:
+                                </p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li><code>azkarChannelId</code> exists in <code>setupGuilds</code></li>
+                                    <li>Channel is text-based and bot has <code>Send Messages</code> permission</li>
+                                    <li>Remote adhkar.json is accessible</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Manual restart: <code>global.startAzkarTimerForGuild(guildId, channelId)</code>
+                                </p>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Embed cache not updating after changes
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Clear the cache manually or wait for TTL expiry:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li><code>clearEmbedCache()</code> in <code>embeds.js</code></li>
+                                    <li>Restart bot (clears memory cache)</li>
+                                    <li>Check if embed key matches current state values</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Active cache entries refresh every 30s, inactive every 60s.
+                                </p>
+                            </details>
+                            <h3>Resource Validation Commands</h3>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Check</th>
+                                        <th>Method</th>
+                                        <th>Expected Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Reciter count</td>
+                                        <td><code>console.log(Object.keys(global.reciters).length)</code></td>
+                                        <td><code>50+</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Radio count</td>
+                                        <td><code>console.log(global.quranRadios.length)</code></td>
+                                        <td><code>30+</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Azkar categories</td>
+                                        <td><code>console.log(global.azkarData.length)</code></td>
+                                        <td><code>10+</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cache status</td>
+                                        <td><code>console.log(embedCache.size)</code></td>
+                                        <td><code>0-100</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Quick Links</h4>
+                    <div class="footer-links">
+                        <a href="../../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="../docs.html" class="footer-link"><i class="fas fa-book"></i> Developer Docs</a>
+                        <a href="./docs-configuration.html" class="footer-link"><i class="fas fa-cog"></i> Advanced Config</a>
+                        <a href="../privacy.html" class="footer-link"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-database"></i> Resources</h4>
+                    <div class="footer-links">
+                        <a href="https://hub-mgv.github.io/QuranBotData" target="_blank" class="footer-link">
+                            <i class="fas fa-cloud"></i>
+                            Data Repository
+                        </a>
+                        <a href="https://aladhan.com" target="_blank" class="footer-link">
+                            <i class="fas fa-clock"></i>
+                            Prayer Times API
+                        </a>
+                        <a href="https://mp3quran.net" target="_blank" class="footer-link">
+                            <i class="fas fa-microphone"></i>
+                            Quran Audio Source
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version">
+                    <i class="fas fa-code-branch"></i>
+                    Docs <span data-app-version></span>
+                </p>
+            </div>
+        </footer>
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

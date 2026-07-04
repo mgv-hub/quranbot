@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot Data Pipeline Documentation - Data loaders, caching strategies, validation, and formatter architecture"
+        />
+        <title>QuranBot Data Pipeline Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link">Development</a>
+                    <a href="docs-configuration.html" class="nav-link">Configuration</a>
+                    <a href="docs-security.html" class="nav-link">Security</a>
+                    <a href="docs-resources.html" class="nav-link">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link active">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">Data Pipeline & Loading System</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For Data Engineers & System Architects</p>
+
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Overview</h3>
+                    <p>
+                        This guide documents the data loading architecture, validation pipelines, caching strategies, and formatter
+                        utilities used across QuranBot.
+                    </p>
+                    <ul>
+                        <li><i class="fas fa-code-branch"></i> Modular loader architecture</li>
+                        <li><i class="fas fa-shield-alt"></i> Validation & sanitization layers</li>
+                        <li><i class="fas fa-database"></i> Remote CDN + local fallback caching</li>
+                        <li><i class="fas fa-wrench"></i> Standardized formatter patterns</li>
+                    </ul>
+                </div>
+
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#pipeline" class="active">Data Pipeline Architecture</a></li>
+                            <li><a href="#loaders">Loader Modules</a></li>
+                            <li><a href="#caching">Caching Strategy</a></li>
+                            <li><a href="#validation">Validation Layer</a></li>
+                            <li><a href="#formatters">Formatter Utilities</a></li>
+                            <li><a href="#prayer-data">Prayer Times Data</a></li>
+                            <li><a href="#azkar-pipeline">Azkar Data Pipeline</a></li>
+                            <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        </ul>
+                    </aside>
+
+                    <div class="doc-main">
+                        <section id="pipeline" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-code-branch"></i> Data Pipeline Architecture</h2>
+                            <p>
+                                QuranBot uses a layered data loading system in <code>src/data/</code> that supports remote CDN fetching,
+                                local caching, and graceful fallback to hardcoded defaults.
+                            </p>
+
+                            <h3>Pipeline Flow</h3>
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px">
+                                    <strong>Config Layer</strong> (<code>data-loader-config.js</code>) - Defines API endpoints and language
+                                    settings
+                                </li>
+                                <li style="margin-bottom: 12px">
+                                    <strong>Fetch Layer</strong> (<code>data-cache.js</code>, <code>data-azkar.js</code>) - Fetches from
+                                    remote CDN with timeout
+                                </li>
+                                <li style="margin-bottom: 12px">
+                                    <strong>Loader Layer</strong> (<code>data-loader-*.js</code>) - Parses, validates, and formats data
+                                </li>
+                                <li>
+                                    <strong>Global State</strong> - Assigns validated data to <code>global.reciters</code>,
+                                    <code>global.surahNames</code>, etc.
+                                </li>
+                            </ol>
+
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/data/data-loader.js
+async function loadAllData() {
+    try {
+        initializeGlobalLanguages();
+        await loadSurahNames();
+        await loadReciters();
+        await loadQuranRadios();
+        await loadAzkarData();
+        await loadAzkarImages();
+        global.surahNames = normalizeSurahCount(global.surahNames);
+        logger.info(`All data loaded: ${global.surahNames?.length || 0} surahs, ${Object.keys(global.reciters || {}).length} reciters`);
+        return true;
+    } catch (error) {
+        logger.error('Error loading all data', error);
+        // Initialize all global data structures with safe defaults on failure
+        global.surahNames = Array.from({ length: 114 }, (_, i) => `سورة ${i + 1}`);
+        global.reciters = {};
+        global.quranRadios = [];
+        global.azkarData = [];
+        return true;
+    }
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="loaders" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-database"></i> Loader Modules</h2>
+                            <p>Each data type has a dedicated loader that handles parsing, validation, and global state assignment:</p>
+
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Module</th>
+                                        <th>Target Data</th>
+                                        <th>Global Assignment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>data-loader-surah.js</code></td>
+                                        <td>Surah names & metadata</td>
+                                        <td><code>global.surahNames</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>data-loader-reciters.js</code></td>
+                                        <td>Reciter links & durations</td>
+                                        <td><code>global.reciters</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>data-loader-radios.js</code></td>
+                                        <td>Radio station URLs</td>
+                                        <td><code>global.quranRadios</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>data-loader-azkar.js</code></td>
+                                        <td>Azkar text & audio files</td>
+                                        <td><code>global.azkarData</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>data-loader-azkar-images.js</code></td>
+                                        <td>Azkar image URLs</td>
+                                        <td><code>global.azkarImages</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section id="caching" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-server"></i> Caching Strategy</h2>
+                            <p>Data is cached in three layers to ensure high availability:</p>
+
+                            <h3>1. Remote CDN Cache (<code>data-cache.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">const remote_data_url = 'https://hub-mgv.github.io/QuranBotData/data_quran.json';
+async function loadPersistedCache() {
+    try {
+        logger.info('Cache Loading data from remote endpoint');
+        const response = await fetch(remote_data_url, {
+            headers: getBrowserHeaders(),
+            timeout: TimeoutRequest('default'),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const remoteData = await response.json();
+        const data = remoteData.cached_data || remoteData;
+        if (!data || typeof data !== 'object') throw new Error('Invalid data structure from remote endpoint');
+        return data;
+    } catch (error) {
+        logger.warn('Cache Failed to load from remote endpoint, using fallback data');
+        return fallback_dataset;
+    }
+}</code></pre>
+                            </div>
+
+                            <h3>2. Local Fallback Cache</h3>
+                            <p>
+                                If remote fetch fails, bot uses <code>fallback_dataset</code> with 114 generated surah names and empty
+                                reciter arrays.
+                            </p>
+
+                            <h3>3. Runtime Memory Cache</h3>
+                            <p>Loaded data persists in <code>global.*</code> objects for the lifetime of the process.</p>
+                        </section>
+
+                        <section id="validation" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-shield-alt"></i> Validation Layer</h2>
+                            <p>All data passes through strict validation before assignment to global state:</p>
+
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/data/data-loader-validator.js
+function validateReciterData(reciter) {
+    return reciter.rewaya_id && reciter.server;
+}
+function validateRadioData(radio) {
+    return radio.url && radio.url.length > 0;
+}
+function validateAdhkarData(data) {
+    return Array.isArray(data) && data.length > 0;
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="formatters" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wrench"></i> Formatter Utilities</h2>
+                            <p>Standardized formatters ensure consistent data structure across all sources:</p>
+
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Function</th>
+                                        <th>Input</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>formatServerUrl</code></td>
+                                        <td>Server base URL</td>
+                                        <td>Ensures trailing <code>/</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>formatSurahUrl</code></td>
+                                        <td>Base URL + surah number</td>
+                                        <td><code>https://server/001.mp3</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>formatDuration</code></td>
+                                        <td>Surah index</td>
+                                        <td>Estimated <code>MM:SS</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>formatReciterName</code></td>
+                                        <td>Raw reciter name</td>
+                                        <td>Cleaned name (removes metadata)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section id="troubleshooting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wrench"></i> Troubleshooting Data Issues</h2>
+
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Reciters not loading
+                                </summary>
+
+                                <div style="margin-top: 12px; color: var(--text-muted)">
+                                    <p>Check CDN accessibility:</p>
+
+                                    <ul style="margin-top: 8px; padding-left: 20px">
+                                        <li>Verify <code>https://hub-mgv.github.io/QuranBotData/data_quran.json</code> is reachable</li>
+                                        <li>Check <code>data-loader-validator.js</code> for schema mismatches</li>
+                                        <li>Ensure <code>formatServerUrl</code> outputs valid base URLs</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Surah names showing as "سورة 1", "سورة 2"
+                                </summary>
+
+                                <div style="margin-top: 12px; color: var(--text-muted)">
+                                    <p>Indicates fallback to <code>fallback_dataset</code>. Causes:</p>
+
+                                    <ul style="margin-top: 8px; padding-left: 20px">
+                                        <li>CDN returned HTTP error</li>
+                                        <li>JSON structure mismatch (missing <code>surah.suwar</code>)</li>
+                                        <li>Network timeout during fetch</li>
+                                    </ul>
+                                </div>
+                            </details>
+                        </section>
+
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Links</h4>
+                    <div class="footer-links">
+                        <a href="../../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="../docs.html" class="footer-link"><i class="fas fa-book"></i> Developer Docs</a>
+                        <a href="./docs-configuration.html" class="footer-link"><i class="fas fa-cog"></i> Advanced Config</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-database"></i> Data Sources</h4>
+                    <div class="footer-links">
+                        <a href="https://hub-mgv.github.io/QuranBotData" target="_blank" class="footer-link">
+                            <i class="fas fa-cloud"></i> Data Repository
+                        </a>
+                        <a href="https://www.mp3quran.net/api/v3" target="_blank" class="footer-link">
+                            <i class="fas fa-microphone"></i> MP3 Quran API
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version"><i class="fas fa-code-branch"></i> Docs <span data-app-version></span></p>
+            </div>
+        </footer>
+
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

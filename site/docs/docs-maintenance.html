@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot Maintenance & Retention Guide - Database cleaners, retention policies, logging architecture, and health monitoring"
+        />
+        <title>QuranBot Maintenance & Retention Guide</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link">Development</a>
+                    <a href="docs-configuration.html" class="nav-link">Configuration</a>
+                    <a href="docs-security.html" class="nav-link">Security</a>
+                    <a href="docs-resources.html" class="nav-link">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link active">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">Maintenance & Retention Guide</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For Database Administrators & DevOps Engineers</p>
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Overview</h3>
+                    <p>
+                        This guide documents the database maintenance routines, data retention policies, logging architecture, and health
+                        monitoring systems used to keep QuranBot running smoothly at scale.
+                    </p>
+                    <ul>
+                        <li><i class="fas fa-broom"></i> Automated database cleaners</li>
+                        <li><i class="fas fa-calendar-check"></i> 15-day retention policies</li>
+                        <li><i class="fas fa-file-alt"></i> Multi-level logging architecture</li>
+                        <li><i class="fas fa-heartbeat"></i> Health check & monitoring</li>
+                    </ul>
+                </div>
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#cleaners" class="active">Database Cleaners</a></li>
+                            <li><a href="#retention">Retention Policies</a></li>
+                            <li><a href="#logging">Logging Architecture</a></li>
+                            <li><a href="#voice-logging">Voice Logging System</a></li>
+                            <li><a href="#health">Health Check Endpoint</a></li>
+                            <li><a href="#backup">Backup System</a></li>
+                            <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        </ul>
+                    </aside>
+                    <div class="doc-main">
+                        <section id="cleaners" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-broom"></i> Database Cleaners</h2>
+                            <p>Automated cleaners remove stale data to prevent database bloat and maintain performance:</p>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Cleaner</th>
+                                        <th>Target Data</th>
+                                        <th>Criteria</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>controlIds.cleaner.js</code></td>
+                                        <td>Control message IDs</td>
+                                        <td>Removes entries for guilds bot no longer serves or invalid messages</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>guildStates.cleaner.js</code></td>
+                                        <td>Guild state entries</td>
+                                        <td>Removes states for left guilds, clears deleted voice channel IDs</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>setupGuilds.cleaner.js</code></td>
+                                        <td>Setup configurations</td>
+                                        <td>Validates channel existence, fixes broken IDs, removes invalid categories</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/database/firebase/maintenance/cleaners/setupGuilds.cleaner.js
+async function cleanSetupGuilds(client) {
+    try {
+        const data = await loadSetupGuildsFromFirebase();
+        if (!data || !Object.keys(data).length) return { cleaned: 0, reason: 'No data' };
+        
+        const botGuilds = new Set(client.guilds.cache.keys());
+        const valid = {};
+        let removed = 0, updated = 0;
+        
+        for (const [gid, sData] of Object.entries(data)) {
+            if (!botGuilds.has(gid)) { removed++; continue; }
+            
+            const guild = client.guilds.cache.get(gid);
+            if (!guild) { removed++; continue; }
+            
+            const res = await validateSetupData(gid, sData, guild);
+            if (!res.valid) { removed++; continue; }
+            
+            if (res.hasChanges) { 
+                valid[gid] = res.data; 
+                updated++; 
+            } else { 
+                valid[gid] = sData; 
+            }
+        }
+        
+        if (removed > 0 || updated > 0) {
+            await saveSetupGuildsToFirebase(valid);
+        }
+        
+        return { cleaned: removed, updated, remaining: Object.keys(valid).length };
+    } catch (err) {
+        logger.error('Error Cleaning Setup Guilds', err);
+        return { cleaned: 0, error: err.message };
+    }
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="retention" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-calendar-check"></i> Retention Policies</h2>
+                            <p>Guild data is retained for 15 days after bot leaves to allow quick restoration if re-added:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/database/firebase/retention/retention.js
+const retention_days = 15;
+const retention_ms = retention_days * 24 * 60 * 60 * 1000;
+
+async function markGuildAsLeft(guildId) {
+    const now = Date.now();
+    const updates = {};
+    updates[`retention_index/${guildId}/isLeft`] = true;
+    updates[`retention_index/${guildId}/leftAt`] = now;
+    
+    await db.ref().update(updates);
+    logger.db(`Guild ${guildId} marked as left in retention index at ${now}`);
+}
+
+async function cleanExpiredLeftData(client) {
+    const now = Date.now();
+    const expiredBefore = now - retention_ms;
+    const snapshot = await db.ref('retention_index').once('value');
+    const retentionIndex = snapshot.val() || {};
+    const expiredGuilds = [];
+    
+    for (const [guildId, data] of Object.entries(retentionIndex)) {
+        if (data?.isLeft && data?.leftAt && data.leftAt < expiredBefore) {
+            expiredGuilds.push(guildId);
+        }
+    }
+    // Bulk delete expired data...
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="logging" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-file-alt"></i> Logging Architecture</h2>
+                            <p>Multi-level logging system with automatic rotation and archiving:</p>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Log Level</th>
+                                        <th>File Pattern</th>
+                                        <th>Usage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>info</code></td>
+                                        <td><code>logs-general-YYYY-MM-DD.log</code></td>
+                                        <td>Standard operational messages</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>warn</code></td>
+                                        <td><code>logs-warnings-YYYY-MM-DD.log</code></td>
+                                        <td>Non-critical issues, fallback activations</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>error</code></td>
+                                        <td><code>logs-errors-YYYY-MM-DD.log</code></td>
+                                        <td>Exceptions, failed API calls, voice disconnects</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>debug</code></td>
+                                        <td><code>logs-general-YYYY-MM-DD.log</code></td>
+                                        <td>Verbose diagnostic information (dev only)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>voice</code></td>
+                                        <td><code>voice-*/logs-general-YYYY-MM-DD.log</code></td>
+                                        <td>Per-guild voice connection events</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Log Rotation & Archiving</h3>
+                            <p>Logs are automatically archived daily at Cairo midnight:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">Location: <code>storage/logs/archive/</code></li>
+                                <li style="margin-bottom: 8px">Format: <code>logs-general-YYYY-MM-DD.zip</code></li>
+                                <li>Retention: 60 days (configurable in <code>logging_config</code>)</li>
+                            </ul>
+                        </section>
+                        <section id="voice-logging" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-headphones"></i> Voice Logging System</h2>
+                            <p>Dedicated per-guild voice logger in <code>src/logging/voiceLogger.js</code> for granular audio debugging:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">async function connection(gid, msg, meta = {}, guildCache = null) {
+    return this.debug(`[CONN] ${msg}`, meta, gid, guildCache);
+}
+
+async function player(gid, msg, meta = {}, guildCache = null) {
+    return this.debug(`[PLAYER] ${msg}`, meta, gid, guildCache);
+}
+
+async function resource(gid, msg, meta = {}, guildCache = null) {
+    return this.debug(`[RESOURCE] ${msg}`, meta, gid, guildCache);
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="health" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-heartbeat"></i> Health Check Endpoint</h2>
+                            <p>Lightweight HTTP endpoint on port <code>HH_CH_PORT</code> (default: 3000) for monitoring systems:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">const healthServer = http.createServer((request, response) => {
+    if (request.url === '/health') {
+        try {
+            const activeVoiceConnections = getConnectedVoiceCount();
+            const botuptime = process.uptime();
+            const currentMemory = process.memoryUsage();
+            
+            response.writeHead(200, { 'Content-Type': 'application/json' });
+            response.end(JSON.stringify({
+                status: 'ok',
+                voiceConnections: activeVoiceConnections,
+                uptime: botuptime,
+                memory: { 
+                    rss: currentMemory.rss, 
+                    heapTotal: currentMemory.heapTotal, 
+                    heapUsed: currentMemory.heapUsed 
+                },
+                timestamp: new Date(),
+            }));
+        } catch (err) {
+            response.writeHead(500, { 'Content-Type': 'application/json' });
+            response.end(JSON.stringify({ status: 'error', message: err.message }));
+        }
+    } else { 
+        response.writeHead(404); 
+        response.end(); 
+    }
+});</code></pre>
+                            </div>
+                        </section>
+                        <section id="backup" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-cloud-upload-alt"></i> Backup System</h2>
+                            <p>Automated compressed backups sent to Discord channels at configurable intervals:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/database/local/database-backup.js
+const BACKUP_INTERVAL_MS = parseInt(process.env.BACKUP_INTERVAL_MS);
+
+async function performBackup() {
+    const snap = await get(ref(db, '/'));
+    const data = snap.val();
+    const filename = generateBackupFilename();
+    const backupPath = pathlra.join(BACKUP_DIR, filename);
+    
+    await fsPromises.writeFile(backupPath.replace('.gz', '.tmp.json'), JSON.stringify(data, null, 2));
+    await compressFile(backupPath.replace('.gz', '.tmp.json'), backupPath);
+    await sendBackupToDiscord(backupPath, filename);
+}
+
+function startBackupService() {
+    setTimeout(() => { 
+        setInterval(performBackup, BACKUP_INTERVAL_MS); 
+    }, 5000);
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="troubleshooting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wrench"></i> Troubleshooting Maintenance</h2>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Logs growing too large
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Check:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Verify <code>logging_config.max_files_to_keep</code> (default: 10)</li>
+                                    <li>Check <code>storage/logs/archive/</code> for old zip files</li>
+                                    <li>Run manual cleanup: <code>cleanupOldLogs('storage/logs', 60)</code></li>
+                                </ul>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Health check returns 500
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Check:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Port <code>HH_CH_PORT</code> is not in use by another service</li>
+                                    <li>Bot client is initialized and connected</li>
+                                    <li><code>getConnectedVoiceCount()</code> isn't throwing on invalid guild state</li>
+                                </ul>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Firebase data growing unbounded
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Cleaners may not be running:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Verify <code>databaseCleaner.performMaintenance(client)</code> is scheduled</li>
+                                    <li>Check retention interval: <code>cleanupInterval = 24 * 60 * 60 * 1000</code> (24h)</li>
+                                    <li>Run manual cleanup via Discord command or script</li>
+                                </ul>
+                            </details>
+                        </section>
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Quick Links</h4>
+                    <div class="footer-links">
+                        <a href="../../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="../docs.html" class="footer-link"><i class="fas fa-book"></i> Developer Docs</a>
+                        <a href="./docs-ui-architecture.html" class="footer-link"><i class="fas fa-palette"></i> UI Architecture</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-shield-alt"></i> Monitoring</h4>
+                    <div class="footer-links">
+                        <a href="https://github.com/mgv-hub/quranbot/issues" class="footer-link">
+                            <i class="fas fa-bug"></i> Report Issue
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version"><i class="fas fa-code-branch"></i> Docs <span data-app-version></span></p>
+            </div>
+        </footer>
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

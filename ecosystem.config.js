@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: 'QuranBot',
-            script: 'core/bot/core.js',
+            script: 'src/bot/core.js',
             node_args: '--trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps',
             autorestart: true,
             watch: false,

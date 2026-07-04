@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot State & Persistence Architecture - Guild state management, azkar engine, cooldowns, and voice idle detection"
+        />
+        <title>QuranBot State & Persistence Architecture</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link">Development</a>
+                    <a href="docs-configuration.html" class="nav-link">Configuration</a>
+                    <a href="docs-security.html" class="nav-link">Security</a>
+                    <a href="docs-resources.html" class="nav-link">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link active">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">State & Persistence Architecture</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For System Architects & State Management Engineers</p>
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Overview</h3>
+                    <p>
+                        This guide details the core state management systems, persistence layer, azkar automation engine, and voice idle
+                        detection mechanisms.
+                    </p>
+                    <ul>
+                        <li><i class="fas fa-database"></i> Guild State Map & Facade</li>
+                        <li><i class="fas fa-cloud-upload-alt"></i> Firebase + Redis Persistence</li>
+                        <li><i class="fas fa-clock"></i> Azkar Timer & Retry Engine</li>
+                        <li><i class="fas fa-chair"></i> Voice Idle Detection</li>
+                    </ul>
+                </div>
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#guild-state" class="active">Guild State Architecture</a></li>
+                            <li><a href="#state-structure">State Object Structure</a></li>
+                            <li><a href="#persistence">Persistence & Serialization</a></li>
+                            <li><a href="#redis">Redis Integration</a></li>
+                            <li><a href="#azkar">Azkar Automation Engine</a></li>
+                            <li><a href="#cooldowns">Cooldown System</a></li>
+                            <li><a href="#voice-idle">Voice Idle Detection</a></li>
+                            <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        </ul>
+                    </aside>
+                    <div class="doc-main">
+                        <section id="guild-state" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-database"></i> Guild State Architecture</h2>
+                            <p>
+                                QuranBot manages per-server runtime data via a centralized <code>Map</code> in
+                                <code>src/state/guild-state-store.js</code>, accessed through a facade in <code>GuildStateManager.js</code>.
+                            </p>
+                            <h3>Storage & Access</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/state/guild-state-store.js
+const guildStates = new Map();
+global.guildStates = guildStates;
+
+function getGuildStateById(guildId) {
+    return guildStates.get(guildId);
+}</code></pre>
+                            </div>
+                            <h3>Lazy Initialization</h3>
+                            <p>
+                                When <code>getGuildState(guildId)</code> is called and no state exists, the manager creates a default state:
+                            </p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/state/GuildStateManager.js
+function getGuildState(guildId) {
+    const store = getStore();
+    
+    if (!store.hasGuildState(guildId)) {
+        const { createNewPlayer } = getPlayer();
+        const player = createNewPlayer();
+        const defaultReciter = Object.keys(global.reciters)[0] || 'reciter_1_ar';
+        
+        const newState = {
+            player,
+            connection: null,
+            channelId: null,
+            currentSurah: 1,
+            currentReciter: defaultReciter,
+            playbackMode: 'radio',
+            controlMode: 'everyone',
+            isPaused: true,
+            savedQuranState: null,
+            savedRadioState: null,
+        };
+        
+        store.setGuildState(guildId, newState);
+    }
+    
+    return store.getGuildStateById(guildId);
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="state-structure" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-sitemap"></i> State Object Structure</h2>
+                            <p>The default state object contains all fields necessary for voice, UI, and azkar functionality:</p>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Field</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>player</code></td>
+                                        <td><code>LavalinkPlayer</code></td>
+                                        <td>Lavalink audio player instance</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>connection</code></td>
+                                        <td><code>object</code></td>
+                                        <td>Discord voice connection wrapper</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>channelId</code></td>
+                                        <td><code>string</code></td>
+                                        <td>Voice channel ID bot is connected to</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>playbackMode</code></td>
+                                        <td><code>'surah' | 'radio'</code></td>
+                                        <td>Current playback mode</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>currentReciter</code></td>
+                                        <td><code>string</code></td>
+                                        <td>Key in <code>global.reciters</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>currentSurah</code></td>
+                                        <td><code>number</code></td>
+                                        <td>1-114 surah index</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>controlMode</code></td>
+                                        <td><code>'admins' | 'everyone'</code></td>
+                                        <td>Permission mode for UI</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>isPaused</code></td>
+                                        <td><code>boolean</code></td>
+                                        <td>Player paused state</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>savedQuranState</code></td>
+                                        <td><code>object</code></td>
+                                        <td>Saved surah/reciter/offset for mode switching</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>savedRadioState</code></td>
+                                        <td><code>object</code></td>
+                                        <td>Saved radio index/page/offset</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <section id="persistence" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-cloud-upload-alt"></i> Persistence & Serialization</h2>
+                            <p>
+                                State is persisted to Firebase via <code>src/state/PersistentStateManager.js</code> with debounced saves to
+                                prevent API rate limits.
+                            </p>
+                            <h3>Debounce & Throttle</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/state/persist-storage.js
+const save_debounce_ms = 60000;    // 1 min
+const save_throttle_ms = 10000;    // 10s min between saves
+
+function scheduleSave(guildId, guildStates, cleanStateFn) {
+    if (saveTimeouts.has(guildId)) {
+        clearTimeout(saveTimeouts.get(guildId));
+    }
+    
+    const timeout = setTimeout(async () => {
+        await saveGuildState(guildId, guildStates, cleanStateFn);
+        saveTimeouts.delete(guildId);
+    }, save_debounce_ms);
+    
+    saveTimeouts.set(guildId, timeout);
+}</code></pre>
+                            </div>
+                            <h3>Serialization & Deep Merge</h3>
+                            <p><code>src/state/persist-utils.js</code> provides cycle-safe cloning and merging:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Cycle-aware clone
+function deepCloneForFirebase(obj, seen = new WeakSet()) {
+    if (seen.has(obj)) return undefined;
+    seen.add(obj);
+    
+    if (Array.isArray(obj)) {
+        return obj.map((item) => deepCloneForFirebase(item, seen));
+    }
+    // ... object handling
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="redis" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-server"></i> Redis Integration</h2>
+                            <p>When Redis is available, it acts as a hot cache alongside Firebase cold storage:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/state/PersistentStateManager.js
+async function updateGuildState(guildId, updates) {
+    const state = this.getGuildState(guildId);
+    deepMerge(state, updates);
+    
+    // Schedule debounced Firebase save
+    scheduleSave(guildId, this.guildStates, cleanState);
+    
+    // Immediate Redis update
+    if (redis.isRedisReady) {
+        redis.set(`quranbot:guild:${guildId}`, cleanState(state))
+            .catch((err) => logger.debug(`Redis update failed for ${guildId}`, err));
+    }
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="azkar" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-clock"></i> Azkar Automation Engine</h2>
+                            <p>
+                                The Azkar system handles timed reminders with randomization, image/audio delivery, and self-healing on
+                                failure.
+                            </p>
+                            <h3>Timer Management</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">Interval: 30 minutes (<code>azkar_interval_ms</code>)</li>
+                                <li style="margin-bottom: 8px">Expiry: Azkar messages expire after 10 days</li>
+                                <li style="margin-bottom: 8px">Retries: Up to 5 attempts with exponential backoff</li>
+                                <li>Self-Heal: Disables timer if channel missing or 10 consecutive permission failures</li>
+                            </ul>
+                            <h3>Delivery Logic (<code>src/state/azkar-sender.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Random selection + retry loop
+async function sendRandomAzkar(cid, gid, maxRetry = 5, forceImg = false) {
+    const data = global.azkarData || [];
+    const cat = data[Math.floor(Math.random() * data.length)];
+    const dhikr = cat.array[Math.floor(Math.random() * cat.array.length)];
+    const ts = Date.now();
+    
+    // 50% chance to send image if available
+    const useImg = forceImg || (global.azkarImages?.length && Math.random() > 0.5);
+    
+    if (useImg && global.azkarImages?.length) {
+        const img = global.azkarImages[Math.floor(Math.random() * global.azkarImages.length)];
+        return sendImageAzkar(ch, img, ts, gid, maxRetry, cid);
+    }
+    
+    // Fallback to audio button
+    if (dhikr.audio) {
+        return sendAudioAzkar(ch, dhikr, clean_Dhikr(dhikr.text), ts, gid, maxRetry, cid);
+    }
+}</code></pre>
+                            </div>
+                            <div class="info-box">
+                                <strong>Self-Healing</strong>
+                                <p>
+                                    If a channel is deleted, the timer clears immediately. If permissions fail 10 times, the channel ID is
+                                    nulled and the timer stops to prevent log spam.
+                                </p>
+                            </div>
+                        </section>
+                        <section id="cooldowns" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-hourglass-half"></i> Cooldown System</h2>
+                            <p>Two-layer cooldown system: per-command and global rate limits.</p>
+                            <h3>Command Cooldowns</h3>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Duration</th>
+                                        <th>Scope</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>/تحكم</code></td>
+                                        <td>25s</td>
+                                        <td>Per user</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/دخول</code></td>
+                                        <td>15s</td>
+                                        <td>Per user</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/إعداد</code></td>
+                                        <td>60s</td>
+                                        <td>Per server</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/مواقيت_الصلاة</code></td>
+                                        <td>50s</td>
+                                        <td>Per user</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Cleanup</h3>
+                            <p>
+                                Expired entries are purged every 60 seconds via <code>initCleanup()</code> in
+                                <code>commandCooldown.js</code>.
+                            </p>
+                        </section>
+                        <section id="voice-idle" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-chair"></i> Voice Idle Detection</h2>
+                            <p>
+                                <code>src/state/voice-idle.js</code> monitors voice channels and pauses playback if empty for 30 seconds,
+                                resuming when users return.
+                            </p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// 30s idle timer
+const t = setTimeout(async () => {
+    const latest = getCtx(guildId);
+    if (!latest || latest.isPaused) return;
+    
+    const ch = await resolveChannel(client, latest.channelId);
+    if (ch && users(ch) === 0) {
+        await pause(latest, guildId, client);
+    }
+    
+    timers.delete(guildId);
+}, 30000);</code></pre>
+                            </div>
+                        </section>
+                        <section id="troubleshooting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wrench"></i> Troubleshooting State Issues</h2>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Azkar timer stopped unexpectedly
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Causes:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Channel deleted or permissions lost</li>
+                                    <li>10 consecutive send failures</li>
+                                    <li>Bot restart without state restoration</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Check <code>guildState.azkarChannelId</code> and restart via <code>/إعداد</code>.
+                                </p>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Playback pauses automatically
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    The Voice Idle system pauses playback if the channel is empty for 30s. This is intentional to save
+                                    resources. Playback resumes automatically when a human joins.
+                                </p>
+                            </details>
+                        </section>
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Links</h4>
+                    <div class="footer-links">
+                        <a href="../../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="./docs-maintenance.html" class="footer-link"><i class="fas fa-database"></i> Maintenance Guide</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-shield-alt"></i> Monitoring</h4>
+                    <div class="footer-links">
+                        <a href="https://github.com/mgv-hub/quranbot/issues" class="footer-link">
+                            <i class="fas fa-bug"></i> Report Issue
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version"><i class="fas fa-code-branch"></i> Docs <span data-app-version></span></p>
+            </div>
+        </footer>
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

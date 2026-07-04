@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot UI & Control Panel Architecture - Embed builders, component patterns, and message updater flow"
+        />
+        <title>QuranBot UI & Control Panel Architecture</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link">Development</a>
+                    <a href="docs-configuration.html" class="nav-link">Configuration</a>
+                    <a href="docs-security.html" class="nav-link">Security</a>
+                    <a href="docs-resources.html" class="nav-link">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link active">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">UI & Control Panel Architecture</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For Frontend & Interaction Designers</p>
+
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Overview</h3>
+                    <p>
+                        This guide documents the UI component architecture, embed caching, control panel builders, and message updater flow
+                        for QuranBot's interactive Discord interface.
+                    </p>
+                    <ul>
+                        <li><i class="fas fa-palette"></i> Standardized embed factory</li>
+                        <li><i class="fas fa-layer-group"></i> Component builders (buttons, menus)</li>
+                        <li><i class="fas fa-sync-alt"></i> Message updater flow</li>
+                        <li><i class="fas fa-tachometer-alt"></i> Embed caching strategy</li>
+                    </ul>
+                </div>
+
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#embeds" class="active">Embed Architecture</a></li>
+                            <li><a href="#components">Component Builders</a></li>
+                            <li><a href="#controlpanel">Control Panel Builder</a></li>
+                            <li><a href="#messageupdater">Message Updater Flow</a></li>
+                            <li><a href="#pagination">Pagination System</a></li>
+                            <li><a href="#caching">Embed Caching</a></li>
+                            <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        </ul>
+                    </aside>
+
+                    <div class="doc-main">
+                        <section id="embeds" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-palette"></i> Embed Architecture</h2>
+                            <p>QuranBot uses a factory pattern for consistent embed creation across all commands and interactions.</p>
+
+                            <h3>Embed Factory (<code>src/ui/embedFactory.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">function createStandardEmbed() {
+    return new EmbedBuilder().setColor(0x1e1f22);
+}
+
+function createLoadingEmbed(desc) {
+    return createStandardEmbed().setTitle('جاري التحميل').setDescription(desc);
+}
+
+function createPrayerTimesDisplay(city, country, data, flag = '') {
+    return createStandardEmbed()
+        .setTitle(`${flag} مواقيت الصلاة`)
+        .setDescription(`**${city} - ${country}**`)
+        .addFields(
+            { name: 'الفجر', value: data.fajr, inline: true },
+            { name: 'الشروق', value: data.sunrise, inline: true },
+            // ... other prayer fields
+        )
+        .setFooter({ text: prayer_times_footer });
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="components" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-layer-group"></i> Component Builders</h2>
+                            <p>
+                                All interactive UI elements are generated via standardized component builders in
+                                <code>src/ui/components.js</code>:
+                            </p>
+
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Builder</th>
+                                        <th>Output</th>
+                                        <th>Usage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>createReciterRow</code></td>
+                                        <td>ActionRow with StringSelectMenu</td>
+                                        <td>Reciter selection dropdown</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>createSelectRow</code></td>
+                                        <td>ActionRow with StringSelectMenu</td>
+                                        <td>Surah selection dropdown</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>createButtonRow</code></td>
+                                        <td>ActionRow with 5 Buttons</td>
+                                        <td>Playback controls (prev, pause, resume, next, toggle)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>createNavigationRow</code></td>
+                                        <td>2-3 ActionRows</td>
+                                        <td>Page navigation + mode toggle + system buttons</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>createRadioRow</code></td>
+                                        <td>ActionRow with StringSelectMenu</td>
+                                        <td>Radio station selection dropdown</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section id="controlpanel" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-sliders-h"></i> Control Panel Builder</h2>
+                            <p>The control panel is dynamically assembled based on guild state:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/ui/controlPanelBuilder.js
+async function rebuildAndSendControlPanel(interaction, guildState, guildId) {
+    const embed = createControlEmbed(guildState, guildId);
+    const rows = [];
+    
+    if (['surah', 'juz'].includes(guildState.playbackMode)) {
+        rows.push(createReciterRow(guildState), createSelectRow(guildState));
+    } else {
+        rows.push(createRadioRow(guildState));
+    }
+    
+    rows.push(createButtonRow(guildState));
+    
+    for (const nav of createNavigationRow(guildState, guildId)) {
+        if (rows.length >= 5) break;
+        if (nav.components?.length <= 5) rows.push(nav);
+    }
+    
+    try {
+        await updateControlMessage(interaction, embed, rows.slice(0, 5));
+        await saveControlId(guildId, interaction.channelId, interaction.message.id);
+        return true;
+    } catch (err) {
+        logger.error('Control panel update failed: ' + err.message);
+        return false;
+    }
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="messageupdater" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-sync-alt"></i> Message Updater Flow</h2>
+                            <p>Handles Discord's interaction expiration and message not found scenarios:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/interactions/flow/messageUpdater.js
+async function updateControlMessage(interaction, embed, components) {
+    try {
+        if (interaction.replied || interaction.deferred) {
+            return await interaction.editReply({ embeds: [embed], components });
+        } else {
+            return await interaction.update({ embeds: [embed], components });
+        }
+    } catch (error) {
+        logger.error('Error Updating Control Message', error);
+        
+        if (error.code === 10062 || error.message?.includes('Unknown interaction')) {
+            logger.debug('Interaction Expired Cannot Update');
+            return null;
+        }
+        
+        if (error.code === 10008 || error.message?.includes('Unknown Message')) {
+            logger.debug('Message Not Found Cannot Update');
+            return null;
+        }
+        
+        // Fallback: send as new message and track ID
+        // ... fallback logic
+        return null;
+    }
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="pagination" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-list-ol"></i> Pagination System</h2>
+                            <p>
+                                Reusable pagination utilities in <code>src/ui/pagination.js</code> handle page calculation and button
+                                creation:
+                            </p>
+                            <table class="config-table">
+                                <thead>
+                                    <tr>
+                                        <th>Function</th>
+                                        <th>Parameters</th>
+                                        <th>Return</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>calculatePagination</code></td>
+                                        <td><code>total</code>, <code>page</code>, <code>limit</code></td>
+                                        <td><code>{ totalPages, currentPage, startIndex, endIndex }</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>createPaginationRow</code></td>
+                                        <td><code>page</code>, <code>totalPages</code>, <code>config</code></td>
+                                        <td><code>ActionRowBuilder</code> with prev/next buttons</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section id="caching" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-server"></i> Embed Caching</h2>
+                            <p>Control embeds are cached to reduce Discord API rate limits and improve response time:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Cache key generation
+const key =
+    'control_embed_' +
+    guildId +
+    '_' + st.currentSurah +
+    '_' + st.currentReciter +
+    '_' + st.currentPage +
+    '_' + st.playbackMode +
+    '_' + st.controlMode;
+
+if (cache.has(key)) {
+    const c = cache.get(key);
+    c.active = true;
+    c.timestamp = Date.now();
+    return c.embed;
+}
+
+// Auto-cleanup interval runs every 10s
+setInterval(() => {
+    const now = Date.now();
+    for (const [k, { timestamp, active }] of cache.entries()) {
+        const ttl = active ? 30000 : 60000;
+        if (now - timestamp > ttl) cache.delete(k);
+    }
+    
+    if (cache.size > 100) {
+        // Remove half if exceeding limit
+    }
+}, 10000);</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="troubleshooting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wrench"></i> Troubleshooting UI Issues</h2>
+
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Control panel shows "Unknown interaction"
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    Discord interactions expire after 15 minutes. Use <code>rebuildAndSendControlPanel</code> to generate a
+                                    fresh panel. The message updater automatically falls back to sending a new message if the original
+                                    expires.
+                                </p>
+                            </details>
+
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Embed cache not updating after state changes
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    Clear the cache manually: <code>clearEmbedCache(guildId)</code> or wait for TTL expiry (30s for active,
+                                    60s for inactive). The cache key includes all state variables, so any state change will bypass the
+                                    cache.
+                                </p>
+                            </details>
+                        </section>
+
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Links</h4>
+                    <div class="footer-links">
+                        <a href="../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="../docs.html" class="footer-link"><i class="fas fa-book"></i> Developer Docs</a>
+                        <a href="./docs-data-pipeline.html" class="footer-link"><i class="fas fa-database"></i> Data Pipeline</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-palette"></i> UI Resources</h4>
+                    <div class="footer-links">
+                        <a href="https://discord.com/developers/docs/interactions/message-components" target="_blank" class="footer-link">
+                            <i class="fab fa-discord"></i> Discord Components Docs
+                        </a>
+                        <a href="https://discord.com/developers/docs/resources/channel#embed-object" target="_blank" class="footer-link">
+                            <i class="fas fa-book"></i> Embed Object Reference
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version"><i class="fas fa-code-branch"></i> Docs <span data-app-version></span></p>
+            </div>
+        </footer>
+
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

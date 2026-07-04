@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot Developer Documentation - Learn how to extend, customize, and contribute to the QuranBot Discord bot project"
+        />
+        <title>QuranBot Developer Documentation</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link active">Development</a>
+                    <a href="docs-configuration.html" class="nav-link">Configuration</a>
+                    <a href="docs-security.html" class="nav-link">Security</a>
+                    <a href="docs-resources.html" class="nav-link">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">Developer Documentation</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For Contributors & Developers</p>
+
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Quick Start</h3>
+                    <p>This documentation covers the core architecture of QuranBot and guides you through extending its functionality.</p>
+                    <ul>
+                        <li><i class="fas fa-code"></i> Node.js v22 required</li>
+                        <li><i class="fas fa-database"></i> Firebase + Redis backend</li>
+                        <li><i class="fas fa-wave-square"></i> Lavalink v4 audio engine</li>
+                    </ul>
+                </div>
+
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#architecture" class="active">Project Architecture</a></li>
+                            <li><a href="#folder-structure">Folder Structure</a></li>
+                            <li><a href="#commands">Adding a New Command</a></li>
+                            <li><a href="#command-registration">Command Registration</a></li>
+                            <li><a href="#ready">Ready Handler Setup</a></li>
+                            <li><a href="#cooldown">Cooldown System</a></li>
+                            <li><a href="#state-management">State Management</a></li>
+                            <li><a href="#audio-integration">Audio Integration</a></li>
+                            <li><a href="#best-practices">Best Practices</a></li>
+                            <li><a href="#troubleshooting">Troubleshooting</a></li>
+                        </ul>
+                    </aside>
+
+                    <div class="doc-main">
+                        <section id="architecture" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-sitemap"></i> Project Architecture</h2>
+                            <p>QuranBot follows a modular, alias-based architecture designed for scalability and maintainability.</p>
+
+                            <div class="highlight-box">
+                                <p><strong>Key Components:</strong></p>
+                                <ul style="margin-top: 8px; list-style: disc; padding-left: 20px">
+                                    <li><code>@startup/botSetup.js</code> - Client initialization, Lavalink setup, global state</li>
+                                    <li><code>@ready/readyHandler.js</code> - Post-login orchestration and data loading</li>
+                                    <li><code>@interactions/</code> - Command/button/menu interaction routing</li>
+                                    <li><code>@audio/</code> - Lavalink player management and resource creation</li>
+                                    <li><code>@state/</code> - Guild state persistence and voice idle handling</li>
+                                    <li><code>@database/</code> - Firebase + Redis data layer abstraction</li>
+                                </ul>
+                            </div>
+
+                            <p>All modules use <code>pathlra-aliaser</code> for clean imports:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Example: Importing from aliased paths
+require('pathlra-aliaser')();
+
+const logger = require('@logging/logger');
+const { createSurahResource } = require('@audio');
+const { getGuildState } = require('@state/GuildStateManager');</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="folder-structure" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-folder-tree"></i> Folder Structure Overview</h2>
+                            <div class="code-block">
+                                <pre>
+QuranBot/
+├── src/
+│   ├── audio/           # Lavalink player, resource creation, recovery
+│   ├── auth/            # Permission checks and authorization logic
+│   ├── bot/             # Bootstrap and core entry point
+│   ├── commands/        # Slash command definitions (/دخول, /تحكم, etc.)
+│   ├── config/          # Constants, env switching, HTTP config
+│   ├── data/            # Data loaders for Quran, reciters, radios
+│   ├── database/        # Firebase, Redis, local backup services
+│   ├── events/          # Voice state, guild events, welcome messages
+│   ├── helpers/         # Utility functions (formatting, emojis)
+│   ├── interactions/    # Button/menu/modal handlers + routing
+│   ├── logging/         # Structured logging with rotation
+│   ├── ready/           # Post-login initialization routines
+│   ├── registry/        # Command registration and permission application
+│   ├── runtime/         # Runtime state persistence
+│   ├── startup/         # Client setup, Lavalink configuration
+│   ├── state/           # Guild state, cooldowns, voice idle logic
+│   ├── statistics/      # Firebase-backed usage metrics
+│   └── ui/              # Embed builders, component factories
+├── .env.example         # Environment variable template
+├── development.env.example         # Environment variable development
+├── production.env.example         # Environment variable production
+├── package.json         # Dependencies and scripts
+└── ecosystem.config.js  # PM2 process management</pre
+                                >
+                            </div>
+                        </section>
+
+                        <section id="commands" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-terminal"></i> Adding a New Slash Command</h2>
+
+                            <h3>Step 1: Create the Command File</h3>
+                            <p>Create a new file in <code>src/commands/</code>, e.g., <code>mycommand.js</code>:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/commands/mycommand.js
+require('pathlra-aliaser')();
+
+const { wrapInteraction, safeReply } = require('@interactions/flow/responder');
+const { resolveGuildState } = require('@auth/guard');
+const logger = require('@logging/logger');
+
+module.exports = {
+    async execute(interaction) {
+        await wrapInteraction(
+            interaction,
+            async () => {
+                const { guildId, guildState } = resolveGuildState(interaction);
+                
+                // Your command logic here
+                await safeReply(
+                    interaction, 
+                    { content: 'Command executed successfully!', flags: 64 },
+                    'mycommand_executed'
+                );
+            },
+            { ephemeral: true, label: 'mycommand' }
+        );
+    },
+};</code></pre>
+                            </div>
+
+                            <div class="doc-alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div class="doc-alert-content">
+                                    <strong>Always use <code>wrapInteraction</code></strong>
+                                    <p>
+                                        This wrapper handles defer/reply logic, error boundaries, and ephemeral messaging consistently
+                                        across all commands.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <h3>Step 2: Register the Command</h3>
+                            <p>Add your command to <code>src/registry/commandregistry.js</code>:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Inside registerCommands() function
+const cmds = [
+    // ... existing commands
+    new SlashCommandBuilder()
+        .setName('mycommand')
+        .setDescription('Description of what my command does')
+        .setDefaultMemberPermissions('0', // '0' = everyone, '8' = admin
+].map(c => c.toJSON());</code></pre>
+                            </div>
+
+                            <h3>Step 3: Add to Bootstrap Exports</h3>
+                            <p>Export your command in <code>src/bot/bootstrap.js</code> for interaction routing:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/bot/bootstrap.js
+const myCommand = require('@commands/mycommand');
+
+// ... later in module.exports
+module.exports.myCommand = myCommand;</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="command-registration" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-cogs"></i> Command Registration Flow</h2>
+                            <p>Commands are registered globally via Discord API and permissions are applied per-guild:</p>
+
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px">
+                                    <strong>Global Registration</strong> - <code>registerCommands()</code> pushes slash commands to Discord
+                                    via REST API
+                                </li>
+                                <li style="margin-bottom: 12px">
+                                    <strong>Guild Permissions</strong> - <code>applyCommandPermissions()</code> restricts admin commands to
+                                    specific roles/users
+                                </li>
+                                <li>
+                                    <strong>Runtime Routing</strong> - <code>interactionProcessor.js</code> routes interactions to handlers
+                                    via <code>coreLoader</code>
+                                </li>
+                            </ol>
+
+                            <div class="highlight-box">
+                                <p><strong>Permission Levels:</strong></p>
+                                <ul style="margin-top: 8px">
+                                    <li><code>.setDefaultMemberPermissions('0')</code> - Everyone can use</li>
+                                    <li><code>.setDefaultMemberPermissions('8')</code> - Administrator only</li>
+                                    <li>Runtime auth checks in <code>@auth/auth-manager.js</code> add granular control</li>
+                                </ul>
+                            </div>
+                        </section>
+
+                        <section id="ready" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-power-off"></i> Ready Handler Setup</h2>
+                            <p>The <code>readyHandler.js</code> orchestrates post-login initialization. To integrate new functionality:</p>
+
+                            <h3>Typical Initialization Sequence:</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/ready/readyHandler.js - simplified flow
+loadData() // Load Quran data, reciters, radios
+    .then(async () => {
+        await persistentStateManager.initialize();
+        await initializeStats();
+        
+        client.once('clientReady', async () => {
+            // 1. Initialize Lavalink
+            await client.lavalink.init(client.user);
+            
+            // 2. Restore runtime states
+            await runtimeStates.restoreRuntimeStates(client);
+            
+            // 3. Process guild recovery
+            for (const guildId of guildsToProcess) {
+                await recoverAzkarTimers(guild, setupData, guildId);
+                await recoverVoiceConnection(guild, setupData, guildId);
+            }
+            
+            // 4. Register commands
+            await registerAllCommands(client);
+        });
+        
+        // 5. Login to Discord
+        await client.login(global.token);
+    });</code></pre>
+                            </div>
+
+                            <h3>Adding Custom Ready Logic:</h3>
+                            <p>Create a new file in <code>src/ready/</code> and import it in <code>readyHandler.js</code>:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/ready/myFeature.js
+require('pathlra-aliaser')();
+const logger = require('@logging/logger');
+
+async function initializeMyFeature(client) {
+    // Your initialization logic
+    logger.info('My feature initialized');
+    return true;
+}
+
+module.exports.initializeMyFeature = initializeMyFeature;</code></pre>
+                            </div>
+                            <p>Then in <code>readyHandler.js</code>, call it after <code>loadData()</code> resolves.</p>
+                        </section>
+
+                        <section id="cooldown" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-hourglass-half"></i> Cooldown System</h2>
+                            <p>QuranBot implements a dual-layer cooldown system: per-command and global rate limiting.</p>
+
+                            <h3>Command Cooldowns (<code>src/state/commandCooldown.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Define cooldowns in COMMAND_COOLDOWNS
+const COMMAND_COOLDOWNS = {
+    control: { duration: 25000, type: 'user' },   // 25s per user
+    join: { duration: 15000, type: 'user' },        // 15s per user
+    setup: { duration: 60000, type: 'server' },     // 60s per server
+};
+
+// Map Arabic command names to keys
+const CMD_MAP = {
+    تحكم: 'control',
+    دخول: 'join',
+    إعداد: 'setup',
+};</code></pre>
+                            </div>
+
+                            <h3>Using Cooldowns in Commands:</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Inside your command execute function
+const cdResult = coreLoader.checkCooldown(
+    interaction.user.id, 
+    interaction.guildId, 
+    'mycommand'
+);
+
+if (!cdResult.allowed) {
+    await safeError(
+        interaction, 
+        coreLoader.getCooldownResponse(cdResult.remaining, cdResult.type)
+    );
+    return;
+}
+
+// ... execute command logic ...
+
+// Set cooldown AFTER successful execution
+coreLoader.setCooldown(interaction.user.id, interaction.guildId, 'mycommand');</code></pre>
+                            </div>
+
+                            <h3>Global Rate Limiting:</h3>
+                            <p>
+                                Prevents spam across all interactions via <code>checkRateLimit()</code> in
+                                <code>interactionProcessor.js</code>:
+                            </p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Default: 100 actions per 60 seconds per user+guild
+const rateLimitResult = coreLoader.checkRateLimit(
+    userId, 
+    guildId, 
+    100,   // maxActions
+    60000  // windowMs
+);
+
+if (!rateLimitResult.valid) {
+    // Block interaction with rate limit message
+}</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="state-management" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-database"></i> State Management</h2>
+                            <p>Guild-specific state is managed through a layered system:</p>
+
+                            <div class="highlight-box">
+                                <p><strong>State Layers:</strong></p>
+                                <ul style="margin-top: 8px">
+                                    <li><strong>Runtime</strong> - <code>global.guildStates</code> Map (in-memory, fast access)</li>
+                                    <li><strong>Persistent</strong> - Firebase Realtime Database (survives restarts)</li>
+                                    <li><strong>Cache</strong> - Redis (distributed, optional fallback)</li>
+                                </ul>
+                            </div>
+
+                            <h3>Accessing Guild State:</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">const { getGuildState } = require('@state/GuildStateManager');
+
+const guildState = getGuildState(guildId);
+// Returns object with: player, connection, currentSurah, playbackMode, etc.
+
+// Update state (auto-persists with debounce)
+guildState.currentSurah = 114;
+await global.saveRuntimeStates(); // Force immediate save if needed</code></pre>
+                            </div>
+
+                            <h3>Key State Properties:</h3>
+                            <table style="width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--line-accent)">
+                                        <th style="text-align: left; padding: 8px; color: var(--text-accent)">Property</th>
+                                        <th style="text-align: left; padding: 8px; color: var(--text-accent)">Type</th>
+                                        <th style="text-align: left; padding: 8px; color: var(--text-accent)">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid var(--line-faint)">
+                                        <td style="padding: 8px"><code>playbackMode</code></td>
+                                        <td style="padding: 8px"><code>'surah' | 'radio'</code></td>
+                                        <td style="padding: 8px">Current playback mode</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--line-faint)">
+                                        <td style="padding: 8px"><code>currentSurah</code></td>
+                                        <td style="padding: 8px"><code>number</code></td>
+                                        <td style="padding: 8px">1-114 surah index</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--line-faint)">
+                                        <td style="padding: 8px"><code>currentReciter</code></td>
+                                        <td style="padding: 8px"><code>string</code></td>
+                                        <td style="padding: 8px">Reciter key (e.g., <code>'reciter_1_ar'</code>)</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid var(--line-faint)">
+                                        <td style="padding: 8px"><code>controlMode</code></td>
+                                        <td style="padding: 8px"><code>'admins' | 'everyone'</code></td>
+                                        <td style="padding: 8px">Permission mode for control panel</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px"><code>playedOffset</code></td>
+                                        <td style="padding: 8px"><code>number</code></td>
+                                        <td style="padding: 8px">Playback position in ms for resume</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section id="audio-integration" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-wave-square"></i> Audio Integration (Lavalink)</h2>
+                            <p>QuranBot uses Lavalink v4 for stable, scalable audio playback.</p>
+
+                            <h3>Creating Audio Resources:</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">const { createSurahResource, createRadioResource } = require('@audio');
+
+// Create surah resource (auto-handles fallbacks)
+const track = await createSurahResource(guildState, surahIndex);
+
+// Create radio resource
+const radioTrack = await createRadioResource(radioUrl);
+
+// Play via Lavalink player
+if (track) {
+    guildState.player.play({ track });
+    
+    // Optional: seek to offset for resume
+    if (guildState.playedOffset > 0) {
+        await guildState.player.seek(guildState.playedOffset);
+    }
+}</code></pre>
+                            </div>
+
+                            <h3>Node Selection & Load Balancing:</h3>
+                            <p>Use <code>getBestNode()</code> for automatic least-loaded node selection:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">const { getBestNode } = require('@startup/botSetup');
+
+const bestNode = getBestNode(client.lavalink);
+// Returns node with lowest player count that's under maxPlayers limit</code></pre>
+                            </div>
+
+                            <div class="doc-alert">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="doc-alert-content">
+                                    <strong>Environment Configuration</strong>
+                                    <p>
+                                        Configure Lavalink nodes via <code>LAVALINK_NODES_</code> env var (see <code>.env.example</code>).
+                                        The bot supports multiple nodes with automatic failover.
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section id="best-practices" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-star"></i> Best Practices</h2>
+
+                            <h3>Do:</h3>
+                            <ul>
+                                <li>
+                                    <strong>Use <code>wrapInteraction</code></strong> for all command/button handlers to ensure consistent
+                                    error handling
+                                </li>
+                                <li>
+                                    <strong>Log with context</strong> - Use <code>logger.info(guildId, 'message')</code> for traceability
+                                </li>
+                                <li>
+                                    <strong>Validate inputs</strong> - Check <code>global.reciters</code>,
+                                    <code>global.surahNames</code> exist before use
+                                </li>
+                                <li>
+                                    <strong>Defer early</strong> - Call <code>deferUpdate()</code> or <code>deferReply()</code> before async
+                                    operations
+                                </li>
+                                <li><strong>Use aliases</strong> - Stick to <code>@module/path</code> imports for consistency</li>
+                            </ul>
+
+                            <h3>Testing Your Changes:</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript"># Development mode with hot reload
+NODE_ENV=development pnpm run dev
+
+# Production mode (requires full env setup)
+NODE_ENV=production pnpm run start
+
+# Run with PM2 for process management
+pnpm run pm2:start
+
+# View logs
+pnpm run pm2:logs</code></pre>
+                            </div>
+                        </section>
+
+                        <section id="troubleshooting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-bug"></i> Troubleshooting Guide</h2>
+
+                            <h3>Common Issues:</h3>
+
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Commands not appearing in Discord
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    Global command registration can take up to 1 hour to propagate. For testing, use a guild-specific
+                                    registration by modifying <code>Routes.applicationCommands</code> to
+                                    <code>Routes.applicationGuildCommands</code> with your test server ID.
+                                </p>
+                            </details>
+
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Voice connection fails with "No compatible encryption modes"
+                                </summary>
+                                <div style="margin-top: 12px; color: var(--text-muted)">
+                                    <p>This indicates a Lavalink node issue. Check:</p>
+
+                                    <ul style="margin-top: 8px; padding-left: 20px">
+                                        <li>Node is running and reachable</li>
+                                        <li>Password matches in <code>.env</code> and Lavalink config</li>
+                                        <li>Node version is compatible (v4.x required)</li>
+                                    </ul>
+
+                                    <p>Use <code>/سرعة</code> command to check node status.</p>
+                                </div>
+                            </details>
+
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    State not persisting after restart
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    Verify Firebase credentials in <code>.env</code>. The bot auto-saves state with a 60s debounce. Force
+                                    save with <code>global.saveRuntimeStates()</code> for immediate persistence during testing.
+                                </p>
+                            </details>
+
+                            <h3>Debug Logging:</h3>
+                            <p>
+                                Enable verbose logging by setting <code>LOG_LEVEL=debug</code> in your environment. Logs are written to
+                                <code>storage/logs/</code> with automatic rotation.
+                            </p>
+                        </section>
+
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Links</h4>
+                    <div class="footer-links">
+                        <a href="../../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="../privacy.html" class="footer-link"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                        <a href="../terms.html" class="footer-link"><i class="fas fa-file-contract"></i> Terms of Service</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-code"></i> Development</h4>
+                    <div class="footer-links">
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="footer-link">
+                            <i class="fab fa-github"></i>
+                            View Source Code
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot/issues" class="footer-link">
+                            <i class="fas fa-bug"></i>
+                            Report a Bug
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot/issues" class="footer-link">
+                            <i class="fas fa-lightbulb"></i>
+                            Request Feature
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version">
+                    <i class="fas fa-code-branch"></i>
+                    Docs <span data-app-version></span>
+                </p>
+            </div>
+        </footer>
+
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

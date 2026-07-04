@@ -15,16 +15,18 @@
             rel="stylesheet"
         />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-        <link rel="stylesheet" href="./style.css" />
+        <link rel="stylesheet" href="./site/css/style.css" />
     </head>
 
     <body>
-        <header class="site-header">
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
             <div class="header-container">
-                <div class="header-brand">
-                    <i class="fas fa-mosque"></i>
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
                     <span>QuranBot</span>
-                </div>
+                </a>
+
                 <nav class="header-nav">
                     <a href="#features" class="nav-link">Features</a>
                     <a href="#commands" class="nav-link">Commands</a>
@@ -33,9 +35,18 @@
                     <a href="#surahs" class="nav-link">Surahs</a>
                     <a href="#faq" class="nav-link">FAQ</a>
                     <a href="#setup" class="nav-link">Setup</a>
-                    <a target="_blank" href="./privacy.html" class="nav-link">Privacy</a>
-                    <a target="_blank" href="./terms.html" class="nav-link">Terms</a>
-                    <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link"><i class="fab fa-github"></i></a>
+                    <a target="_blank" href="./site/privacy.html" class="nav-link">Privacy</a>
+                    <a target="_blank" href="./site/terms.html" class="nav-link">Terms</a>
+                    <a href="./site/docs.html" class="nav-link">docs</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
                 </nav>
                 <button class="mobile-menu-toggle" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
@@ -46,10 +57,6 @@
         <main class="main-content">
             <section class="hero-section">
                 <div class="hero-container">
-                    <div class="hero-badge">
-                        <i class="fas fa-star"></i>
-                        Open Source & Production Ready
-                    </div>
                     <h1 class="hero-title">
                         Advanced Quran & Islamic Companion<br />
                         <span class="text-accent">Built for Stability</span>
@@ -198,7 +205,7 @@
                             awareness.
                         </p>
                         <ul class="feature-list">
-                            <li><i class="fas fa-check"></i> 300+ cities worldwide</li>
+                            <li><i class="fas fa-check"></i> 135+ cities worldwide</li>
                             <li><i class="fas fa-check"></i> Hijri & Gregorian dates</li>
                             <li><i class="fas fa-check"></i> Regional calculation methods</li>
                         </ul>
@@ -353,7 +360,7 @@
                                 <span class="command-perms">Permissions: Everyone</span>
                             </div>
                             <div class="command-item">
-                                <code class="command-name">/ping</code>
+                                <code class="command-name">/سرعة</code>
                                 <p class="command-desc">Display bot latency, uptime, server count, and system metrics</p>
                                 <span class="command-perms">Permissions: Everyone</span>
                             </div>
@@ -416,8 +423,6 @@
                 </div>
                 <div class="surahs-filter">
                     <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="makkia">Makki</button>
-                    <button class="filter-btn" data-filter="madania">Madani</button>
                 </div>
                 <div id="surahs-grid" class="surahs-grid">
                     <div class="loading-placeholder">
@@ -463,6 +468,7 @@
                     </h2>
                     <p class="section-subtitle">Engineered for 24/7 operation with automatic recovery and resource management</p>
                 </div>
+
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-icon">
@@ -500,6 +506,39 @@
                         <h3 class="feature-title">Local & Cloud Backups</h3>
                         <p class="feature-description">
                             Compressed JSON backups sent to Discord channels. Firebase sync ensures zero data loss during restarts.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="feature-title">Redis State Management</h3>
+                        <p class="feature-description">
+                            Distributed Redis caching and shared runtime state management for faster response times, synchronization, and
+                            scalable multi-process infrastructure.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <h3 class="feature-title">Lavalink v4 Audio Nodes</h3>
+                        <p class="feature-description">
+                            Dedicated Lavalink v4 nodes with automatic failover, voice recovery, load balancing, and resilient audio
+                            streaming infrastructure.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h3 class="feature-title">Hybrid Sharding System</h3>
+                        <p class="feature-description">
+                            Advanced hybrid sharding architecture with distributed cluster management, centralized state synchronization,
+                            and scalable multi-instance Discord gateway handling.
                         </p>
                     </div>
                 </div>
@@ -656,8 +695,8 @@
                 <div class="cta-container">
                     <h2 class="cta-title">Ready to Enhance Your Community?</h2>
                     <p class="cta-description">
-                        Join thousands of servers using QuranBot for reliable Quran streaming, automated remembrance, and professional voice
-                        management. Fully open-source.
+                        Use QuranBot for reliable Quran streaming, automated remembrance, and professional voice management. Fully
+                        open-source.
                     </p>
                     <div class="cta-actions">
                         <a
@@ -671,6 +710,11 @@
                         <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="btn-outline btn-large">
                             <i class="fab fa-github"></i>
                             View Source Code
+                        </a>
+
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="btn-outline btn-large">
+                            <i class="fab fa-discord"></i>
+                            Support Server
                         </a>
                     </div>
                 </div>
@@ -689,7 +733,7 @@
                         everyone.
                     </p>
                     <div class="footer-social">
-                        <a href="https://discord.gg/cgRMtuXkJf" target="_blank" class="social-btn discord" title="Discord Support">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
                             <i class="fab fa-discord"></i>
                         </a>
                         <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
@@ -698,13 +742,13 @@
                     </div>
                 </div>
                 <div class="footer-section">
-                    <h4><i class="fas fa-link"></i> Quick Links</h4>
+                    <h4><i class="fas fa-link"></i> Links</h4>
                     <div class="footer-links">
-                        <a href="./privacy.html" class="footer-link">
+                        <a href="./site/privacy.html" class="footer-link">
                             <i class="fas fa-shield-alt"></i>
                             Privacy Policy
                         </a>
-                        <a href="./terms.html" class="footer-link">
+                        <a href="./site/terms.html" class="footer-link">
                             <i class="fas fa-file-contract"></i>
                             Terms of Service
                         </a>
@@ -717,7 +761,7 @@
                 <div class="footer-section">
                     <h4><i class="fas fa-headset"></i> Support</h4>
                     <div class="footer-links">
-                        <a href="https://discord.gg/cgRMtuXkJf" target="_blank" class="footer-link">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="footer-link">
                             <i class="fab fa-discord"></i>
                             Discord Support Server
                         </a>
@@ -733,13 +777,13 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="footer-copyright">&copy; 2026 QuranBot. All rights reserved. Independent open-source project</p>
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
             </div>
         </footer>
 
         <button class="scroll-top-btn" aria-label="Scroll to top">
             <i class="fas fa-arrow-up"></i>
         </button>
-        <script src="./scripts.js"></script>
+        <script src="./site/js/scripts.js"></script>
     </body>
 </html>

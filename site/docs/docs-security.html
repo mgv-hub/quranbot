@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="QuranBot Security, Permissions & Contributing Guide - Authentication, rate limiting, security practices, and contribution workflow"
+        />
+        <title>QuranBot Security & Contributing</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        <link rel="stylesheet" href="../css/style.css" />
+        <link href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism-tomorrow.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="loader-bar-css" id="LoaderBar"></div>
+        <header class="site-header" id="site-nav">
+            <div class="header-container">
+                <a href="/" class="header-brand">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>QuranBot</span>
+                </a>
+                <nav class="header-nav">
+                    <a href="../../index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back</a>
+                    <span class="nav-separator">|</span>
+                    <a href="docs-development.html" class="nav-link">Development</a>
+                    <a href="docs-configuration.html" class="nav-link">Configuration</a>
+                    <a href="docs-security.html" class="nav-link active">Security</a>
+                    <a href="docs-resources.html" class="nav-link">Resources</a>
+                    <a href="docs-data-pipeline.html" class="nav-link">Data Pipeline</a>
+                    <a href="docs-ui-architecture.html" class="nav-link">UI Architecture</a>
+                    <a href="docs-maintenance.html" class="nav-link">Maintenance</a>
+                    <a href="docs-state-management.html" class="nav-link">State Mgmt</a>
+                    <a id="github-link" href="https://github.com/mgv-hub/quranbot" target="_blank" class="nav-link github-link">
+                        <i class="fab fa-github"></i>
+                        <span class="github-stats">
+                            <i class="fas fa-star"></i>
+                            <span id="gh-stars"></span>
+                            <i class="fas fa-code-branch" style="margin-left: 10px"></i>
+                            <span id="gh-forks"></span>
+                        </span>
+                    </a>
+                </nav>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </header>
+        <main class="main-content">
+            <section class="page-wrap">
+                <div class="doc-header">
+                    <h1 class="doc-title">Security & Contributing Guide</h1>
+                    <span class="badge-version"><span data-app-version></span></span>
+                </div>
+                <p class="doc-meta">Last Updated: 2026-05-26 • For Security Engineers & Contributors</p>
+                <div class="exec-summary">
+                    <h3><i class="fas fa-lightbulb"></i> Overview</h3>
+                    <p>
+                        This guide covers the authentication architecture, security best practices, rate limiting implementation, and
+                        contribution workflow for QuranBot.
+                    </p>
+                    <ul>
+                        <li><i class="fas fa-shield-alt"></i> Role-based permission system</li>
+                        <li><i class="fas fa-hourglass-half"></i> Rate limiting & cooldown implementation</li>
+                        <li><i class="fas fa-lock"></i> Security practices & token handling</li>
+                        <li><i class="fas fa-code-branch"></i> Contribution workflow & PR guidelines</li>
+                    </ul>
+                </div>
+                <div class="doc-grid">
+                    <aside class="doc-sidebar">
+                        <div class="toc-title"><i class="fas fa-list"></i> On This Page</div>
+                        <ul>
+                            <li><a href="#auth" class="active">Authentication Architecture</a></li>
+                            <li><a href="#permission-flow">Permission Flow</a></li>
+                            <li><a href="#cooldown-system">Cooldown System Deep Dive</a></li>
+                            <li><a href="#rate-limiting">Rate Limiting Implementation</a></li>
+                            <li><a href="#security">Security Best Practices</a></li>
+                            <li><a href="#token-handling">Token & Secret Handling</a></li>
+                            <li><a href="#input-validation">Input Validation</a></li>
+                            <li><a href="#contributing">Contributing Guidelines</a></li>
+                            <li><a href="#pr-process">Pull Request Workflow</a></li>
+                            <li><a href="#code-style">Code Style & Standards</a></li>
+                            <li><a href="#testing">Testing Requirements</a></li>
+                            <li><a href="#debugging">Debugging Techniques</a></li>
+                        </ul>
+                    </aside>
+                    <div class="doc-main">
+                        <section id="auth" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-key"></i> Authentication Architecture</h2>
+                            <p>
+                                QuranBot implements a multi-layered authentication system via <code>src/auth/auth-manager.js</code> that
+                                handles permissions at three levels: Discord native permissions, role-based keywords, and special developer
+                                users.
+                            </p>
+                            <h3>Authentication Layers</h3>
+                            <table class="permission-table">
+                                <thead>
+                                    <tr>
+                                        <th>Layer</th>
+                                        <th>Implementation</th>
+                                        <th>Use Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>hasAdminPermission()</code></td>
+                                        <td>Checks <code>PermissionsBitField.Flags.Administrator</code></td>
+                                        <td>Native Discord admin permission (bypasses all checks)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>hasAdminRole()</code></td>
+                                        <td>Keyword match against <code>permissions_config.admin_roles</code></td>
+                                        <td>Server-specific admin roles (e.g., "Quran Admin", "Islamic Admin")</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>isSpecialUser()</code></td>
+                                        <td>Checks <code>global.SPE_USER_IDS</code> from env</td>
+                                        <td>Bot developers with global access across all servers</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Control Mode System</h3>
+                            <p>The bot supports two control modes per guild, stored in <code>guildState.controlMode</code>:</p>
+                            <div class="auth-flow">
+                                <strong>Mode: <code>'admins'</code> (Default)</strong>
+                                <ol>
+                                    <li>Only users with admin permission/role or special user ID can interact with control panel</li>
+                                    <li>Public features (prayer times, azkar, guide) remain accessible to everyone</li>
+                                    <li>Commands like <code>/إعداد</code>, <code>/دخول</code>, <code>/خروج</code> require admin</li>
+                                </ol>
+                            </div>
+                            <div class="auth-flow">
+                                <strong>Mode: <code>'everyone'</code></strong>
+                                <ol>
+                                    <li>Any member can use navigation buttons (prev/next surah, reciter selection)</li>
+                                    <li>Admin-only actions (join/leave voice, mode toggle) still require authorization</li>
+                                    <li>Cooldowns apply to prevent abuse (90s for public actions in this mode)</li>
+                                </ol>
+                            </div>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/auth/auth-manager.js - Core authorization logic
+function isAuthorized(interaction, guildState, interactionType) {
+    const member = interaction.member;
+    const userId = interaction.user?.id;
+    
+    // Support/help always open
+    if (interactionType === 'support' || interactionType === 'open_complaint_modal') {
+        return true;
+    }
+    
+    // Admin/special users bypass everything
+    if (hasAdminPermission(member) || hasAdminRole(member) || isSpecialUser(userId)) {
+        return true;
+    }
+    
+    // Control mode check
+    if (!guildState?.controlMode || guildState.controlMode === 'admins') {
+        return false;
+    }
+    
+    // Everyone mode - check whitelist
+    return allowed_everyone_actions.includes(interactionType);
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="permission-flow" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-project-diagram"></i> Permission Flow Diagram</h2>
+                            <p>
+                                Every interaction passes through this authorization pipeline in
+                                <code>src/interactions/interactionProcessor.js</code>:
+                            </p>
+                            <div class="auth-flow">
+                                <strong>Interaction Processing Pipeline:</strong>
+                                <ol>
+                                    <li>
+                                        <strong>Global Cooldown Check</strong> - <code>checkGlobalCooldown()</code> blocks spam at user
+                                        level
+                                    </li>
+                                    <li>
+                                        <strong>Public Feature Detection</strong> - <code>isPublicFeature()</code> allows azkar/prayer
+                                        buttons without auth
+                                    </li>
+                                    <li>
+                                        <strong>Voice State Validation</strong> - <code>checkVoiceState()</code> ensures bot is in voice for
+                                        playback actions
+                                    </li>
+                                    <li>
+                                        <strong>Authorization Check</strong> - <code>checkAuthorization()</code> applies permission logic
+                                    </li>
+                                    <li>
+                                        <strong>Voice-Specific Cooldown</strong> - <code>checkVoiceCooldown()</code> for join/leave actions
+                                    </li>
+                                    <li><strong>Handler Execution</strong> - Route to button/menu/command handler</li>
+                                </ol>
+                            </div>
+                            <h3>Exempt Actions (No Auth Required)</h3>
+                            <p>These interaction types bypass authorization checks entirely:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 6px">
+                                    <code>submit_complaint</code>, <code>open_complaint_modal</code> - Support flows
+                                </li>
+                                <li style="margin-bottom: 6px"><code>play_azkar_*</code> - Azkar audio playback buttons</li>
+                                <li style="margin-bottom: 6px">
+                                    <code>prayer_times</code>, <code>select_country_prayer</code>, <code>select_city_prayer</code> - Prayer
+                                    time selection
+                                </li>
+                                <li style="margin-bottom: 6px">
+                                    <code>more_features</code>, <code>back_to_main</code> - Navigation helpers
+                                </li>
+                                <li><code>toggle_control_mode</code> - Mode switching (handled separately)</li>
+                            </ul>
+                        </section>
+                        <section id="cooldown-system" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-hourglass-half"></i> Cooldown System Deep Dive</h2>
+                            <p>QuranBot implements a dual-layer cooldown system: per-command cooldowns and global rate limiting.</p>
+                            <h3>Command Cooldowns (<code>src/state/commandCooldown.js</code>)</h3>
+                            <table class="permission-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Duration</th>
+                                        <th>Scope</th>
+                                        <th>Key Mapping</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>/تحكم</code></td>
+                                        <td>25s</td>
+                                        <td>Per user</td>
+                                        <td><code>control</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/دخول</code></td>
+                                        <td>15s</td>
+                                        <td>Per user</td>
+                                        <td><code>join</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/خروج</code></td>
+                                        <td>15s</td>
+                                        <td>Per user</td>
+                                        <td><code>leave</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/إعداد</code></td>
+                                        <td>60s</td>
+                                        <td>Per server</td>
+                                        <td><code>setup</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>/مواقيت_الصلاة</code></td>
+                                        <td>50s</td>
+                                        <td>Per user</td>
+                                        <td><code>prayerTimes</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>prayer_times button</code></td>
+                                        <td>15s</td>
+                                        <td>Per user</td>
+                                        <td><code>prayerTimesButton</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Implementation Pattern</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// In command handler (e.g., src/commands/join.js)
+const cdResult = coreLoader.checkCooldown(
+    interaction.user.id,
+    interaction.guildId,
+    'join'
+);
+
+if (!cdResult.allowed) {
+    await safeError(
+        interaction,
+        coreLoader.getCooldownResponse(cdResult.remaining, cdResult.type)
+    );
+    return;
+}
+
+// ... execute command logic ...
+
+// Set cooldown AFTER successful execution
+coreLoader.setCooldown(interaction.user.id, interaction.guildId, 'join');</code></pre>
+                            </div>
+                            <h3>Memory Management</h3>
+                            <p>Cooldown data is stored in <code>Map</code> objects with automatic cleanup:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px"><code>userCD</code> Map: Keys are <code>"userId:commandKey"</code></li>
+                                <li style="margin-bottom: 8px"><code>serverCD</code> Map: Keys are <code>"guildId:commandKey"</code></li>
+                                <li>Cleanup interval runs every 60s to remove expired entries</li>
+                            </ul>
+                        </section>
+                        <section id="rate-limiting" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-shield-alt"></i> Rate Limiting Implementation</h2>
+                            <p>
+                                Beyond per-command cooldowns, QuranBot implements global rate limiting to prevent abuse across all
+                                interactions.
+                            </p>
+                            <h3>Global Rate Limit (<code>src/state/cooldown.js</code>)</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Default: 100 actions per 60 seconds per user+guild combination
+function checkRateLimit(userId, guildId, maxActions = 100, windowMs = 60000) {
+    const now = Date.now();
+    const key = `${userId}:${guildId}`;
+    
+    if (!rateLimitTracker.has(key)) {
+        rateLimitTracker.set(key, { count: 1, windowStart: now });
+        return { valid: true, count: 1, limit: maxActions };
+    }
+    
+    const tracker = rateLimitTracker.get(key);
+    
+    // Reset window if expired
+    if (now - tracker.windowStart > windowMs) {
+        tracker.count = 1;
+        tracker.windowStart = now;
+        return { valid: true, count: 1, limit: maxActions };
+    }
+    
+    tracker.count++;
+    
+    if (tracker.count > maxActions) {
+        return {
+            valid: false,
+            count: tracker.count,
+            limit: maxActions,
+            message: `تم تجاوز حد الاستخدام المسموح. يرجى الانتظار ${Math.ceil((windowMs - (now - tracker.windowStart)) / 1000)} ثانية`,
+        };
+    }
+    
+    return { valid: true, count: tracker.count, limit: maxActions };
+}</code></pre>
+                            </div>
+                            <h3>Interaction Deduplication</h3>
+                            <p>
+                                To prevent duplicate processing of rapid clicks,
+                                <code>src/interactions/interactionHandler.js</code> implements a 500ms deduplication window:
+                            </p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Generate unique interaction ID
+const interactionId = `${interaction.guildId}-${interaction.user.id}-${interaction.id}`;
+
+// Check if this exact interaction was processed recently
+if (global.interactionRateLimits && global.interactionRateLimits.has(interactionId)) {
+    const lastTime = global.interactionRateLimits.get(interactionId);
+    const now = Date.now();
+    
+    if (now - lastTime < 500) { // 500ms minimum interval
+        coreLoader.logger.debug(`Ignored Fast Duplicate Interaction ${interactionId}`);
+        return;
+    }
+}
+
+// Record this interaction
+global.interactionRateLimits.set(interactionId, Date.now());</code></pre>
+                            </div>
+                            <div class="security-note">
+                                <strong>Security Note: Rate Limit Storage</strong>
+                                <p>
+                                    Rate limit data is stored in-memory only and resets on bot restart. This is intentional: persistent rate
+                                    limiting across restarts could unfairly penalize users after maintenance. For production deployments
+                                    requiring persistent rate limiting, consider integrating with Redis using the
+                                    <code>@database/redis</code> module.
+                                </p>
+                            </div>
+                        </section>
+                        <section id="security" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-lock"></i> Security Best Practices</h2>
+                            <h3>Environment Security</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">
+                                    <strong>Never commit secrets</strong> - Use <code>.env.example</code> files as templates only
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Separate environments</strong> - <code>development.env</code> and
+                                    <code>production.env</code> prevent accidental use of production tokens in dev
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>TOPGG_TOKEN stripping</strong> - <code>envSwitcher.js</code> automatically removes this token in
+                                    development mode
+                                </li>
+                                <li>
+                                    <strong>Rotate tokens regularly</strong> - Especially after team member changes or suspected compromise
+                                </li>
+                            </ul>
+                            <h3>Input Validation Patterns</h3>
+                            <p>All user inputs that affect bot behavior should be validated before use:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Example: Validating surah selection in menu handler
+const selectedSurahNum = parseInt(interaction.values[0]);
+
+// Validate range
+if (selectedSurahNum < 1 || selectedSurahNum > global.surahNames.length) {
+    await safeError(interaction, 'Invalid surah selection');
+    return;
+}
+
+// Validate availability for current reciter
+if (!isSurahAvailable(guildState, surahIndex)) {
+    await safeError(interaction, 'This surah is not available for the current reciter');
+    return;
+}</code></pre>
+                            </div>
+                            <h3>SQL/NoSQL Injection Prevention</h3>
+                            <p>
+                                Since QuranBot uses Firebase Realtime Database (NoSQL), injection risks are lower, but still follow these
+                                practices:
+                            </p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">
+                                    Use <code>deepCloneForFirebase()</code> to sanitize objects before storage
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    Never use user input directly in database paths - always validate and sanitize
+                                </li>
+                                <li>Use Firebase security rules (<code>firebase.rules.json</code>) to deny public access</li>
+                            </ul>
+                            <h3>Discord API Security</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">
+                                    <strong>Use ephemeral replies</strong> for sensitive information (<code>flags: 64</code>)
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Validate interaction ownership</strong> - Ensure buttons/menus are used by the original
+                                    requester when appropriate
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Handle interaction expiration</strong> - Catch <code>10062 Unknown interaction</code> errors
+                                    gracefully
+                                </li>
+                                <li><strong>Limit embed content</strong> - Sanitize user-generated content before including in embeds</li>
+                            </ul>
+                        </section>
+                        <section id="token-handling" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-key"></i> Token & Secret Handling</h2>
+                            <h3>Firebase Private Key Sanitization</h3>
+                            <p>
+                                The <code>getSanitizedPrivateKey()</code> function in <code>src/database/firebase/client.js</code> handles
+                                common formatting issues:
+                            </p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">function getSanitizedPrivateKey() {
+    const rawKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+    if (!rawKey) return '';
+    
+    let key = rawKey;
+    
+    // Fix escaped newlines from dotenv parsing
+    key = key.replace(/\\n/g, '\n');
+    key = key.replace(/\\r\\n/g, '\n');
+    
+    // Remove surrounding quotes if present
+    if (key.startsWith('"') && key.endsWith('"')) {
+        key = key.slice(1, -1);
+    }
+    
+    // Ensure trailing newline for PEM format
+    if (key && !key.endsWith('\n')) {
+        key += '\n';
+    }
+    
+    return key;
+}</code></pre>
+                            </div>
+                            <h3>Token Loading Flow</h3>
+                            <ol style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 12px"><code>.env</code> sets <code>NODE_ENV</code> (development/production)</li>
+                                <li style="margin-bottom: 12px">
+                                    <code>envSwitcher.js</code> loads the corresponding <code>*.env</code> file
+                                </li>
+                                <li style="margin-bottom: 12px">
+                                    In development: <code>TOPGG_TOKEN</code> is stripped from <code>process.env</code>
+                                </li>
+                                <li>Bot modules access tokens via <code>process.env</code> or <code>global.token</code></li>
+                            </ol>
+                            <div class="security-note">
+                                <strong>Production Deployment Tip</strong>
+                                <p>
+                                    For cloud deployments (Heroku, Railway, etc.), set environment variables via the platform's dashboard or
+                                    CLI, not via <code>.env</code> files. Never commit <code>.env</code> files to version control.
+                                </p>
+                            </div>
+                        </section>
+                        <section id="input-validation" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-check-circle"></i> Input Validation Patterns</h2>
+                            <h3>Common Validation Utilities</h3>
+                            <table class="permission-table">
+                                <thead>
+                                    <tr>
+                                        <th>Utility</th>
+                                        <th>Location</th>
+                                        <th>Use Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>validateReciterData()</code></td>
+                                        <td><code>src/data/data-loader-validator.js</code></td>
+                                        <td>Ensures reciter has required <code>rewaya_id</code> and <code>server</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>validateRadioData()</code></td>
+                                        <td><code>src/data/data-loader-validator.js</code></td>
+                                        <td>Checks radio entry has non-empty <code>url</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>validateSurahId()</code></td>
+                                        <td><code>src/data/data-loader-validator.js</code></td>
+                                        <td>Validates surah ID is between 1-114</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>clean_Dhikr()</code></td>
+                                        <td><code>src/helpers/azkar.js</code></td>
+                                        <td>Removes annotation chars from dhikr text before display</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Sanitization for Display</h3>
+                            <p>When displaying user-generated or external content, sanitize to prevent XSS or layout issues:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// Example: Truncating text for Discord embed fields (max 1024 chars)
+function truncateText(text, maxLength) {
+    if (!text) return '';
+    const str = String(text);
+    return str.length > maxLength ? str.substring(0, maxLength) : str;
+}
+
+// Usage in UI components
+const safeLabel = truncateText(reciter.name, 100);</code></pre>
+                            </div>
+                            <h3>URL Validation for Audio Streams</h3>
+                            <p>Before playing audio, validate stream URLs to prevent playback errors:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// src/audio/resource.js - validateStreamUrl function
+async function validateStreamUrl(url) {
+    if (!url?.startsWith('http')) return { valid: false, reason: 'Invalid URL' };
+    
+    try {
+        const client = require('@startup/botSetup').client;
+        if (!client.lavalink) return { valid: false, reason: 'Lavalink unavailable' };
+        
+        const bestNode = getBestNode(client.lavalink);
+        const nodes = bestNode ? [bestNode] : client.lavalink.nodeManager.leastUsedNodes('players').filter((n) => n.connected);
+        if (!nodes.length) return { valid: false, reason: 'No connected nodes' };
+        
+        const result = await nodes[0].search({ query: url, source: 'http' }, client.user);
+        return { valid: result.tracks && result.tracks.length > 0, reason: 'OK' };
+    } catch (error) {
+        return { valid: false, reason: error.message };
+    }
+}</code></pre>
+                            </div>
+                        </section>
+                        <section id="contributing" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-code-branch"></i> Contributing Guidelines</h2>
+                            <h3>Before You Start</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">
+                                    <strong>Check existing issues</strong> - Search GitHub for similar feature requests or bug reports
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Discuss major changes</strong> - Open an issue or join Discord to discuss architecture changes
+                                    before coding
+                                </li>
+                                <li><strong>Test locally</strong> - Ensure your changes work in a test server before submitting</li>
+                            </ul>
+                            <h3>Branch Naming Convention</h3>
+                            <table class="permission-table">
+                                <thead>
+                                    <tr>
+                                        <th>Branch Type</th>
+                                        <th>Format</th>
+                                        <th>Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Feature</td>
+                                        <td><code>feature/descriptive-name</code></td>
+                                        <td><code>feature/add-surah-favorites</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bug Fix</td>
+                                        <td><code>fix/issue-description</code></td>
+                                        <td><code>fix/voice-disconnect-recovery</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Documentation</td>
+                                        <td><code>docs/section-updated</code></td>
+                                        <td><code>docs/add-security-guide</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Refactor</td>
+                                        <td><code>refactor/module-name</code></td>
+                                        <td><code>refactor/auth-manager-cleanup</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h3>Commit Message Format</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript"># Format: type(scope): brief description
+# Types: feat, fix, docs, style, refactor, test, chore
+
+# Good examples:
+feat(audio): add fallback reciter selection on stream failure
+fix(auth): handle expired interactions in permission checks
+docs(security): add token handling best practices guide
+refactor(state): simplify guild state initialization logic
+
+# Avoid:
+"fixed stuff"
+"update code"
+"wip"</code></pre>
+                            </div>
+                        </section>
+                        <section id="pr-process" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-pull-request"></i> Pull Request Workflow</h2>
+                            <div class="pr-flow">
+                                <div class="pr-step">
+                                    <div class="pr-step-number">1</div>
+                                    <div class="pr-step-content">
+                                        <h4>Fork & Clone</h4>
+                                        <p>Fork the repository and clone your fork locally. Add upstream remote for syncing.</p>
+                                    </div>
+                                </div>
+                                <div class="pr-step">
+                                    <div class="pr-step-number">2</div>
+                                    <div class="pr-step-content">
+                                        <h4>Create Feature Branch</h4>
+                                        <p>Use the branch naming convention. Keep branches focused on a single change.</p>
+                                    </div>
+                                </div>
+                                <div class="pr-step">
+                                    <div class="pr-step-number">3</div>
+                                    <div class="pr-step-content">
+                                        <h4>Implement & Test</h4>
+                                        <p>
+                                            Write code following existing patterns. Test in a real Discord server. Run
+                                            <code>pnpm run dev</code> for hot reload.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="pr-step">
+                                    <div class="pr-step-number">4</div>
+                                    <div class="pr-step-content">
+                                        <h4>Run Linting</h4>
+                                        <p>
+                                            Ensure code passes style checks: <code>pnpm run lint</code> (if configured) or follow
+                                            <code>prettier.config.js</code>.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="pr-step">
+                                    <div class="pr-step-number">5</div>
+                                    <div class="pr-step-content">
+                                        <h4>Submit PR</h4>
+                                        <p>
+                                            Open PR with clear title, description of changes, and any relevant issue links. Request review
+                                            from maintainers.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="pr-step">
+                                    <div class="pr-step-number">6</div>
+                                    <div class="pr-step-content">
+                                        <h4>Address Feedback</h4>
+                                        <p>
+                                            Respond to review comments promptly. Push additional commits to the same branch; they'll
+                                            auto-append to the PR.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="code-style" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-palette"></i> Code Style & Standards</h2>
+                            <h3>JavaScript Conventions</h3>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 8px">
+                                    <strong>Indentation</strong>: 4 spaces (configured in <code>prettier.config.js</code>)
+                                </li>
+                                <li style="margin-bottom: 8px">
+                                    <strong>Quotes</strong>: Single quotes for strings, template literals for interpolation
+                                </li>
+                                <li style="margin-bottom: 8px"><strong>Semicolons</strong>: Always use semicolons</li>
+                                <li style="margin-bottom: 8px"><strong>Trailing commas</strong>: Use in multiline objects/arrays</li>
+                                <li>
+                                    <strong>Arrow functions</strong>: Use for callbacks and short functions; named functions for complex
+                                    logic
+                                </li>
+                            </ul>
+                            <h3>Module Organization</h3>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">// 1. External dependencies first
+const { EmbedBuilder } = require('discord.js');
+
+// 2. Internal modules with path aliases
+require('pathlra-aliaser')();
+const logger = require('@logging/logger');
+const { safeReply } = require('@interactions/flow/responder');
+
+// 3. Local relative imports last
+const { createControlEmbed } = require('../ui/embeds');
+
+// 4. Module exports at bottom
+module.exports = { execute };</code></pre>
+                            </div>
+                            <h3>Naming Conventions</h3>
+                            <table class="permission-table">
+                                <thead>
+                                    <tr>
+                                        <th>Element</th>
+                                        <th>Convention</th>
+                                        <th>Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Variables/Functions</td>
+                                        <td><code>camelCase</code></td>
+                                        <td><code>createSurahResource</code>, <code>guildState</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Constants</td>
+                                        <td><code>UPPER_SNAKE_CASE</code></td>
+                                        <td><code>COMMAND_COOLDOWNS</code>, <code>MAX_RETRY_ATTEMPTS</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Classes</td>
+                                        <td><code>PascalCase</code></td>
+                                        <td><code>PersistentStateManager</code>, <code>VoiceLogger</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Files</td>
+                                        <td><code>kebab-case.js</code></td>
+                                        <td><code>guild-state-store.js</code>, <code>commandCooldown.js</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Commands</td>
+                                        <td>Arabic names for user-facing, English keys internally</td>
+                                        <td><code>/تحكم</code> → <code>'control'</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+                        <section id="testing" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-vial"></i> Testing Requirements</h2>
+                            <h3>Manual Testing Checklist</h3>
+                            <p>Before submitting a PR, verify these scenarios in a test Discord server:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 6px">☐ Command works with valid inputs</li>
+                                <li style="margin-bottom: 6px">☐ Command handles invalid inputs gracefully (error message, no crash)</li>
+                                <li style="margin-bottom: 6px">☐ Permissions are enforced correctly (admin vs. everyone mode)</li>
+                                <li style="margin-bottom: 6px">☐ Cooldowns trigger appropriately</li>
+                                <li style="margin-bottom: 6px">☐ Voice operations work (join, play, pause, leave)</li>
+                                <li style="margin-bottom: 6px">☐ State persists across bot restarts (if applicable)</li>
+                                <li>☐ No memory leaks after repeated use (monitor with <code>/سرعة</code>)</li>
+                            </ul>
+                            <h3>Logging for Debugging</h3>
+                            <p>Use the centralized logger instead of <code>console.log</code> for consistent output:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">const logger = require('@logging/logger');
+
+// Log levels: debug, info, warn, error, fatal
+logger.info(`User ${userId} triggered command ${commandName}`);
+logger.warn(`Fallback reciter used for guild ${guildId}`);
+logger.error('Failed to fetch surah', error, { surahIndex, reciter });
+
+// Voice-specific logging
+const voiceLogger = require('@logging/voiceLogger');
+voiceLogger.connection(guildId, 'Voice connection established', { channelId });</code></pre>
+                            </div>
+                            <h3>Using the <code>/سرعة</code> Diagnostic Command</h3>
+                            <p>This command provides real-time metrics for debugging:</p>
+                            <ul style="padding-left: 20px; color: var(--text-muted)">
+                                <li style="margin-bottom: 6px">Bot latency, WebSocket ping, Discord API response time</li>
+                                <li style="margin-bottom: 6px">Uptime, server count, total users</li>
+                                <li style="margin-bottom: 6px">Voice connection count, CPU usage</li>
+                                <li style="margin-bottom: 6px">Lavalink node status (ping, players, uptime)</li>
+                                <li>Commands used, azkar sent (from Firebase stats)</li>
+                            </ul>
+                        </section>
+                        <section id="debugging" class="doc-section toc-anchor">
+                            <h2><i class="fas fa-bug"></i> Debugging Techniques</h2>
+                            <h3>Enabling Debug Logging</h3>
+                            <p>Set <code>LOG_LEVEL=debug</code> in your environment to see detailed logs:</p>
+                            <div class="code-block">
+                                <pre><span class="comment"># In .env or command line</span>
+LOG_LEVEL=debug NODE_ENV=development pnpm run dev
+<span class="comment"># Logs will show:</span>
+<span class="comment"># - Interaction routing decisions</span>
+<span class="comment"># - Voice connection state changes</span>
+<span class="comment"># - Cache hits/misses</span>
+<span class="comment"># - Database read/write operations</span></pre>
+                            </div>
+                            <h3>Voice-Specific Debugging</h3>
+                            <p>Use <code>voiceLogger</code> for granular audio debugging:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript">const voiceLogger = require('@logging/voiceLogger');
+
+// Log connection events
+voiceLogger.connection(guildId, 'Initializing Lavalink player', {
+    channelId: targetChannel.id,
+    guildName: targetChannel.guild?.name,
+});
+
+// Log playback events
+voiceLogger.player(guildId, 'Track started', { title: track.info?.title });
+
+// Log resource creation
+voiceLogger.resource(guildId, 'Creating surah resource', {
+    surahIndex,
+    reciter: state.currentReciter,
+});</code></pre>
+                            </div>
+                            <h3>Common Debugging Scenarios</h3>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Bot not responding to commands
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Check:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>
+                                        Bot has <code>Application (bot)</code> scope with <code>applications.commands</code> in OAuth URL
+                                    </li>
+                                    <li>Commands are registered (<code>logger.info</code> should show count)</li>
+                                    <li>Bot has <code>Message Content</code> intent enabled in Discord Developer Portal</li>
+                                    <li>No interaction cooldown or rate limit blocking the request</li>
+                                </ul>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    Voice connection fails with "No compatible encryption modes"
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">
+                                    This indicates a Lavalink version mismatch. Verify:
+                                </p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Lavalink server is v4.x (required for Discord's current encryption)</li>
+                                    <li><code>secure</code> setting matches your deployment (false for HTTP, true for HTTPS)</li>
+                                    <li>Bot and Lavalink are on compatible Node.js versions (v22 recommended)</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Use <code>/سرعة</code> to check node status and error messages.
+                                </p>
+                            </details>
+                            <details
+                                style="
+                                    background: var(--bg-overlay-1);
+                                    border-radius: 8px;
+                                    padding: 12px 16px;
+                                    margin: 8px 0;
+                                    border: 1px solid var(--line-faint);
+                                "
+                            >
+                                <summary style="cursor: pointer; font-weight: 600; color: var(--text-base)">
+                                    <i class="fas fa-chevron-right" style="margin-right: 8px"></i>
+                                    State not persisting after restart
+                                </summary>
+                                <p style="margin-top: 12px; color: var(--text-muted)">Verify:</p>
+                                <ul style="margin-top: 8px; padding-left: 20px">
+                                    <li>Firebase credentials are correct in <code>production.env</code></li>
+                                    <li><code>global.saveRuntimeStates</code> is called after state changes</li>
+                                    <li>Redis is available (if used) for hot caching</li>
+                                    <li>Check <code>storage/logs/</code> for Firebase connection errors</li>
+                                </ul>
+                                <p style="margin-top: 8px; color: var(--text-muted)">
+                                    Test by making a state change, restarting the bot, and verifying the state is restored.
+                                </p>
+                            </details>
+                            <h3>Memory Profiling</h3>
+                            <p>Use Node.js built-in tools to identify memory leaks:</p>
+                            <div class="code-block">
+                                <pre><code class="language-javascript"># Start bot with heap snapshot capability
+node --heap-prof src/bot/core.js
+
+# Or use Chrome DevTools
+node --inspect src/bot/core.js
+
+# Then open chrome://inspect in Chrome
+
+# Monitor memory usage via /سرعة command
+# Alert if heapUsed exceeds 1.5GB (triggers aggressive GC)</code></pre>
+                            </div>
+                            <div class="security-note">
+                                <strong>Debugging in Production</strong>
+                                <p>
+                                    Never enable <code>LOG_LEVEL=debug</code> in production environments. Use structured logging with
+                                    appropriate levels (<code>info</code>, <code>warn</code>, <code>error</code>) and rely on the
+                                    <code>/سرعة</code> command for operational monitoring.
+                                </p>
+                            </div>
+                        </section>
+                        <div class="doc-footer-note">
+                            <p>
+                                <strong>Need Help?</strong> Join our
+                                <a href="https://discord.gg/DwtAPzrbZS" target="_blank" style="color: var(--text-accent)"
+                                    >Discord Support Server</a
+                                >
+                                or open an issue on
+                                <a
+                                    href="https://github.com/mgv-hub/quranbot/issues"
+                                    target="_blank"
+                                    style="color: var(--text-accent)"
+                                    >GitHub</a
+                                >.
+                            </p>
+                            <p class="mt-2" style="color: var(--text-faint)">
+                                Documentation generated for QuranBot <span data-app-version></span> • Made By mgv-hub
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="page-footer landing">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-brand-title">
+                        <i class="fas fa-mosque"></i>
+                        QuranBot
+                    </div>
+                    <p class="footer-brand-desc">
+                        Complete Islamic Discord bot for Quran recitations, radio, azkar, and prayer times. Open source and free for
+                        everyone.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://discord.gg/DwtAPzrbZS" target="_blank" class="social-btn discord" title="Discord Support">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot" target="_blank" class="social-btn github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-link"></i> Links</h4>
+                    <div class="footer-links">
+                        <a href="../../index.html" class="footer-link"><i class="fas fa-home"></i> Home Page</a>
+                        <a href="../docs.html" class="footer-link"><i class="fas fa-book"></i> Developer Docs</a>
+                        <a href="./docs-configuration.html" class="footer-link"><i class="fas fa-cog"></i> Advanced Config</a>
+                        <a href="../privacy.html" class="footer-link"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4><i class="fas fa-shield-alt"></i> Security</h4>
+                    <div class="footer-links">
+                        <a href="https://github.com/mgv-hub/quranbot/security/policy" target="_blank" class="footer-link">
+                            <i class="fas fa-shield-alt"></i>
+                            Security Policy
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot/blob/main/CONTRIBUTING.md" class="footer-link">
+                            <i class="fas fa-code-branch"></i>
+                            Contributing Guide
+                        </a>
+                        <a href="https://github.com/mgv-hub/quranbot/issues" class="footer-link">
+                            <i class="fas fa-bug"></i>
+                            Report Vulnerability
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">&copy; 2026 QuranBot. Made By mgv-hub</p>
+                <p class="footer-version">
+                    <i class="fas fa-code-branch"></i>
+                    Docs <span data-app-version></span>
+                </p>
+            </div>
+        </footer>
+        <button class="scroll-top-btn" aria-label="Scroll to top">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <script src="../js/scripts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-javascript.min.js"></script>
+    </body>
+</html>

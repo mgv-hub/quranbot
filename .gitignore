@@ -6,7 +6,6 @@ storage/
 .pnpm-store/
 .test/
 
-dist/
 dist-ssr/
 dist-electron/
 release/
@@ -14,17 +13,20 @@ coverage/
 .test/
 dev/
 .dev/
-local/
 quranbot.zip/
 QuranBot.zip/
 core.zip/
+testBot/
 
 test.txt
 package-lock.json
 .stylelintrc.json
 babel.config.js
 jest.config.js
+bot-lavalink.js
+test-archiver.js
 knip.json
+application.yml
 
 .vscode/*
 !.vscode/extensions.json
@@ -39,6 +41,7 @@ storage
 *.zip
 *.7z
 *.rar
+*.code-workspace
 
 ui-*.css
 
@@ -54,3 +57,5 @@ production.env.local
 __test__/
 QuranBotData/
 oid/
+bot-test/
+git-commit-message.txt
