@@ -1,8 +1,8 @@
 {
     "name": "quranbot",
-    "version": "3.1.78",
+    "version": "3.1.88",
     "description": "QuranBot is an advanced Discord bot for Quran recitation, Azkar, prayer times, and Islamic radio streaming with a control panel and stable voice.",
-    "lastUpdated": "2026-07-02",
+    "lastUpdated": "2026-07-17",
     "lastUpdateNote": "Last Update",
     "main": "src/bot/core.js",
     "packageManager": "pnpm@8.15.0",

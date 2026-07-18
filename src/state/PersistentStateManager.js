@@ -5,7 +5,7 @@ const { createDefaultState, cleanState } = require('@state/persist-defaults');
 const { saveGuildState, saveAllStates, scheduleSave, clearSaveTimeout } = require('@state/persist-storage');
 const { shouldRestore, restoreGuildState, setManualDisconnect, clearGuildState, getAllStates } = require('@state/persist-restore');
 
-const redis = require('@database/redis');
+// const redis = require('@database/redis');
 
 class PersistentStateManager {
     constructor() {
@@ -22,20 +22,20 @@ class PersistentStateManager {
                 if (isPlainObject(state)) {
                     const cleaned = cleanState(state, createDefaultState);
                     this.guildStates.set(guildId, cleaned);
-                    if (redis.isRedisReady) {
-                        await redis.set(`quranbot:guild:${guildId}`, JSON.stringify(cleaned));
-                    }
+                    //   if (redis.isRedisReady) {
+                    //       await redis.set(`quranbot:guild:${guildId}`, JSON.stringify(cleaned));
+                    //   }
                 }
             }
             this.isInitialized = true;
-            logger.info('Persistent State Manager Initialized With ' + this.guildStates.size + ' Guild States cached to Redis');
-            if (redis.isRedisReady) {
-                for (const [guildId, state] of this.guildStates.entries()) {
-                    redis.set(`quranbot:guild:${guildId}`, cleanState(state, createDefaultState)).catch((err) => {
-                        logger.debug(`Redis pre-warm failed for guild ${guildId}`, err);
-                    });
-                }
-            }
+            logger.info('Persistent State Manager Initialized With ' + this.guildStates.size + ' Guild States');
+            // if (redis.isRedisReady) {
+            //     for (const [guildId, state] of this.guildStates.entries()) {
+            //         redis.set(`quranbot:guild:${guildId}`, cleanState(state, createDefaultState)).catch((err) => {
+            //             logger.debug(`Redis pre-warm failed for guild ${guildId}`, err);
+            //         });
+            //     }
+            // }
         } catch (error) {
             logger.error('Failed To Initialize Persistent State Manager', error);
             this.isInitialized = true;
@@ -56,11 +56,11 @@ class PersistentStateManager {
         deepMerge(state, updates);
         state.timestamp = Date.now();
         scheduleSave(guildId, this.guildStates, cleanState);
-        if (redis.isRedisReady) {
-            redis.set(`quranbot:guild:${guildId}`, cleanState(state, createDefaultState)).catch((err) => {
-                logger.debug(`Redis update failed for guild ${guildId}`, err);
-            });
-        }
+        //   if (redis.isRedisReady) {
+        //       redis.set(`quranbot:guild:${guildId}`, cleanState(state, createDefaultState)).catch((err) => {
+        //           logger.debug(`Redis update failed for guild ${guildId}`, err);
+        //       });
+        //   }
         return state;
     }
 
@@ -87,11 +87,11 @@ class PersistentStateManager {
 
     clearGuildState(guildId) {
         clearGuildState(guildId, this.guildStates, clearSaveTimeout);
-        if (redis.isRedisReady) {
-            redis.del(`quranbot:guild:${guildId}`).catch((err) => {
-                logger.debug(`Redis delete failed for guild ${guildId}`, err);
-            });
-        }
+        //   if (redis.isRedisReady) {
+        //       redis.del(`quranbot:guild:${guildId}`).catch((err) => {
+        //           logger.debug(`Redis delete failed for guild ${guildId}`, err);
+        //       });
+        //   }
     }
 
     getAllStates() {

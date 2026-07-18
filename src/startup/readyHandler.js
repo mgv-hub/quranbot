@@ -67,11 +67,12 @@ loadData()
                     }
                     const fixedSetupData = await validateAndFixSetupData(guild, setupData);
                     await recoverAzkarTimers(guild, fixedSetupData, guildId);
-                    // await recoverVoiceConnection(guild, fixedSetupData, guildId); // Disabled: restoreGuildStates handles voice recovery
+                    // await recoverVoiceConnection(guild, fixedSetupData, guildId);
                 }, i * 1000);
             }
             const staleGuildIds = allSetupGuildIds.filter((gid) => !actualBotGuilds.has(gid));
-            if (staleGuildIds.length > 0) {}
+            if (staleGuildIds.length > 0) {
+            }
             await restoreGuildStates(client, actualBotGuilds);
             await registerAllCommands(client);
             startMemoryCleanup();

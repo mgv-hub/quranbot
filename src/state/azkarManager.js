@@ -28,7 +28,6 @@ const fallback_azkar_data = [
     },
 ];
 
-// Removed unused firstMsg Map that was causing a slow memory leak
 const audioData = new Map();
 
 function setAudioData(id, data) {

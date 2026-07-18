@@ -39,10 +39,15 @@ botClient.on('voiceStateUpdate', async (previousState, currentState) => {
     // Detect when bot gets kicked/disconnected from voice channel externally
     if (wasConnected && !isCurrentlyConnected) {
         // Prevent false positives during Lavalink queue transitions or internal state updates
-        //   if (guildState.player && !guildState.player.destroyed && guildState.channelId === previousState.channelId) {
-        //       voiceLogger.connection(guildId, 'Ignored temporary voice state change - Lavalink player still active');
-        //       return;
-        //   }
+        if (guildState.player && !guildState.player.destroyed) {
+            voiceLogger.connection(guildId, 'Ignored temporary voice state change - Lavalink player still active');
+            return;
+        }
+
+        if (!guildState.channelId && (!guildState.player || guildState.player.destroyed)) {
+            return;
+        }
+
         voiceLogger.connection(guildId, 'Bot externally disconnected from voice channel');
 
         // Destroy the Lavalink player to prevent state desync where the player is alive in memory but dead in Discord

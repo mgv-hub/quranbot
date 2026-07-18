@@ -101,12 +101,14 @@ module.exports = {
                                 guildState.playbackMode = 'surah';
 
                                 const surahAudio = await createSurahResource(guildState, guildState.currentSurah - 1);
-                                if (surahAudio && guildState.player && !guildState.player.destroyed) guildState.player.play({ track: surahAudio });
+                                if (surahAudio && guildState.player && !guildState.player.destroyed)
+                                    guildState.player.play({ track: surahAudio });
                             }
                         } else {
                             guildState.playbackMode = 'surah';
                             const surahAudio = await createSurahResource(guildState, guildState.currentSurah - 1);
-                            if (surahAudio && guildState.player && !guildState.player.destroyed) guildState.player.play({ track: surahAudio });
+                            if (surahAudio && guildState.player && !guildState.player.destroyed)
+                                guildState.player.play({ track: surahAudio });
                         }
                     }
                 }

@@ -2,7 +2,15 @@ const logger = require('@logging/logger');
 const persistentStateManager = require('@state/PersistentStateManager');
 const voiceManager = require('@audio/voice-connection');
 
+let RuntimeSaveTime = 0;
+
 async function saveRuntimeStates() {
+    const now = Date.now();
+    if (now - 0 < 10000) {
+        return true;
+    }
+    RuntimeSaveTime = now;
+
     try {
         if (global.guildStates) {
             for (const [guildId, state] of global.guildStates.entries()) {
