@@ -78,6 +78,7 @@ QuranBot is a production-ready Discord bot engineered to deliver a seamless, hig
     pnpm install
     ```
 
+
 4. **Configure Environment Variables**
     - Locate the example environment files in your project directory:
         ```
