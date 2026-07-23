@@ -4,6 +4,21 @@
 
 QuranBot is a production-ready Discord bot engineered to deliver a seamless, high-fidelity Quran listening experience. It integrates automated Azkar reminders, precise prayer time calculations, and live Islamic radio streaming within a robust, state-synchronized architecture.
 
+## Repository Information
+
+This is the **primary and official repository** for QuranBot.
+
+A synchronized copy is also maintained under the Cortex HQ organization as part of the project's partnership and collaboration.
+
+- **Primary Repository (Official):**
+  https://github.com/mgv-hub/quranbot
+
+- **Partnership Repository (Cortex HQ):**
+  https://github.com/cortexhqcore/Cortex-QuranBot
+
+Both repositories are actively maintained and synchronized by the same core developer, **hub-mgv**:
+
+
 ## Key Features
 
 - **Comprehensive Quran Playback:** Full access to 114 surahs with multiple verified reciters, seamless surah navigation, and continuous playback.
