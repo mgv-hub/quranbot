@@ -19,5 +19,5 @@ module.exports = {
             await statusManager.updateStatus({ activityType: selectedValue });
             await interaction.followUp({ content: `Activity type updated to **${selectedValue}**`, flags: 64 });
         }
-    }
+    },
 };

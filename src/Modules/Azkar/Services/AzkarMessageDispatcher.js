@@ -51,7 +51,7 @@ async function sendImageAzkar(ch, imgUrl, ts, gid, maxRetry, cid) {
     try {
         const res = await fetch(imgUrl, { headers: { 'User-Agent': 'QuranBot/1.0' }, timeout: request_timeout_ms });
         if (!res.ok) return { success: false, type: 'OTHER', reason: 'HTTP ' + res.status, guildId: gid, channelId: cid };
-        
+
         const mentionText = getMentionText(gid);
         const containerComponents = [
             { type: 10, content: `### 🕋 ذكر` },
@@ -63,14 +63,15 @@ async function sendImageAzkar(ch, imgUrl, ts, gid, maxRetry, cid) {
         containerComponents.push({ type: 14, divider: true, spacing: 1 });
 
         containerComponents.push({
-            type: 1, components: [
+            type: 1,
+            components: [
                 { type: 2, custom_id: 'azkar_get_role', label: 'تفعيل المنشن', style: 2 },
                 { type: 2, custom_id: 'azkar_settings', label: 'الاعدادات', style: 2 },
             ],
         });
 
         const components = [{ type: 17, accent_color: 0xfefdfe, components: containerComponents }];
-        
+
         const result = await sendWithRetry(ch, { components, flags: 32768, allowed_mentions: { parse: ['roles'] } }, maxRetry, gid, cid);
         if (result.success) await incStat();
 
@@ -86,29 +87,40 @@ async function sendAudioAzkar(ch, dhikr, text, ts, gid, maxRetry, cid) {
     const url = adhkar_base_url + dhikr.audio;
     const id = dhikr.filename || 'dhikr_' + dhikr.id;
     const customId = 'play_azkar_' + id + '_' + ts;
-    
+
     const { trackAudioData } = require('@modules/Azkar/Services/AudioDataCacheManager');
     trackAudioData(customId, { url, filename: id, timestamp: ts });
-    
+
     const mentionText = getMentionText(gid);
     const contentText = mentionText ? `${mentionText}\n${text}` : text;
 
-    const components = [{
-        type: 17, accent_color: 0xfefdfe, components: [
-            { type: 10, content: `### 🕋 ذكر` },
-            { type: 14, divider: true, spacing: 1 },
-            { type: 10, content: contentText },
-            { type: 14, divider: false, spacing: 2 },
-            { type: 10, content: '> **ملاحظة**\nللاستماع إلى الذكر بطريقة أوضح وأدق، يُرجى الضغط على زر **استماع**.\nوقد يساعد ذلك على فهم الذكر وقراءته بالشكل الصحيح.' },
-            { type: 14, divider: true, spacing: 1 },
-            { type: 1, components: [
-                { type: 2, custom_id: customId, label: 'استماع', style: 2 },
-                { type: 2, custom_id: 'azkar_get_role', label: 'تفعيل المنشن', style: 2 },
-                { type: 2, custom_id: 'azkar_settings', label: 'الاعدادات', style: 2 },
-            ]},
-        ],
-    }];
-    
+    const components = [
+        {
+            type: 17,
+            accent_color: 0xfefdfe,
+            components: [
+                { type: 10, content: `### 🕋 ذكر` },
+                { type: 14, divider: true, spacing: 1 },
+                { type: 10, content: contentText },
+                { type: 14, divider: false, spacing: 2 },
+                {
+                    type: 10,
+                    content:
+                        '> **ملاحظة**\nللاستماع إلى الذكر بطريقة أوضح وأدق، يُرجى الضغط على زر **استماع**.\nوقد يساعد ذلك على فهم الذكر وقراءته بالشكل الصحيح.',
+                },
+                { type: 14, divider: true, spacing: 1 },
+                {
+                    type: 1,
+                    components: [
+                        { type: 2, custom_id: customId, label: 'استماع', style: 2 },
+                        { type: 2, custom_id: 'azkar_get_role', label: 'تفعيل المنشن', style: 2 },
+                        { type: 2, custom_id: 'azkar_settings', label: 'الاعدادات', style: 2 },
+                    ],
+                },
+            ],
+        },
+    ];
+
     const result = await sendWithRetry(ch, { components, flags: 32768, allowed_mentions: { parse: ['roles'] } }, maxRetry, gid, cid);
     if (result.success) await incStat();
 
@@ -121,29 +133,40 @@ async function sendCategoryAudioAzkar(ch, cat, text, ts, gid, maxRetry, cid) {
     const url = adhkar_base_url + cat.audio;
     const id = cat.filename || 'category_' + cat.id;
     const customId = 'play_azkar_category_' + id + '_' + ts;
-    
+
     const { trackAudioData } = require('@modules/Azkar/Services/AudioDataCacheManager');
     trackAudioData(customId, { url, filename: id, timestamp: ts });
-    
+
     const mentionText = getMentionText(gid);
     const contentText = mentionText ? `${mentionText}\n${text}` : text;
 
-    const components = [{
-        type: 17, accent_color: 0xfefdfe, components: [
-            { type: 10, content: `### 🕋 ذكر` },
-            { type: 14, divider: true, spacing: 1 },
-            { type: 10, content: contentText },
-            { type: 14, divider: false, spacing: 2 },
-            { type: 10, content: '> **ملاحظة**\nللاستماع إلى الذكر بطريقة أوضح وأدق، يُرجى الضغط على زر **استماع**.\nوقد يساعد ذلك على فهم الذكر وقراءته بالشكل الصحيح.' },
-            { type: 14, divider: true, spacing: 1 },
-            { type: 1, components: [
-                { type: 2, custom_id: customId, label: 'استماع للقسم', style: 2 },
-                { type: 2, custom_id: 'azkar_get_role', label: 'تفعيل المنشن', style: 2 },
-                { type: 2, custom_id: 'azkar_settings', label: 'الاعدادات', style: 2 },
-            ]},
-        ],
-    }];
-    
+    const components = [
+        {
+            type: 17,
+            accent_color: 0xfefdfe,
+            components: [
+                { type: 10, content: `### 🕋 ذكر` },
+                { type: 14, divider: true, spacing: 1 },
+                { type: 10, content: contentText },
+                { type: 14, divider: false, spacing: 2 },
+                {
+                    type: 10,
+                    content:
+                        '> **ملاحظة**\nللاستماع إلى الذكر بطريقة أوضح وأدق، يُرجى الضغط على زر **استماع**.\nوقد يساعد ذلك على فهم الذكر وقراءته بالشكل الصحيح.',
+                },
+                { type: 14, divider: true, spacing: 1 },
+                {
+                    type: 1,
+                    components: [
+                        { type: 2, custom_id: customId, label: 'استماع للقسم', style: 2 },
+                        { type: 2, custom_id: 'azkar_get_role', label: 'تفعيل المنشن', style: 2 },
+                        { type: 2, custom_id: 'azkar_settings', label: 'الاعدادات', style: 2 },
+                    ],
+                },
+            ],
+        },
+    ];
+
     const result = await sendWithRetry(ch, { components, flags: 32768, allowed_mentions: { parse: ['roles'] } }, maxRetry, gid, cid);
     if (result.success) await incStat();
 

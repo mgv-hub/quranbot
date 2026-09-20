@@ -72,19 +72,21 @@ function getListenerDetails(client) {
     client.guilds.cache.forEach((guild) => {
         const voiceChannel = guild.members.me?.voice?.channel;
         if (voiceChannel && voiceChannel.members) {
-            voiceChannel.members.filter((m) => !m.user.bot).forEach((member) => {
-                const states = [];
-                if (member.voice.mute) states.push('Muted');
-                if (member.voice.deaf) states.push('Deafened');
-                if (member.voice.serverMute) states.push('Server Muted');
-                if (member.voice.serverDeaf) states.push('Server Deafened');
-                if (states.length === 0) states.push('Active');
-                listenerDetails.push({
-                    username: member.user.username,
-                    displayName: member.displayName,
-                    states: states,
+            voiceChannel.members
+                .filter((m) => !m.user.bot)
+                .forEach((member) => {
+                    const states = [];
+                    if (member.voice.mute) states.push('Muted');
+                    if (member.voice.deaf) states.push('Deafened');
+                    if (member.voice.serverMute) states.push('Server Muted');
+                    if (member.voice.serverDeaf) states.push('Server Deafened');
+                    if (states.length === 0) states.push('Active');
+                    listenerDetails.push({
+                        username: member.user.username,
+                        displayName: member.displayName,
+                        states: states,
+                    });
                 });
-            });
         }
     });
     return listenerDetails;
@@ -158,7 +160,7 @@ async function pingAll() {
     const nodes = getAllNodesInfo();
     if (nodes.length === 0) return [];
     const results = await Promise.allSettled(
-        nodes.map((node) => LavalinkNode(node.host, node.port, node.secure, node.password, node.location, node.flag, node.id))
+        nodes.map((node) => LavalinkNode(node.host, node.port, node.secure, node.password, node.location, node.flag, node.id)),
     );
     return results
         .filter((r) => r.status === 'fulfilled')
@@ -245,7 +247,11 @@ module.exports.execute = async function execute(interaction) {
             { name: 'Memory (RSS)', value: `${rssMegabytes} MB`, inline: true },
             { name: 'Protection System', value: 'Active', inline: true },
             { name: botFlag ? `${botFlag} Bot Latency` : 'Bot Latency', value: `${botLat} ms`, inline: true },
-            { name: redisFlag ? `${redisFlag} Redis Ping` : 'Redis Ping', value: Redisping.success ? `${Redisping.latency} ms` : 'Offline', inline: true },
+            {
+                name: redisFlag ? `${redisFlag} Redis Ping` : 'Redis Ping',
+                value: Redisping.success ? `${Redisping.latency} ms` : 'Offline',
+                inline: true,
+            },
             { name: 'WebSocket Ping', value: `${wsLat} ms`, inline: true },
             { name: 'Discord API', value: `${apiLat} ms`, inline: true },
             { name: 'Servers', value: formatCompactNumber(guilds), inline: true },
@@ -259,10 +265,13 @@ module.exports.execute = async function execute(interaction) {
         );
 
     if (listenerDetails.length > 0) {
-        const listenerSummary = listenerDetails.slice(0, 20).map((listener) => {
-            const name = listener.displayName || listener.username;
-            return `• **${name}**: ${listener.states.join(', ')}`;
-        }).join('\n');
+        const listenerSummary = listenerDetails
+            .slice(0, 20)
+            .map((listener) => {
+                const name = listener.displayName || listener.username;
+                return `• **${name}**: ${listener.states.join(', ')}`;
+            })
+            .join('\n');
         statsEmbed.addFields({
             name: `Listener Details (${listenerDetails.length})`,
             value: listenerSummary || 'No listeners',

@@ -1,5 +1,9 @@
 const logger = require('@infrastructure/Logging/Logger');
-const { loadStatusFromFirebase, saveStatusToFirebase, clearStatusFromFirebase } = require('@infrastructure/Persistence/Firebase/Services/StatusService');
+const {
+    loadStatusFromFirebase,
+    saveStatusToFirebase,
+    clearStatusFromFirebase,
+} = require('@infrastructure/Persistence/Firebase/Services/StatusService');
 
 class StatusManager {
     constructor() {
@@ -7,7 +11,7 @@ class StatusManager {
             presence: null,
             activityType: null,
             activityText: null,
-            voiceStatus: null
+            voiceStatus: null,
         };
         this.isInitialized = false;
     }
@@ -44,7 +48,7 @@ class StatusManager {
             presence: null,
             activityType: null,
             activityText: null,
-            voiceStatus: null
+            voiceStatus: null,
         };
         await clearStatusFromFirebase();
 
@@ -61,16 +65,16 @@ class StatusManager {
         if (!client || !client.user) return;
 
         const typeMap = {
-            'Playing': 0,
-            'Watching': 3,
-            'Listening': 2,
-            'Competing': 5,
-            'Custom': 4
+            Playing: 0,
+            Watching: 3,
+            Listening: 2,
+            Competing: 5,
+            Custom: 4,
         };
 
         const presenceData = {
             status: this.status.presence || 'online',
-            activities: []
+            activities: [],
         };
 
         const activityType = this.status.activityType || 'Watching';
@@ -81,9 +85,10 @@ class StatusManager {
             activityObj.name = '/مساعدة | quranbot.cortexhq.net';
             activityObj.state = typeof this.status.activityText === 'string' ? this.status.activityText : '';
         } else {
-            activityObj.name = (typeof this.status.activityText === 'string' && this.status.activityText) 
-                ? this.status.activityText 
-                : '/مساعدة | quranbot.cortexhq.net';
+            activityObj.name =
+                typeof this.status.activityText === 'string' && this.status.activityText
+                    ? this.status.activityText
+                    : '/مساعدة | quranbot.cortexhq.net';
         }
 
         presenceData.activities.push(activityObj);

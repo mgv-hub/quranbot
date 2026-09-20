@@ -1,7 +1,13 @@
 const { getGuildState } = require('@state/GuildStateManager');
 const logger = require('@infrastructure/Logging/Logger');
 const { createControlEmbed } = require('@infrastructure/Discord/UI/Embeds');
-const { createReciterRow, createSelectRow, createButtonRow, createNavigationRow, createRadioRow } = require('@infrastructure/Discord/UI/Components');
+const {
+    createReciterRow,
+    createSelectRow,
+    createButtonRow,
+    createNavigationRow,
+    createRadioRow,
+} = require('@infrastructure/Discord/UI/Components');
 const { saveControlId } = require('@trackers/ControlIdsTracker');
 const { saveSetupGuildsToFirebase } = require('@infrastructure/Persistence/Firebase/FirebaseIndex');
 const { createCategory, createVoiceChannel, createTextChannel, createAzkarChannel } = require('@modules/Setup/Services/ChannelCreator');
@@ -48,7 +54,8 @@ async function safelyDeleteBotChannels(guild, oldSetup, gid) {
             continue;
         }
 
-        const isOwnedByBot = (chInfo.type === 'voice' && ch.id === oldSetup.voiceChannelId) ||
+        const isOwnedByBot =
+            (chInfo.type === 'voice' && ch.id === oldSetup.voiceChannelId) ||
             (chInfo.type === 'text' && ch.id === oldSetup.textChannelId) ||
             (chInfo.type === 'azkar' && ch.id === oldSetup.azkarChannelId);
 
@@ -78,13 +85,9 @@ async function safelyDeleteBotChannels(guild, oldSetup, gid) {
         const cat = guild.channels.cache.get(oldSetup.categoryId) || (await guild.channels.fetch(oldSetup.categoryId).catch(() => null));
 
         if (cat && cat.type === ChannelType.GuildCategory) {
-            const botChildIds = new Set([
-                oldSetup.voiceChannelId,
-                oldSetup.textChannelId,
-                oldSetup.azkarChannelId,
-            ].filter(Boolean));
+            const botChildIds = new Set([oldSetup.voiceChannelId, oldSetup.textChannelId, oldSetup.azkarChannelId].filter(Boolean));
 
-            const hasNonBotChannels = Array.from(cat.children.cache.values()).some(child => !botChildIds.has(child.id));
+            const hasNonBotChannels = Array.from(cat.children.cache.values()).some((child) => !botChildIds.has(child.id));
 
             if (hasNonBotChannels) {
                 logger.info(`Category ${cat.id} contains non-bot channels Preserving category and leaving all channels as they are`);
@@ -187,7 +190,13 @@ async function setupQuranCategory(guild, ix, opts = {}) {
         };
 
         global.setupGuilds[gid] = newSetup;
-        auditLogger.logSetupOperation(guild, isReSetup ? 'RE_SETUP_COMPLETE' : 'INITIAL_SETUP_COMPLETE', oldSetup, newSetup, isReSetup ? 'Re-setup completed' : 'Initial setup completed');
+        auditLogger.logSetupOperation(
+            guild,
+            isReSetup ? 'RE_SETUP_COMPLETE' : 'INITIAL_SETUP_COMPLETE',
+            oldSetup,
+            newSetup,
+            isReSetup ? 'Re-setup completed' : 'Initial setup completed',
+        );
 
         st.azkarChannelId = azkar.id;
         startAzkarTimerForGuild(gid, azkar.id, true);

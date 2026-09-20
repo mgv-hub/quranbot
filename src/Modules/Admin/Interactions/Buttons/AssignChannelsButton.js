@@ -4,7 +4,13 @@ const logger = require('@infrastructure/Logging/Logger');
 const { saveSetupGuildsToFirebase } = require('@infrastructure/Persistence/Firebase/FirebaseIndex');
 const { assignSession } = require('@modules/Admin/Interactions/Helpers/AssignSession');
 const { createControlEmbed } = require('@infrastructure/Discord/UI/Embeds');
-const { createReciterRow, createRadioRow, createSelectRow, createButtonRow, createNavigationRow } = require('@infrastructure/Discord/UI/Components');
+const {
+    createReciterRow,
+    createRadioRow,
+    createSelectRow,
+    createButtonRow,
+    createNavigationRow,
+} = require('@infrastructure/Discord/UI/Components');
 const { saveControlId } = require('@trackers/ControlIdsTracker');
 const { startAzkarTimerForGuild } = require('@modules/Azkar/AzkarModule');
 const {

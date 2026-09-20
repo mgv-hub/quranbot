@@ -27,10 +27,7 @@ const exempt_prefixes = [
     'assign_',
 ];
 
-const exempt_exact = [
-    'select_country_prayer',
-    'select_city_prayer',
-];
+const exempt_exact = ['select_country_prayer', 'select_city_prayer'];
 
 function isBotInVoice(gs) {
     if (!gs?.channelId) return false;

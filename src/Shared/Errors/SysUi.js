@@ -1,5 +1,11 @@
 const { createControlEmbed } = require('@infrastructure/Discord/UI/Embeds');
-const { createReciterRow, createSelectRow, createButtonRow, createNavigationRow, createRadioRow } = require('@infrastructure/Discord/UI/Components');
+const {
+    createReciterRow,
+    createSelectRow,
+    createButtonRow,
+    createNavigationRow,
+    createRadioRow,
+} = require('@infrastructure/Discord/UI/Components');
 const { updateControlMessage, saveControlId } = require('@infrastructure/Discord/Flow/MessageUpdater');
 
 // Rebuild and update the control panel UI after state changes

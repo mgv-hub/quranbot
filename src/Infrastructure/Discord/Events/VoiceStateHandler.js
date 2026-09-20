@@ -34,7 +34,9 @@ botClient.on('voiceStateUpdate', async (previousState, currentState) => {
         auditLogger.logVoiceExternalDisconnect(previousState.guild, previousState.channelId, currentState.member?.user || null);
 
         if (guildState.player && !guildState.player.destroyed) {
-            try { await guildState.player.destroy().catch(() => {}); } catch (e) {}
+            try {
+                await guildState.player.destroy().catch(() => {});
+            } catch (e) {}
         }
 
         // Reset connection state locally
@@ -77,7 +79,12 @@ botClient.on('voiceStateUpdate', async (previousState, currentState) => {
     } else if (wasConnected && isCurrentlyConnected && previousState.channelId !== currentState.channelId) {
         guildState.channelId = currentState.channelId;
         if (guildState.player && !guildState.player.destroyed) guildState.connection = guildState.player;
-        auditLogger.logVoiceChannelChange(previousState.guild || currentState.guild, previousState.channelId, currentState.channelId, currentState.member?.user || null);
+        auditLogger.logVoiceChannelChange(
+            previousState.guild || currentState.guild,
+            previousState.channelId,
+            currentState.channelId,
+            currentState.member?.user || null,
+        );
         await checkInitialIdleState(guildId, botClient);
     }
     await voiceIdle(guildId, botClient);

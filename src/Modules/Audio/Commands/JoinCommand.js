@@ -31,7 +31,10 @@ module.exports = {
                         const result = await executeVoiceJoin(guildId, guildState, channel, interaction.guild.voiceAdapterCreator);
                         if (result.idle) {
                             await checkInitialIdleState(guildId, interaction.client);
-                            await interaction.editReply({ content: 'تم الانضمام الى ' + channel.name + ' - لا يوجد مستخدمين حالياً، البوت في وضع الخمول', flags: 64 });
+                            await interaction.editReply({
+                                content: 'تم الانضمام الى ' + channel.name + ' - لا يوجد مستخدمين حالياً، البوت في وضع الخمول',
+                                flags: 64,
+                            });
                         } else {
                             await interaction.editReply({ content: 'تم الانضمام الى ' + channel.name + ' جاري التشغيل', flags: 64 });
                         }

@@ -13,7 +13,9 @@ function removeGuildState(guildId) {
         if (state.player) state.player.stop();
 
         if (state.rawConnection) {
-            try { state.rawConnection.destroy(); } catch (e) {}
+            try {
+                state.rawConnection.destroy();
+            } catch (e) {}
             state.rawConnection = null;
         }
         if (state.connection && !state.connection.destroyed) {
@@ -45,7 +47,9 @@ function cleanupGuildState(guildId) {
             state.player.removeAllListeners();
         }
         if (state.rawConnection) {
-            try { state.rawConnection.destroy(); } catch (e) {}
+            try {
+                state.rawConnection.destroy();
+            } catch (e) {}
             state.rawConnection = null;
         }
         if (state.connection && !state.connection.destroyed) {

@@ -23,8 +23,14 @@ dns.setDefaultResultOrder('ipv4first');
 
 process.on('unhandledRejection', (err) => {
     const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-    
-    if (err?.code === 'ECONNREFUSED' || message.includes('ECONNREFUSED') || err?.code === 'ETIMEDOUT' || message.includes('ETIMEDOUT') || message.includes('fetch failed')) {
+
+    if (
+        err?.code === 'ECONNREFUSED' ||
+        message.includes('ECONNREFUSED') ||
+        err?.code === 'ETIMEDOUT' ||
+        message.includes('ETIMEDOUT') ||
+        message.includes('fetch failed')
+    ) {
         logger.warn(`network error: ${message}`);
         return;
     }
@@ -131,7 +137,7 @@ async function pullFirebase() {
 
 function updateStatus() {
     const currentStatus = statusManager.getStatus();
-    
+
     if (currentStatus.activityText) {
         return;
     }

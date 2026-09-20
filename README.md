@@ -18,7 +18,6 @@ A synchronized copy is also maintained under the Cortex HQ organization as part 
 
 Both repositories are actively maintained and synchronized by the same core developer, **hub-mgv**:
 
-
 ## Key Features
 
 - **Comprehensive Quran Playback:** Full access to 114 surahs with multiple verified reciters, seamless surah navigation, and continuous playback.
@@ -92,7 +91,6 @@ Both repositories are actively maintained and synchronized by the same core deve
     ```bash
     pnpm install
     ```
-
 
 4. **Configure Environment Variables**
     - Locate the example environment files in your project directory:

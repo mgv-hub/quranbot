@@ -13,9 +13,16 @@ async function createAutoChannel(guild, interaction) {
                 name: channel_names.category,
                 type: ChannelType.GuildCategory,
                 permissionOverwrites: [
-                    { id: guild.roles.everyone.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory] },
+                    {
+                        id: guild.roles.everyone.id,
+                        allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
+                    },
                     { id: guild.client.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels] },
-                    { id: interaction.user.id, type: OverwriteType.Member, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels] },
+                    {
+                        id: interaction.user.id,
+                        type: OverwriteType.Member,
+                        allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ManageChannels],
+                    },
                 ],
                 reason: 'Auto-create category for prayer reminders',
             });
@@ -32,8 +39,26 @@ async function createAutoChannel(guild, interaction) {
             parent: category.id,
             rateLimitPerUser: 0,
             permissionOverwrites: [
-                { id: guild.roles.everyone.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory], deny: [PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.AttachFiles] },
-                { id: guild.client.user.id, allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ManageChannels, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.EmbedLinks, PermissionsBitField.Flags.AttachFiles] },
+                {
+                    id: guild.roles.everyone.id,
+                    allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.ReadMessageHistory],
+                    deny: [
+                        PermissionsBitField.Flags.SendMessages,
+                        PermissionsBitField.Flags.EmbedLinks,
+                        PermissionsBitField.Flags.AttachFiles,
+                    ],
+                },
+                {
+                    id: guild.client.user.id,
+                    allow: [
+                        PermissionsBitField.Flags.ViewChannel,
+                        PermissionsBitField.Flags.SendMessages,
+                        PermissionsBitField.Flags.ManageChannels,
+                        PermissionsBitField.Flags.ReadMessageHistory,
+                        PermissionsBitField.Flags.EmbedLinks,
+                        PermissionsBitField.Flags.AttachFiles,
+                    ],
+                },
             ],
             reason: 'Auto-create channel for prayer reminders',
         });
@@ -45,7 +70,9 @@ async function createAutoChannel(guild, interaction) {
 }
 
 async function saveReminder(guildId, session, interaction) {
-    const channel = interaction.guild.channels.cache.get(session.channelId) || (await interaction.guild.channels.fetch(session.channelId).catch(() => null));
+    const channel =
+        interaction.guild.channels.cache.get(session.channelId) ||
+        (await interaction.guild.channels.fetch(session.channelId).catch(() => null));
     const channelName = channel?.name || 'Unknown';
     const username = interaction.user.globalName || interaction.user.username;
 

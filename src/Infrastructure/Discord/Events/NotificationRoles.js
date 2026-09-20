@@ -1,5 +1,8 @@
 const logger = require('@infrastructure/Logging/Logger');
-const { getNotificationRolesMessageId, saveNotificationRolesMessageId } = require('@infrastructure/Persistence/Firebase/Services/NotificationRolesService');
+const {
+    getNotificationRolesMessageId,
+    saveNotificationRolesMessageId,
+} = require('@infrastructure/Persistence/Firebase/Services/NotificationRolesService');
 
 const components = {
     flags: 32768,

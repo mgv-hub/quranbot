@@ -230,7 +230,10 @@ function buildRoleSelect(session) {
         components: [
             { type: 10, content: `### ${emoji.chat} الخطوة 5: اختر الرتب للمنشن` },
             { type: 14, divider: true, spacing: 1 },
-            { type: 10, content: 'اختر الرتب التي تريد منشنها عند إرسال التذكير (حد أقصى 3 رتب).\nيمكنك أيضاً تفعيل منشن @everyone أو @here.' },
+            {
+                type: 10,
+                content: 'اختر الرتب التي تريد منشنها عند إرسال التذكير (حد أقصى 3 رتب).\nيمكنك أيضاً تفعيل منشن @everyone أو @here.',
+            },
             { type: 14, divider: true, spacing: 1 },
             selectRow.toJSON(),
             toggleRow.toJSON(),

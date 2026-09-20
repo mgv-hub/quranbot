@@ -10,7 +10,7 @@ let restorationActive = false;
 async function restoreGuildStates(client, activeGuildIds) {
     const guildsToRestore = identifyRestorableGuilds(activeGuildIds);
     if (restorationActive || guildsToRestore.length === 0) return;
-    
+
     restorationActive = true;
     let successCount = 0;
     let failureCount = 0;
@@ -22,13 +22,22 @@ async function restoreGuildStates(client, activeGuildIds) {
         setTimeout(async () => {
             try {
                 const guild = client.guilds.cache.get(guildId);
-                if (!guild) { skippedCount++; return; }
+                if (!guild) {
+                    skippedCount++;
+                    return;
+                }
 
                 const setupData = global.setupGuilds[guildId];
-                if (!setupData?.voiceChannelId) { skippedCount++; return; }
+                if (!setupData?.voiceChannelId) {
+                    skippedCount++;
+                    return;
+                }
 
                 const connectionSuccess = await establishVoiceConnection(guild, guildId, setupData);
-                if (!connectionSuccess) { failureCount++; return; }
+                if (!connectionSuccess) {
+                    failureCount++;
+                    return;
+                }
 
                 await resumeGuildPlayback(guildId);
                 successCount++;
@@ -42,7 +51,12 @@ async function restoreGuildStates(client, activeGuildIds) {
             } finally {
                 if (successCount + failureCount + skippedCount === guildsToRestore.length) {
                     logger.info(`State Restoration Complete ${successCount} Restored ${failureCount} Failed ${skippedCount} Skipped`);
-                    auditLogger.logVoiceRecoverySummary({ restored: successCount, failed: failureCount, skipped: skippedCount, total: guildsToRestore.length });
+                    auditLogger.logVoiceRecoverySummary({
+                        restored: successCount,
+                        failed: failureCount,
+                        skipped: skippedCount,
+                        total: guildsToRestore.length,
+                    });
                     restorationActive = false;
                 }
             }

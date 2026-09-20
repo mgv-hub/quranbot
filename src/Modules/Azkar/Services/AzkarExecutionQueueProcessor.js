@@ -6,7 +6,10 @@ const { sendImageAzkar, sendAudioAzkar, sendCategoryAudioAzkar } = require('@mod
 const azkar_max_retry_attempts = time_constants.azkar_max_retry_attempts;
 const fallback_azkar_data = [
     {
-        id: 1, category: 'تسبيح', audio: '/audio/ar_7esn_AlMoslem_by_Doors_028.mp3', filename: 'ar_7esn_AlMoslem_by_Doors_028',
+        id: 1,
+        category: 'تسبيح',
+        audio: '/audio/ar_7esn_AlMoslem_by_Doors_028.mp3',
+        filename: 'ar_7esn_AlMoslem_by_Doors_028',
         array: [{ id: 1, text: 'سبحان الله وبحمده', count: 100, audio: '/audio/91.mp3', filename: '91' }],
     },
 ];
@@ -74,7 +77,7 @@ async function executeAzkarSend(cid, gid, maxRetry = azkar_max_retry_attempts, f
     if (!ch || !ch.isTextBased?.()) {
         return { success: false, reason: 'Channel not found or invalid locally' };
     }
-    
+
     let data = global.azkarData || [];
     if (!Array.isArray(data) || !data.length) {
         logger.warn('Azkar No Data For Guild ' + gid + ' Using Fallback');
@@ -85,11 +88,11 @@ async function executeAzkarSend(cid, gid, maxRetry = azkar_max_retry_attempts, f
     if (!cat?.array?.length) return { success: false, reason: 'No valid azkar category' };
     const dhikr = cat.array[Math.floor(Math.random() * cat.array.length)];
     if (!dhikr) return { success: false, reason: 'No valid dhikr' };
-    
+
     const ts = Date.now();
     const text = clean_Dhikr(dhikr.text || 'لا يوجد');
     const useImg = forceImg || (global.azkarImages?.length && Math.random() > 0.5);
-    
+
     if (useImg && global.azkarImages?.length) {
         const img = global.azkarImages[Math.floor(Math.random() * global.azkarImages.length)];
         const res = await sendImageAzkar(ch, img, ts, gid, maxRetry, cid);

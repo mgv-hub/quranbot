@@ -18,7 +18,6 @@ function getLocalDateString(timezone) {
 }
 
 function getUtcTimestampFromAladhan(dateStr, timeStr, timezone) {
-
     const [d, m, y] = dateStr.split('-').map(Number);
     const timeParts = timeStr.split(':').map(Number);
     if (timeParts.length < 2 || isNaN(timeParts[0]) || isNaN(timeParts[1])) {
@@ -78,7 +77,7 @@ function buildReminderComponents(job, timeUntilAdhanMs) {
     const mentions = [];
     if (job.mentionEveryone) mentions.push('@everyone');
     if (job.mentionHere) mentions.push('@here');
-    if (job.roles && job.roles.length > 0) {    
+    if (job.roles && job.roles.length > 0) {
         mentions.push(...job.roles.map((r) => `<@&${r}>`));
     }
 
@@ -94,12 +93,18 @@ function buildReminderComponents(job, timeUntilAdhanMs) {
     containerComponents.push({ type: 10, content: `حان وقت الاستعداد لأذان **${prayerName}**.` });
     containerComponents.push({ type: 10, content: `متبقي على الأذان تقريباً **${timeStr}**.` });
     containerComponents.push({ type: 14, divider: true, spacing: 1 });
-    containerComponents.push({ type: 10, content: `**ميزة تجريبية.** للمشاكل أو الشكاوى والاقتراحات: \`تحكم\` ← **المزيد** ← **تقديم شكوى أو اقتراح**.` });
+    containerComponents.push({
+        type: 10,
+        content: `**ميزة تجريبية.** للمشاكل أو الشكاوى والاقتراحات: \`تحكم\` ← **المزيد** ← **تقديم شكوى أو اقتراح**.`,
+    });
 
     if (job.prayerName === 'fajr') {
         containerComponents.push({ type: 14, divider: true, spacing: 1 }, { type: 10, content: `**الصَّلاةُ خَيْرٌ مِنَ النَّوْمِ**` });
     } else if (job.prayerName === 'isha') {
-        containerComponents.push({ type: 14, divider: true, spacing: 1 }, { type: 10, content: `**إِنَّ صَلَاةَ الْعِشَاءِ لَتَثْقُلُ إِلَّا عَلَى الْمُنَافِقِينَ**` });
+        containerComponents.push(
+            { type: 14, divider: true, spacing: 1 },
+            { type: 10, content: `**إِنَّ صَلَاةَ الْعِشَاءِ لَتَثْقُلُ إِلَّا عَلَى الْمُنَافِقِينَ**` },
+        );
     }
 
     return [{ type: 17, accent_color: 0xfefdfe, components: containerComponents }];

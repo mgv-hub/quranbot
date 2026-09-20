@@ -14,14 +14,15 @@ function scheduleDelayedCapacityRetry(client, guildId) {
             if (!guild) return;
 
             const guildState = getGuildState(guildId);
-            const targetChannel = guild.channels.cache.get(setupData.voiceChannelId) || (await guild.channels.fetch(setupData.voiceChannelId).catch(() => null));
+            const targetChannel =
+                guild.channels.cache.get(setupData.voiceChannelId) ||
+                (await guild.channels.fetch(setupData.voiceChannelId).catch(() => null));
 
             if (targetChannel && targetChannel.type === ChannelType.GuildVoice && !guildState.player?.destroyed) {
                 await initializeConnection(guildId, guildState, targetChannel, guild.voiceAdapterCreator);
                 logger.info(`Delayed restoration successful for guild ${guildId}`);
                 return true;
             }
-
         } catch {}
         return false;
     }, 10000);

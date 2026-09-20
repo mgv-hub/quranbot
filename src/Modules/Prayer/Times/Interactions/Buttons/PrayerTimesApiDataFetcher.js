@@ -13,21 +13,26 @@ function getTargetDate(countryCode) {
         day: '2-digit',
     });
     const parts = formatter.formatToParts(now);
-    const year = parseInt(parts.find(p => p.type === 'year').value, 10);
-    const month = parseInt(parts.find(p => p.type === 'month').value, 10);
-    const day = parseInt(parts.find(p => p.type === 'day').value, 10);
+    const year = parseInt(parts.find((p) => p.type === 'year').value, 10);
+    const month = parseInt(parts.find((p) => p.type === 'month').value, 10);
+    const day = parseInt(parts.find((p) => p.type === 'day').value, 10);
     return new Date(year, month - 1, day, 12, 0, 0);
 }
 
 function getCalculationParams(countryCode) {
     switch (countryCode) {
-        case 'EG': return adhan.CalculationMethod.Egyptian();
-        case 'SA': return adhan.CalculationMethod.UmmAlQura();
+        case 'EG':
+            return adhan.CalculationMethod.Egyptian();
+        case 'SA':
+            return adhan.CalculationMethod.UmmAlQura();
         case 'KW':
         case 'QA':
-        case 'BH': return adhan.CalculationMethod.MuslimWorldLeague();
-        case 'AE': return adhan.CalculationMethod.Karachi();
-        default: return adhan.CalculationMethod.NorthAmerica();
+        case 'BH':
+            return adhan.CalculationMethod.MuslimWorldLeague();
+        case 'AE':
+            return adhan.CalculationMethod.Karachi();
+        default:
+            return adhan.CalculationMethod.NorthAmerica();
     }
 }
 
@@ -40,12 +45,12 @@ function formatPrayerTime(date, countryCode) {
             timeZone: timezone,
             hour: 'numeric',
             minute: '2-digit',
-            hour12: true
+            hour12: true,
         });
         const parts = formatter.formatToParts(date);
-        const hour = parts.find(p => p.type === 'hour').value;
-        const minute = parts.find(p => p.type === 'minute').value;
-        const dayPeriod = parts.find(p => p.type === 'dayPeriod').value;
+        const hour = parts.find((p) => p.type === 'hour').value;
+        const minute = parts.find((p) => p.type === 'minute').value;
+        const dayPeriod = parts.find((p) => p.type === 'dayPeriod').value;
         const ampm = dayPeriod === 'AM' ? 'ص' : 'م';
         const h = hour.padStart(2, '0');
         return `${h}:${minute} ${ampm}`;
@@ -54,11 +59,11 @@ function formatPrayerTime(date, countryCode) {
             timeZone: timezone,
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false
+            hour12: false,
         });
         const parts = formatter.formatToParts(date);
-        const hour = parts.find(p => p.type === 'hour').value;
-        const minute = parts.find(p => p.type === 'minute').value;
+        const hour = parts.find((p) => p.type === 'hour').value;
+        const minute = parts.find((p) => p.type === 'minute').value;
         return `${hour}:${minute}`;
     }
 }
@@ -74,13 +79,13 @@ async function fetchPrayerTimes(lat, lng, cityName, countryCode) {
             timeZone: timezone,
             day: 'numeric',
             month: 'long',
-            year: 'numeric'
+            year: 'numeric',
         });
         const gregorianFormatter = new Intl.DateTimeFormat('ar-EG', {
             timeZone: timezone,
             day: 'numeric',
             month: 'long',
-            year: 'numeric'
+            year: 'numeric',
         });
         return {
             fajr: formatPrayerTime(prayerTimes.fajr, countryCode),

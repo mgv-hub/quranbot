@@ -38,7 +38,6 @@ module.exports = {
                 } else {
                     await sendErrorReply(interaction, 'تم الانضمام وبدء التشغيل بنجاح');
                 }
-
             } else if (interaction.customId === 'leave_vc') {
                 const leaveResult = await leaveVoiceChannelHandler(guildId, guildState);
                 if (!leaveResult.success) {

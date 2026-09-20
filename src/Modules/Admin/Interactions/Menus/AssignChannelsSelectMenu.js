@@ -2,7 +2,12 @@ const { wrapInteraction, safeError } = require('@infrastructure/Discord/Flow/Def
 const { resolveGuildState } = require('@core/Auth/AuthGuard');
 const { assignSession } = require('@modules/Admin/Interactions/Helpers/AssignSession');
 const logger = require('@infrastructure/Logging/Logger');
-const { buildTextSelect, buildAzkarSelect, buildVoiceSelect, buildReviewMessage } = require('@modules/Admin/Interactions/Helpers/AssignChannelsUI');
+const {
+    buildTextSelect,
+    buildAzkarSelect,
+    buildVoiceSelect,
+    buildReviewMessage,
+} = require('@modules/Admin/Interactions/Helpers/AssignChannelsUI');
 
 module.exports = {
     async execute(interaction) {

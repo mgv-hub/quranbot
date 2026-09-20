@@ -1,5 +1,8 @@
 const logger = require('@infrastructure/Logging/Logger');
-const { updateSingleGuildStateInFirebase, saveGuildStatesToFirebase } = require('@infrastructure/Persistence/Firebase/Services/GuildsService');
+const {
+    updateSingleGuildStateInFirebase,
+    saveGuildStatesToFirebase,
+} = require('@infrastructure/Persistence/Firebase/Services/GuildsService');
 const { isPlainObject, deepCloneForFirebase } = require('@state/PersistUtils');
 
 const save_debounce_ms = 90000;

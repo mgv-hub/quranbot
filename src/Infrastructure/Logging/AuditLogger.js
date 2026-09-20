@@ -20,7 +20,9 @@ function logChannelCreation(guild, action, details, user) {
         isCritical: false,
     };
     auditLogBuffer.push(entry);
-    logger.info(`Channel ${action} | Guild: ${guild?.name} (${guild?.id}) | ${details.channelName || 'unknown'} (${details.channelId || 'unknown'})`);
+    logger.info(
+        `Channel ${action} | Guild: ${guild?.name} (${guild?.id}) | ${details.channelName || 'unknown'} (${details.channelId || 'unknown'})`,
+    );
     if (auditLogBuffer.length >= buffer) {
         flushAuditLogs();
     }
@@ -38,7 +40,9 @@ function logChannelDeletion(guild, action, details, user) {
         isCritical: true,
     };
     auditLogBuffer.push(entry);
-    logger.warn(`Channel ${action} | Guild: ${guild?.name} (${guild?.id}) | ${details.channelName || 'unknown'} (${details.channelId || 'unknown'})`);
+    logger.warn(
+        `Channel ${action} | Guild: ${guild?.name} (${guild?.id}) | ${details.channelName || 'unknown'} (${details.channelId || 'unknown'})`,
+    );
     if (auditLogBuffer.length >= buffer) {
         flushAuditLogs();
     }
@@ -175,7 +179,9 @@ function logVoiceRecoverySummary(stats) {
         isCritical: false,
     };
     auditLogBuffer.push(entry);
-    logger.info(`[AUDIT-VOICE] Recovery completed: ${entry.restored}/${entry.total} restored, ${entry.failed} failed, ${entry.skipped} skipped`);
+    logger.info(
+        `[AUDIT-VOICE] Recovery completed: ${entry.restored}/${entry.total} restored, ${entry.failed} failed, ${entry.skipped} skipped`,
+    );
 }
 
 async function flushAuditLogs() {
@@ -196,7 +202,15 @@ async function flushAuditLogs() {
             logger.warn(`Audit log skipped: Admin user with ID ${adminUserId} not found.`);
             return;
         }
-        const importantEntries = entries.filter((e) => e.isCritical || e.action === 'GUILD_JOIN' || e.action === 'GUILD_LEAVE' || e.action === 'VOICE_RECOVERY_SUMMARY' || e.action === 'VOICE_EXTERNAL_DISCONNECT' || e.action === 'VOICE_EXTERNAL_JOIN');
+        const importantEntries = entries.filter(
+            (e) =>
+                e.isCritical ||
+                e.action === 'GUILD_JOIN' ||
+                e.action === 'GUILD_LEAVE' ||
+                e.action === 'VOICE_RECOVERY_SUMMARY' ||
+                e.action === 'VOICE_EXTERNAL_DISCONNECT' ||
+                e.action === 'VOICE_EXTERNAL_JOIN',
+        );
         if (importantEntries.length === 0) return;
 
         const components = [
@@ -226,10 +240,11 @@ async function flushAuditLogs() {
 
         for (const entry of importantEntries.slice(0, 10)) {
             let content = '';
-            const triggerInfo = (entry.userTag && entry.userTag !== 'Unknown' && entry.userId && entry.userId !== 'Unknown')
-                ? `
+            const triggerInfo =
+                entry.userTag && entry.userTag !== 'Unknown' && entry.userId && entry.userId !== 'Unknown'
+                    ? `
 **Triggered By:** ${entry.userTag} (\`${entry.userId}\`)`
-                : '';
+                    : '';
             const timeStr = new Date(entry.timestamp).toLocaleTimeString('en-US', { timeZone: 'Africa/Cairo' });
 
             if (entry.action === 'GUILD_JOIN') {
@@ -259,8 +274,16 @@ async function flushAuditLogs() {
 **Failed:** ${entry.failed}
 **Skipped:** ${entry.skipped}`;
             } else if (entry.operation) {
-                const oldCh = entry.oldChannels ? Object.entries(entry.oldChannels).map(([k, v]) => `${k}: ${v || 'None'}`).join(', ') : 'None';
-                const newCh = entry.newChannels ? Object.entries(entry.newChannels).map(([k, v]) => `${k}: ${v || 'None'}`).join(', ') : 'None';
+                const oldCh = entry.oldChannels
+                    ? Object.entries(entry.oldChannels)
+                          .map(([k, v]) => `${k}: ${v || 'None'}`)
+                          .join(', ')
+                    : 'None';
+                const newCh = entry.newChannels
+                    ? Object.entries(entry.newChannels)
+                          .map(([k, v]) => `${k}: ${v || 'None'}`)
+                          .join(', ')
+                    : 'None';
                 content = `**Event:** ${entry.operation}
 **Reason:** ${entry.reason}${triggerInfo}
 **Old Channels:** ${oldCh}
@@ -288,14 +311,14 @@ async function flushAuditLogs() {
                 {
                     type: 14,
                     spacing: 2,
-                }
+                },
             );
         }
 
         try {
             await user.send({
                 components,
-                flags: 32768
+                flags: 32768,
             });
         } catch (sendErr) {
             if (sendErr.code === 50007) {

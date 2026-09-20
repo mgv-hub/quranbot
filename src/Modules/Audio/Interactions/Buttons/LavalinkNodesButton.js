@@ -122,7 +122,7 @@ module.exports = {
                             {
                                 type: 17,
                                 accent_color: 0xfefdfe,
-                                components: [ { type: 10, content: 'لا توجد عقد مُكونة أو يمكن الوصول إليها', }, ],
+                                components: [{ type: 10, content: 'لا توجد عقد مُكونة أو يمكن الوصول إليها' }],
                             },
                         ],
                         flags: 32832,

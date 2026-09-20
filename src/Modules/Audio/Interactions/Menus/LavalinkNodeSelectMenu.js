@@ -16,7 +16,9 @@ module.exports = {
                 const { guildId, guildState } = resolveGuildState(interaction);
 
                 const userVoiceChannelId = interaction.member?.voice?.channelId;
-                const botVoiceChannelId = interaction.guild?.members?.me?.voice?.channelId || interaction.guild?.voiceStates?.cache?.get(interaction.client.user.id)?.channelId;
+                const botVoiceChannelId =
+                    interaction.guild?.members?.me?.voice?.channelId ||
+                    interaction.guild?.voiceStates?.cache?.get(interaction.client.user.id)?.channelId;
 
                 if (!userVoiceChannelId || !botVoiceChannelId || userVoiceChannelId !== botVoiceChannelId) {
                     await interaction.followUp({

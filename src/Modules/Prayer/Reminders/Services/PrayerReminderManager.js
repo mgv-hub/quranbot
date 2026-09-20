@@ -1,5 +1,9 @@
 const logger = require('@infrastructure/Logging/Logger');
-const { loadPrayerRemindersFromFirebase, savePrayerReminderToFirebase, deletePrayerReminderFromFirebase } = require('@infrastructure/Persistence/Firebase/Services/PrayerRemindersService');
+const {
+    loadPrayerRemindersFromFirebase,
+    savePrayerReminderToFirebase,
+    deletePrayerReminderFromFirebase,
+} = require('@infrastructure/Persistence/Firebase/Services/PrayerRemindersService');
 const { prayer_reminder_config } = require('@config/Constants');
 
 class PrayerReminderManager {
@@ -23,7 +27,14 @@ class PrayerReminderManager {
                 for (const [guildId, config] of Object.entries(data)) {
                     const configToValidate = { ...config, guildId };
                     if (this._validateConfig(configToValidate)) {
-                        this._reminders.set(guildId, Object.freeze({ ...configToValidate, prayers: [...configToValidate.prayers], roles: [...(configToValidate.roles || [])] }));
+                        this._reminders.set(
+                            guildId,
+                            Object.freeze({
+                                ...configToValidate,
+                                prayers: [...configToValidate.prayers],
+                                roles: [...(configToValidate.roles || [])],
+                            }),
+                        );
                     }
                 }
                 this._isInitialized = true;

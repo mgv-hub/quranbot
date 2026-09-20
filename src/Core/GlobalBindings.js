@@ -1,4 +1,10 @@
-const { createSurahResource, createRadioResource, getReciterLinks, findWorkingReciter, findAvailableSurahForReciter } = require('@modules/Audio/AudioModule');
+const {
+    createSurahResource,
+    createRadioResource,
+    getReciterLinks,
+    findWorkingReciter,
+    findAvailableSurahForReciter,
+} = require('@modules/Audio/AudioModule');
 
 const {
     createReciterRow,

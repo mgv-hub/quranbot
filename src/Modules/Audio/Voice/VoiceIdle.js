@@ -39,7 +39,9 @@ async function switchToRaw(state, guildId, client) {
     };
 
     if (state.player && !state.player.destroyed) {
-        try { await state.player.destroy(); } catch (e) {
+        try {
+            await state.player.destroy();
+        } catch (e) {
             voiceLogger.error(guildId, 'Failed to destroy Lavalink player for raw switch', e);
         }
     }
@@ -73,7 +75,9 @@ async function switchToRaw(state, guildId, client) {
 
 async function switchToLavalink(state, guildId, client) {
     if (state.rawConnection) {
-        try { state.rawConnection.destroy(); } catch (e) {}
+        try {
+            state.rawConnection.destroy();
+        } catch (e) {}
         state.rawConnection = null;
     }
 
@@ -144,9 +148,15 @@ async function resolveChannel(client, channelId) {
 
 async function voiceIdle(guildId, client) {
     const state = getCtx(guildId);
-    if (!state) { clearTimer(guildId); return; }
+    if (!state) {
+        clearTimer(guildId);
+        return;
+    }
     let channel = await resolveChannel(client, state.channelId);
-    if (!channel || channel.type !== 2) { clearTimer(guildId); return; }
+    if (!channel || channel.type !== 2) {
+        clearTimer(guildId);
+        return;
+    }
 
     const count = users(channel);
     if (count > 0) {
@@ -187,7 +197,9 @@ function clearGuildIdleTimerVc(guildId) {
     clearTimer(guildId);
     const state = getGuildStateById(guildId);
     if (state?.rawConnection) {
-        try { state.rawConnection.destroy(); } catch (e) {}
+        try {
+            state.rawConnection.destroy();
+        } catch (e) {}
         state.rawConnection = null;
     }
 }

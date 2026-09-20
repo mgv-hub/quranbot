@@ -224,7 +224,8 @@ async function handlePlaybackControl(guildId, guildState, action) {
                     }
                     if (guildState.playedOffset > 0) {
                         setTimeout(() => {
-                            if (guildState.player && !guildState.player.destroyed) guildState.player.seek(guildState.playedOffset).catch(() => {});
+                            if (guildState.player && !guildState.player.destroyed)
+                                guildState.player.seek(guildState.playedOffset).catch(() => {});
                         }, 500);
                     }
                 }

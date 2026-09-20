@@ -87,7 +87,9 @@ module.exports = {
                         const guild = interaction.guild;
                         const { channel_names } = require('@config/Constants');
                         const { ChannelType } = require('discord.js');
-                        const hasCategory = guild.channels.cache.some((c) => c.name === channel_names.category && c.type === ChannelType.GuildCategory);
+                        const hasCategory = guild.channels.cache.some(
+                            (c) => c.name === channel_names.category && c.type === ChannelType.GuildCategory,
+                        );
                         const { buildChannelPrompt } = require('@modules/Prayer/Reminders/Helpers/PrayerReminderUI');
                         await interaction.editReply({ components: [buildChannelPrompt(session, hasCategory)], flags: 32832 });
                     }
@@ -110,7 +112,9 @@ module.exports = {
                     if (session.isEdit) {
                         await interaction.editReply({ components: [buildEditMenu(session)], flags: 32832 });
                     } else {
-                        const channel = interaction.guild.channels.cache.get(session.channelId) || (await interaction.guild.channels.fetch(session.channelId).catch(() => null));
+                        const channel =
+                            interaction.guild.channels.cache.get(session.channelId) ||
+                            (await interaction.guild.channels.fetch(session.channelId).catch(() => null));
                         const channelName = channel?.name || 'Unknown';
                         const username = interaction.user.globalName || interaction.user.username;
                         const metadata = { userId: interaction.user.id, username, channelName };

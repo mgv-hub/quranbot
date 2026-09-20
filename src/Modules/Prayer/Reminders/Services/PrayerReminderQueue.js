@@ -67,7 +67,11 @@ async function calculateDailyJobs() {
                         dedupSet.add(dedupKey);
                         let adhanTimestamp;
                         try {
-                            adhanTimestamp = getUtcTimestampFromAladhan(prayerData.dateStr, prayerData.timings[apiPrayerName], prayerData.timezone);
+                            adhanTimestamp = getUtcTimestampFromAladhan(
+                                prayerData.dateStr,
+                                prayerData.timings[apiPrayerName],
+                                prayerData.timezone,
+                            );
                         } catch (err) {
                             logger.prayer('Timezone conversion failed', { guildId: r.guildId, prayer: prayerKey, error: err.message });
                             continue;
@@ -103,7 +107,10 @@ async function calculateDailyJobs() {
             for (let i = 1; i < newJobs.length; i++) {
                 if (newJobs[i].sendTimestamp <= newJobs[i - 1].sendTimestamp) {
                     const adjusted = newJobs[i - 1].sendTimestamp + prayer_reminder_config.rate_delay_ms;
-                    const maxAllowed = newJobs[i].adhanTimestamp - prayer_reminder_config.reminder_buffer_ms + prayer_reminder_config.max_collision_drift_ms;
+                    const maxAllowed =
+                        newJobs[i].adhanTimestamp -
+                        prayer_reminder_config.reminder_buffer_ms +
+                        prayer_reminder_config.max_collision_drift_ms;
                     newJobs[i].sendTimestamp = Math.min(adjusted, maxAllowed);
                 }
             }

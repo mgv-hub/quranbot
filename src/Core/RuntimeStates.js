@@ -24,7 +24,7 @@ async function saveRuntimeStates() {
                 storedState.currentRadioPage = state.currentRadioPage;
                 storedState.savedQuranState = state.savedQuranState;
                 storedState.savedRadioState = state.savedRadioState;
-                
+
                 // Update persistent state directly to avoid circular calls to saveRuntimeStates
                 persistentStateManager.updateGuildState(guildId, storedState);
             }

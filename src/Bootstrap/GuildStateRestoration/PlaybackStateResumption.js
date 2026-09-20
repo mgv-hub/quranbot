@@ -7,7 +7,7 @@ const { restorePlaybackState, startPlayback } = require('@modules/Audio/Interact
 async function resumeGuildPlayback(guildId) {
     const storedState = persistentStateManager.getGuildState(guildId);
     const guildState = getGuildState(guildId);
-    
+
     guildState.controlMode = storedState?.controlMode || 'everyone';
     restorePlaybackState(guildState);
     guildState.isPaused = false;

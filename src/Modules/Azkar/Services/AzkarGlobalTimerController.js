@@ -14,7 +14,6 @@ function initTimer() {
                 queueAzkarSend(st.azkarChannelId, gid, 5, false);
             }
         }
-
     }, azkar_interval_ms);
 }
 

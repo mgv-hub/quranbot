@@ -20,11 +20,16 @@ function startCacheCleanup() {
 
 function getCalculationParams(method) {
     switch (method) {
-        case 5: return adhan.CalculationMethod.Egyptian();
-        case 4: return adhan.CalculationMethod.UmmAlQura();
-        case 3: return adhan.CalculationMethod.MuslimWorldLeague();
-        case 1: return adhan.CalculationMethod.Karachi();
-        default: return adhan.CalculationMethod.NorthAmerica();
+        case 5:
+            return adhan.CalculationMethod.Egyptian();
+        case 4:
+            return adhan.CalculationMethod.UmmAlQura();
+        case 3:
+            return adhan.CalculationMethod.MuslimWorldLeague();
+        case 1:
+            return adhan.CalculationMethod.Karachi();
+        default:
+            return adhan.CalculationMethod.NorthAmerica();
     }
 }
 
@@ -37,10 +42,10 @@ function getTargetDateFromTimezone(timezone) {
         day: '2-digit',
     });
     const parts = formatter.formatToParts(now);
-    const year = parseInt(parts.find(p => p.type === 'year').value, 10);
-    const month = parseInt(parts.find(p => p.type === 'month').value, 10);
-    const day = parseInt(parts.find(p => p.type === 'day').value, 10);
-    
+    const year = parseInt(parts.find((p) => p.type === 'year').value, 10);
+    const month = parseInt(parts.find((p) => p.type === 'month').value, 10);
+    const day = parseInt(parts.find((p) => p.type === 'day').value, 10);
+
     return new Date(year, month - 1, day, 12, 0, 0);
 }
 
@@ -50,11 +55,11 @@ function formatPrayerTimeForScheduler(date, timezone) {
         timeZone: timezone,
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: false,
     });
     const parts = formatter.formatToParts(date);
-    const hour = parts.find(p => p.type === 'hour').value;
-    const minute = parts.find(p => p.type === 'minute').value;
+    const hour = parts.find((p) => p.type === 'hour').value;
+    const minute = parts.find((p) => p.type === 'minute').value;
     return `${hour}:${minute}`;
 }
 
@@ -75,7 +80,7 @@ async function fetchPrayerTimesWithTimezone(lat, lng, method, timezone) {
             const coordinates = new adhan.Coordinates(lat, lng);
             const targetDate = getTargetDateFromTimezone(timezone);
             const params = getCalculationParams(method);
-            
+
             const prayerTimes = new adhan.PrayerTimes(coordinates, targetDate, params);
 
             const day = String(targetDate.getDate()).padStart(2, '0');
@@ -101,14 +106,14 @@ async function fetchPrayerTimesWithTimezone(lat, lng, method, timezone) {
             logger.prayer('Local calculation failed permanently', {
                 key: cacheKey,
                 error: error?.message,
-                stack: error?.stack
+                stack: error?.stack,
             });
             return null;
         } finally {
             state.inflightFetches.delete(cacheKey);
         }
     })();
-    
+
     state.inflightFetches.set(cacheKey, fetchPromise);
     return fetchPromise;
 }

@@ -1,4 +1,11 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder } = require('discord.js');
+const {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder,
+    EmbedBuilder,
+} = require('discord.js');
 const { prayer_times_config } = require('@config/Constants');
 const { emoji } = require('@shared/Helpers/Emojis');
 
@@ -34,27 +41,39 @@ function createCountryComponents(countries, currentPage, totalPages) {
         .setPlaceholder('اختر الدولة')
         .addOptions(menuOptions);
 
-    const prevBtn = new ButtonBuilder().setCustomId(`prev_country_page_${currentPage}`).setLabel('السابق').setStyle(ButtonStyle.Secondary).setDisabled(currentPage === 0);
-    const nextBtn = new ButtonBuilder().setCustomId(`next_country_page_${currentPage}`).setLabel('التالي').setStyle(ButtonStyle.Secondary).setDisabled(currentPage >= totalPages - 1);
+    const prevBtn = new ButtonBuilder()
+        .setCustomId(`prev_country_page_${currentPage}`)
+        .setLabel('السابق')
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(currentPage === 0);
+    const nextBtn = new ButtonBuilder()
+        .setCustomId(`next_country_page_${currentPage}`)
+        .setLabel('التالي')
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(currentPage >= totalPages - 1);
     const cancelBtn = new ButtonBuilder().setCustomId('cancel_prayer').setLabel('إلغاء').setStyle(ButtonStyle.Secondary);
 
     const selectRow = new ActionRowBuilder().addComponents(countrySelect);
     const navRow = new ActionRowBuilder().addComponents(prevBtn, nextBtn);
     const cancelRow = new ActionRowBuilder().addComponents(cancelBtn);
 
-    return [{
-        type: 17, accent_color: 0xfefdfe, components: [
-            { type: 10, content: '### مواقيت الصلاة' },
-            { type: 14, divider: true, spacing: 1 },
-            { type: 10, content: 'اختر الدولة من القائمة أدناه' },
-            { type: 14, divider: false, spacing: 2 },
-            { type: 10, content: `**الصفحة:** ${currentPage + 1} من ${totalPages}` },
-            { type: 14, divider: true, spacing: 1 },
-            selectRow.toJSON(),
-            navRow.toJSON(),
-            cancelRow.toJSON(),
-        ],
-    }];
+    return [
+        {
+            type: 17,
+            accent_color: 0xfefdfe,
+            components: [
+                { type: 10, content: '### مواقيت الصلاة' },
+                { type: 14, divider: true, spacing: 1 },
+                { type: 10, content: 'اختر الدولة من القائمة أدناه' },
+                { type: 14, divider: false, spacing: 2 },
+                { type: 10, content: `**الصفحة:** ${currentPage + 1} من ${totalPages}` },
+                { type: 14, divider: true, spacing: 1 },
+                selectRow.toJSON(),
+                navRow.toJSON(),
+                cancelRow.toJSON(),
+            ],
+        },
+    ];
 }
 
 module.exports.createCountrySelectionEmbed = createCountrySelectionEmbed;

@@ -1,4 +1,8 @@
-const { interactionCache, max_interaction_cache_size, interaction_cache_ttl_ms } = require('@infrastructure/Discord/Interactions/InteractionCache');
+const {
+    interactionCache,
+    max_interaction_cache_size,
+    interaction_cache_ttl_ms,
+} = require('@infrastructure/Discord/Interactions/InteractionCache');
 const coreLoader = require('@core/GlobalBindings');
 
 // Check if an interaction has already been processed recently to prevent duplicates

@@ -8,4 +8,4 @@ function categorizeDiscordError(err) {
     return 'OTHER';
 }
 
-module.exports.categorizeDiscordError = categorizeDiscordError;                                                                                                                     
+module.exports.categorizeDiscordError = categorizeDiscordError;

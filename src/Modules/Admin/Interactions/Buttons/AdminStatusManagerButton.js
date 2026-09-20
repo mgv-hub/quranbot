@@ -53,10 +53,22 @@ module.exports = {
         const currentStatus = statusManager.getStatus();
 
         const presenceOptions = [
-            new StringSelectMenuOptionBuilder().setLabel('Online').setValue('online').setDefault(currentStatus.presence === 'online'),
-            new StringSelectMenuOptionBuilder().setLabel('Idle').setValue('idle').setDefault(currentStatus.presence === 'idle'),
-            new StringSelectMenuOptionBuilder().setLabel('Do Not Disturb').setValue('dnd').setDefault(currentStatus.presence === 'dnd'),
-            new StringSelectMenuOptionBuilder().setLabel('Invisible').setValue('invisible').setDefault(currentStatus.presence === 'invisible'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Online')
+                .setValue('online')
+                .setDefault(currentStatus.presence === 'online'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Idle')
+                .setValue('idle')
+                .setDefault(currentStatus.presence === 'idle'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Do Not Disturb')
+                .setValue('dnd')
+                .setDefault(currentStatus.presence === 'dnd'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Invisible')
+                .setValue('invisible')
+                .setDefault(currentStatus.presence === 'invisible'),
         ];
 
         const presenceMenu = new StringSelectMenuBuilder()
@@ -65,11 +77,26 @@ module.exports = {
             .addOptions(presenceOptions);
 
         const activityOptions = [
-            new StringSelectMenuOptionBuilder().setLabel('Playing').setValue('Playing').setDefault(currentStatus.activityType === 'Playing'),
-            new StringSelectMenuOptionBuilder().setLabel('Watching').setValue('Watching').setDefault(currentStatus.activityType === 'Watching'),
-            new StringSelectMenuOptionBuilder().setLabel('Listening').setValue('Listening').setDefault(currentStatus.activityType === 'Listening'),
-            new StringSelectMenuOptionBuilder().setLabel('Competing').setValue('Competing').setDefault(currentStatus.activityType === 'Competing'),
-            new StringSelectMenuOptionBuilder().setLabel('Custom Status').setValue('Custom').setDefault(currentStatus.activityType === 'Custom'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Playing')
+                .setValue('Playing')
+                .setDefault(currentStatus.activityType === 'Playing'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Watching')
+                .setValue('Watching')
+                .setDefault(currentStatus.activityType === 'Watching'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Listening')
+                .setValue('Listening')
+                .setDefault(currentStatus.activityType === 'Listening'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Competing')
+                .setValue('Competing')
+                .setDefault(currentStatus.activityType === 'Competing'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Custom Status')
+                .setValue('Custom')
+                .setDefault(currentStatus.activityType === 'Custom'),
         ];
 
         const activityMenu = new StringSelectMenuBuilder()
@@ -87,28 +114,40 @@ module.exports = {
                 components: [
                     { type: 10, content: '### Bot Status Manager' },
                     { type: 14, divider: true, spacing: 1 },
-                    { type: 10, content: 'Use the menus below to change the bot\'s presence and activity status.' },
+                    { type: 10, content: "Use the menus below to change the bot's presence and activity status." },
                     { type: 14, divider: false, spacing: 2 },
                     presenceRow.toJSON(),
                     activityRow.toJSON(),
                     {
                         type: 1,
                         components: [
-                            new ButtonBuilder().setCustomId('admin_status_text_modal').setLabel('Set Status Text').setStyle(ButtonStyle.Secondary),
-                            new ButtonBuilder().setCustomId('admin_voice_status_modal').setLabel('Set Voice Status').setStyle(ButtonStyle.Secondary)
-                        ]
+                            new ButtonBuilder()
+                                .setCustomId('admin_status_text_modal')
+                                .setLabel('Set Status Text')
+                                .setStyle(ButtonStyle.Secondary),
+                            new ButtonBuilder()
+                                .setCustomId('admin_voice_status_modal')
+                                .setLabel('Set Voice Status')
+                                .setStyle(ButtonStyle.Secondary),
+                        ],
                     },
                     {
                         type: 1,
                         components: [
-                            new ButtonBuilder().setCustomId('admin_status_clear').setLabel('Clear All Manual Status').setStyle(ButtonStyle.Secondary),
-                            new ButtonBuilder().setCustomId('admin_back_to_panel').setLabel('Back to Panel').setStyle(ButtonStyle.Secondary),
-                        ]
-                    }
-                ]
-            }
+                            new ButtonBuilder()
+                                .setCustomId('admin_status_clear')
+                                .setLabel('Clear All Manual Status')
+                                .setStyle(ButtonStyle.Secondary),
+                            new ButtonBuilder()
+                                .setCustomId('admin_back_to_panel')
+                                .setLabel('Back to Panel')
+                                .setStyle(ButtonStyle.Secondary),
+                        ],
+                    },
+                ],
+            },
         ];
 
         await interaction.reply({ components, flags: 32832 });
-    }
+    },
 };

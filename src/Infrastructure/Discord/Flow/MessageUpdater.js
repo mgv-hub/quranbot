@@ -1,6 +1,12 @@
 const { EmbedBuilder } = require('discord.js');
 const { createControlEmbed } = require('@infrastructure/Discord/UI/Embeds');
-const { createReciterRow, createRadioRow, createSelectRow, createButtonRow, createNavigationRow } = require('@infrastructure/Discord/UI/Components');
+const {
+    createReciterRow,
+    createRadioRow,
+    createSelectRow,
+    createButtonRow,
+    createNavigationRow,
+} = require('@infrastructure/Discord/UI/Components');
 const { saveControlId } = require('@trackers/ControlIdsTracker');
 const logger = require('@infrastructure/Logging/Logger');
 

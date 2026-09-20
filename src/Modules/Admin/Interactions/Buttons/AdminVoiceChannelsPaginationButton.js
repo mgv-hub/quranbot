@@ -51,7 +51,6 @@ module.exports = {
                                 .map(([status, count]) => `${count} ${status}`)
                                 .join(', ');
 
-
                             listenerValue += `\n> ${statusSummary}`;
                         }
 

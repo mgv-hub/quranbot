@@ -5,7 +5,7 @@ const logger = require('@infrastructure/Logging/Logger');
 // Persist global data objects to local JSON files for offline fallback
 async function saveDataLocally() {
     try {
-        const dataDirectory = path.join(__dirname, '..'); 
+        const dataDirectory = path.join(__dirname, '..');
         await fs.mkdir(dataDirectory, { recursive: true });
         await fs.writeFile(path.join(dataDirectory, 'surah_names_ar.json'), JSON.stringify(global.surahNames, null, 2));
         await fs.writeFile(path.join(dataDirectory, 'reciters_ar.json'), JSON.stringify(global.reciters, null, 2));

@@ -5,7 +5,13 @@ function getAudio() {
     return _audio;
 }
 
-const { createReciterRow, createRadioRow, createSelectRow, createButtonRow, createNavigationRow } = require('@infrastructure/Discord/UI/Components');
+const {
+    createReciterRow,
+    createRadioRow,
+    createSelectRow,
+    createButtonRow,
+    createNavigationRow,
+} = require('@infrastructure/Discord/UI/Components');
 
 const { createControlEmbed } = require('@infrastructure/Discord/UI/Embeds');
 const { getGuildState, removeGuildState, isAuthorized } = require('@state/GuildStateManager');
@@ -14,7 +20,13 @@ const { sendRandomAzkar, startAzkarTimerForGuild } = require('@modules/Azkar/Azk
 const { registerCommands, applyCommandPermissions } = require('@core/CommandRegistry');
 const { checkCooldown, checkRateLimit, checkVoiceCooldown, COOLDOWN_TYPES } = require('@state/Cooldown');
 
-const { loadPrayerTimesData, getCountries, getCitiesByCountry, getCitiesForCountry, getCountryByCode } = require('@data/PrayerTimes/PrayerTimesData');
+const {
+    loadPrayerTimesData,
+    getCountries,
+    getCitiesByCountry,
+    getCitiesForCountry,
+    getCountryByCode,
+} = require('@data/PrayerTimes/PrayerTimesData');
 const databaseCleaner = require('@infrastructure/Persistence/Firebase/Maintenance/DatabaseCleaner');
 
 module.exports = {

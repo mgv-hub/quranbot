@@ -30,18 +30,12 @@ async function registerCommands() {
     const cmds = [
         new SlashCommandBuilder().setName('دليل').setDescription('دليل استخدام البوت وخيارات الإعداد'),
         new SlashCommandBuilder().setName('مساعدة').setDescription('عرض جميع الروابط الرسمية للبوت'),
-        new SlashCommandBuilder()
-            .setName('إعداد')
-            .setDescription('إعداد فئة القرآن مع القنوات')
-            .setDefaultMemberPermissions(setup),
+        new SlashCommandBuilder().setName('إعداد').setDescription('إعداد فئة القرآن مع القنوات').setDefaultMemberPermissions(setup),
         new SlashCommandBuilder()
             .setName('تعيين_القنوات')
             .setDescription('تعيين أو إصلاح قنوات البوت (الصوت، التحكم، الأذكار) بدون الحاجة لإعادة الإعداد')
             .setDefaultMemberPermissions(setup),
-        new SlashCommandBuilder()
-            .setName('تحكم')
-            .setDescription('لوحة التحكم للقرآن')
-            .setDefaultMemberPermissions(control),
+        new SlashCommandBuilder().setName('تحكم').setDescription('لوحة التحكم للقرآن').setDefaultMemberPermissions(control),
         new SlashCommandBuilder()
             .setName('دخول')
             .setDescription('الانضمام إلى الروم الصوتي المعد من الإعداد')
@@ -59,7 +53,9 @@ async function registerCommands() {
             .setDescription('إعداد تذكيرات تلقائية لأوقات الصلاة في قناة محددة')
             .setDefaultMemberPermissions(setup),
         new SlashCommandBuilder().setName('مواقيت_الصلاة').setDescription('عرض مواقيت الصلاة لجميع الدول والمناطق'),
-        new SlashCommandBuilder().setName('سورة').setDescription('عرض النص الكامل لسورة من القرآن الكريم')
+        new SlashCommandBuilder()
+            .setName('سورة')
+            .setDescription('عرض النص الكامل لسورة من القرآن الكريم')
             .addStringOption((opt) => opt.setName('سورة').setDescription('اسم أو رقم السورة (1-114)').setRequired(true)),
         new SlashCommandBuilder().setName('تفسير').setDescription('عرض آية من القرآن مع التفسير'),
         //   new SlashCommandBuilder()
@@ -111,8 +107,8 @@ async function applyCommandPermissions(guild) {
             await rest.put(Routes.guildCommandPermissions(global.clientId, guild.id, cmd.id), {
                 body: { permissions: perms },
             });
-            
-            await new Promise(resolve => setTimeout(resolve, 300)); 
+
+            await new Promise((resolve) => setTimeout(resolve, 300));
         }
     } catch (err) {
         logger.error(`Perm apply failed for guild ${guild.id}`, err);

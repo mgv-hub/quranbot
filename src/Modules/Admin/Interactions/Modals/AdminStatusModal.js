@@ -6,7 +6,6 @@ const logger = require('@infrastructure/Logging/Logger');
 module.exports = {
     customId: 'admin_status_modal',
     async execute(interaction) {
-
         if (!isSpecialUser(interaction.user.id)) {
             return interaction.reply({ content: 'This feature is available for the developers only', flags: 64 });
         }
@@ -77,5 +76,5 @@ module.exports = {
                 await interaction.editReply({ content: 'Voice status cleared. Bot will use default voice status.' });
             }
         }
-    }
+    },
 };
