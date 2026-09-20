@@ -1,5 +1,5 @@
-const logger = require('@logging/logger');
-const { emoji } = require('@helpers/emojis');
+const logger = require('@infrastructure/Logging/Logger');
+const { emoji } = require('@shared/Helpers/Emojis');
 
 let _parsed = null;
 let lastParsed = null;
@@ -89,6 +89,7 @@ function parseNodeConfig(index) {
 
 function buildLavalink() {
     const nodes = _parseNodesFromEnv();
+    const retryDelay = 7 * 60 * 60 * 1000;
 
     return nodes.map((node) => ({
         id: node.id,
@@ -97,7 +98,7 @@ function buildLavalink() {
         authorization: node.password,
         secure: node.secure,
         retryAmount: 999999,
-        retryDelay: 30000,
+        retryDelay,
     }));
 }
 

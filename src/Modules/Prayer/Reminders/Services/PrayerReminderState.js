@@ -1,0 +1,10 @@
+module.exports.dailyJobs = [];
+module.exports.queueIndex = 0;
+module.exports.schedulerTimeout = null;
+module.exports.schedulerState = 'STOPPED';
+module.exports.currentGeneration = 0;
+module.exports.isCalculating = false;
+module.exports.isCalculationDirty = false;
+module.exports.prayerTimesCache = new Map();
+module.exports.inflightFetches = new Map();
+module.exports.cacheCleanupTimer = null;

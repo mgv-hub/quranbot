@@ -92,7 +92,7 @@ const urls = {
     adhkar_images_base_url: 'https://hub-mgv.github.io/QuranBotData/azkar-images',
     adhkar_json_url: 'https://hub-mgv.github.io/QuranBotData/adhkar.json',
     mp3quran_api_base: 'https://www.mp3quran.net/api/v3',
-    aladhan_api_base: 'https://api.aladhan.com/v1',
+    aladhan_api_base: 'local_calculation',
     api_endpoints: {
         surah: 'https://www.mp3quran.net/api/v3/suwar?language=ar',
         rewayah: 'https://www.mp3quran.net/api/v3/riwayat?language=ar',
@@ -152,10 +152,41 @@ const prayer_times_config = {
     countries_count: 35,
     cities_per_page: 25,
     time_format_12h_countries: ['SA', 'EG', 'AE', 'KW', 'QA', 'BH', 'OM', 'JO', 'LB', 'SY', 'IQ', 'SD', 'YE', 'PS', 'PK', 'BD', 'US', 'CA'],
+    country_timezones: {
+        'SA': 'Asia/Riyadh', 'EG': 'Africa/Cairo', 'AE': 'Asia/Dubai', 'KW': 'Asia/Kuwait',
+        'QA': 'Asia/Qatar', 'BH': 'Asia/Bahrain', 'OM': 'Asia/Muscat', 'JO': 'Asia/Amman',
+        'LB': 'Asia/Beirut', 'SY': 'Asia/Damascus', 'IQ': 'Asia/Baghdad', 'IR': 'Asia/Tehran',
+        'TR': 'Europe/Istanbul', 'MA': 'Africa/Casablanca', 'DZ': 'Africa/Algiers', 'TN': 'Africa/Tunis',
+        'LY': 'Africa/Tripoli', 'SD': 'Africa/Khartoum', 'YE': 'Asia/Aden', 'PS': 'Asia/Gaza',
+        'PK': 'Asia/Karachi', 'BD': 'Asia/Dhaka', 'IN': 'Asia/Kolkata', 'ID': 'Asia/Jakarta',
+        'MY': 'Asia/Kuala_Lumpur', 'FR': 'Europe/Paris', 'DE': 'Europe/Berlin', 'GB': 'Europe/London',
+        'US': 'America/New_York', 'CA': 'America/Toronto', 'AU': 'Australia/Sydney', 'RU': 'Europe/Moscow',
+        'CN': 'Asia/Shanghai', 'JP': 'Asia/Tokyo', 'KR': 'Asia/Seoul'
+    },
+};
+
+const prayer_reminder_config = {
+    rate_delay_ms: 150,
+    reminder_buffer_ms: 5 * 60 * 1000,
+    overdue_tolerance_ms: 60000,
+    max_collision_drift_ms: 2000,
+    api_concurrency: 5,
+    send_concurrency: 5,
+    cache_ttl_ms: 2 * 60 * 60 * 1000,
+    cache_cleanup_interval_ms: 30 * 60 * 1000,
+    api_max_retries: 2,
+    api_retry_delay_ms: 3000,
+    discord_max_retries: 1,
+    discord_retry_delay_ms: 1000,
+    batch_window_ms: 500,
+    sleep_check_ms: 500,
+    valid_methods: new Set([0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
+    valid_prayers: new Set(['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']),
+    prayer_map: { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' },
 };
 
 const logging_config = {
-    dir: '../../storage/logs',
+    dir: '../../../storage/logs', 
     max_file_size_mb: 50,
     max_files_to_keep: 10,
     levels: ['debug', 'info', 'warn', 'error', 'fatal'],
@@ -172,6 +203,7 @@ const channel_names = {
     voice: '🕌︱بثّ القُرآن الكريم',
     text: '📖︱تحكم البوت القرآني',
     azkar: '🌙︱الأذكار',
+    prayer_reminder: '⏰︱تذكيرات الصلاة',
 };
 
 const azkarSettings = {
@@ -190,6 +222,12 @@ const pagination = {
     prayer_items: 25,
 };
 
+const audit_config = {
+    log_admin_user_env: 'LOG_ADMIN_USER_ID',
+    max_channels_per_category_check: 50,
+    deletion_confirmation_required: true,
+};
+
 module.exports = {
     time_constants,
     limits,
@@ -199,9 +237,11 @@ module.exports = {
     memory_config,
     voice_config,
     prayer_times_config,
+    prayer_reminder_config,
     logging_config,
     permissions_config,
     channel_names,
     azkarSettings,
     pagination,
+    audit_config,
 };

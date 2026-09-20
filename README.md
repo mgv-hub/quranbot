@@ -207,8 +207,8 @@ The bot is designed to work with **strict security rules** that deny all public 
 ```json
 {
     "rules": {
-        ".read": true,
-        ".write": true
+        ".read": false,
+        ".write": false
     }
 }
 ```

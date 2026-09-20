@@ -1,6 +1,6 @@
 const path = require('path');
 const dotenv = require('dotenv');
-const logger = require('@logging/logger');
+const logger = require('@infrastructure/Logging/Logger');
 const fs = require('fs');
 require('dotenv').config();
 

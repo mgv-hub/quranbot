@@ -1,4 +1,4 @@
-const logger = require('@logging/logger');
+const logger = require('@infrastructure/Logging/Logger');
 
 const COOLDOWN_TYPES = {
     COMMAND: 'command',

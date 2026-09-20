@@ -1,6 +1,6 @@
-const logger = require('@logging/logger');
+const logger = require('@infrastructure/Logging/Logger');
 const { ref, set, get, serverTimestamp, increment, update } = require('firebase/database');
-const { db, isFirebaseReady } = require('@database/firebase');
+const { db, isFirebaseReady } = require('@infrastructure/Persistence/Firebase/FirebaseIndex');
 
 const STATS_UPDATE_INTERVAL_MS = 60000;
 const path = 'bot_statistics';

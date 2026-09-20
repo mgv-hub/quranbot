@@ -1,10 +1,10 @@
 {
     "name": "quranbot",
-    "version": "3.1.88",
+    "version": "4.9.19",
     "description": "QuranBot is an advanced Discord bot for Quran recitation, Azkar, prayer times, and Islamic radio streaming with a control panel and stable voice.",
-    "lastUpdated": "2026-07-17",
-    "lastUpdateNote": "Last Update",
-    "main": "src/bot/core.js",
+    "lastUpdated": "2026-09-20",
+    "lastUpdateNote": "Last Update (beta)",
+    "main": "src/Core/Bot.js",
     "packageManager": "pnpm@8.15.0",
     "keywords": [
         "discord",
@@ -14,6 +14,9 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/mgv-hub/quranbot"
+    },
+    "SupportPartnerShip": {
+        "discord": "https://discord.gg/DwtAPzrbZS"
     },
     "bugs": {
         "url": "https://github.com/mgv-hub/quranbot/issues"
@@ -34,6 +37,11 @@
             "name": "cortexhqcore"
         }
     ],
+    "branding": {
+        "developedBy": "hub-mgv",
+        "poweredBy": "The team at Cortex HQ",
+        "type": "partnership"
+    },
     "features": [
         "Quran recitation",
         "Azkar system",
@@ -42,9 +50,9 @@
         "Control panel"
     ],
     "scripts": {
-        "start:single": "node --trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps src/bot/core.js",
-        "dev:single": "nodemon --trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps src/bot/core.js",
-        "run:shard": "node --trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps src/shard.js",
+        "start:single": "node --trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps src/Core/Bot.js",
+        "dev:single": "nodemon --trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps src/Core/Bot.js",
+        "run:shard": "node --trace-warnings --trace-deprecation --unhandled-rejections=strict --enable-source-maps src/Bootstrap/Shard.js",
         "start": "pnpm run start:single",
         "dev": "pnpm run dev:single",
         "pm2:start": "pm2 start ecosystem.config.js",
@@ -57,31 +65,20 @@
         "clean": "rd /s /q node_modules",
         "lint": "eslint .",
         "format": "prettier --write .",
-        "format:check": "prettier --check .",
         "test": "jest"
     },
     "path_aliaser_": {
-        "@startup": "./src/startup",
-        "@interactions": "./src/interactions",
-        "@database": "./src/database",
-        "@events": "./src/events",
-        "@auth": "./src/auth",
-        "@audio": "./src/audio",
-        "@logging": "./src/logging",
-        "@ui": "./src/ui",
-        "@state": "./src/state",
-        "@runtime": "./src/runtime",
-        "@data": "./src/data",
-        "@commands": "./src/commands",
-        "@web": "./src/web",
-        "@global": "./src/global",
-        "@bot": "./src/bot",
-        "@ready": "./src/ready",
-        "@statistics": "./src/statistics",
-        "@config": "./src/config",
-        "@helpers": "./src/helpers",
-        "@setup": "./src/setup/",
-        "@registry": "./src/registry"
+        "@bootstrap": "./src/Bootstrap",
+        "@config": "./src/Config",
+        "@core": "./src/Core",
+        "@modules": "./src/Modules",
+        "@infrastructure": "./src/Infrastructure",
+        "@data": "./src/Data",
+        "@state": "./src/State",
+        "@statistics": "./src/Statistics",
+        "@trackers": "./src/Trackers",
+        "@shared": "./src/Shared",
+        "@resources": "./src/Resources"
     },
     "_moduleDirectories": [
         "node_modules",
@@ -92,6 +89,7 @@
         "@discordjs/voice": "^0.19.0",
         "@top-gg/sdk": "^3.1.6",
         "abort-controller": "^3.0.0",
+        "adhan": "^4.4.6",
         "archiver": "^5.3.2",
         "async-mutex": "^0.5.0",
         "discord-hybrid-sharding": "^3.0.1",

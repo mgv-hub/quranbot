@@ -1,0 +1,21 @@
+const { setAudioData, getAudioData, deleteAudioData, trackAudioData, getAzkarAudioUrl } = require('@modules/Azkar/Services/AudioDataCacheManager');
+const { categorizeDiscordError } = require('@modules/Azkar/Services/DiscordApiErrorClassifier');
+const { sendWithRetry, getMentionText, sendImageAzkar, sendAudioAzkar, sendCategoryAudioAzkar } = require('@modules/Azkar/Services/AzkarMessageDispatcher');
+const { queueAzkarSend, executeAzkarSend } = require('@modules/Azkar/Services/AzkarExecutionQueueProcessor');
+const { startAzkarTimerForGuild } = require('@modules/Azkar/Services/AzkarGlobalTimerController');
+
+module.exports.setAudioData = setAudioData;
+module.exports.getAudioData = getAudioData;
+module.exports.deleteAudioData = deleteAudioData;
+module.exports.trackAudioData = trackAudioData;
+module.exports.getAzkarAudioUrl = getAzkarAudioUrl;
+module.exports.categorizeDiscordError = categorizeDiscordError;
+module.exports.sendWithRetry = sendWithRetry;
+module.exports.getMentionText = getMentionText;
+module.exports.sendImageAzkar = sendImageAzkar;
+module.exports.sendAudioAzkar = sendAudioAzkar;
+module.exports.sendCategoryAudioAzkar = sendCategoryAudioAzkar;
+module.exports.queueAzkarSend = queueAzkarSend;
+module.exports.executeAzkarSend = executeAzkarSend;
+module.exports.startAzkarTimerForGuild = startAzkarTimerForGuild;
+module.exports.sendRandomAzkar = queueAzkarSend;

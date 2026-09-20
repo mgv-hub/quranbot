@@ -1,4 +1,4 @@
-const logger = require('@logging/logger');
+const logger = require('@infrastructure/Logging/Logger');
 
 const userCD = new Map();
 const serverCD = new Map();
@@ -12,10 +12,12 @@ const COMMAND_COOLDOWNS = {
     ping: { duration: 30000, type: 'user' },
     prayerTimes: { duration: 5000, type: 'user' },
     prayerTimesButton: { duration: 5000, type: 'user' },
-    setup: { duration: 60000, type: 'server' },
+    setup: { duration: 6000, type: 'server' },
     sources: { duration: 5000, type: 'user' },
-    changelog: { duration: 15000, type: 'user' },
-    help: { duration: 3000, type: 'user' },
+    changelog: { duration: 10000, type: 'user' },
+    help: { duration: 1000, type: 'user' },
+    contributors: { duration: 10000, type: 'user' },
+    lavalink_status: { duration: 50000, type: 'server' },
 };
 
 //  control: { duration: 1000, type: 'user' },
@@ -44,6 +46,8 @@ const CMD_MAP = {
     مصادر: 'sources',
     تحديثات: 'changelog',
     مساعدة: 'help',
+    المساهمين: 'contributors',
+    lavalink_status: 'lavalink_status',
 };
 
 function getCmdKey(name) {

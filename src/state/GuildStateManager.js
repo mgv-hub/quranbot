@@ -1,28 +1,28 @@
 // const { createAudioPlayer } = require('@discordjs/voice');
-const logger = require('@logging/logger');
+const logger = require('@infrastructure/Logging/Logger');
 let _store, _voice, _player, _events, _auth, _cleanup, _persistent;
 function getStore() {
-    if (!_store) _store = require('@state/guild-state-store');
+    if (!_store) _store = require('@state/GuildStateStore');
     return _store;
 }
 function getVoice() {
-    if (!_voice) _voice = require('@state/guild-state-voice');
+    if (!_voice) _voice = require('@state/GuildStateVoice');
     return _voice;
 }
 function getPlayer() {
-    if (!_player) _player = require('@state/guild-state-player');
+    if (!_player) _player = require('@state/GuildStatePlayer');
     return _player;
 }
 function getEvents() {
-    if (!_events) _events = require('@state/guild-state-events');
+    if (!_events) _events = require('@state/GuildStateEvents');
     return _events;
 }
 function getAuth() {
-    if (!_auth) _auth = require('@state/guild-state-auth');
+    if (!_auth) _auth = require('@state/GuildStateAuth');
     return _auth;
 }
 function getCleanup() {
-    if (!_cleanup) _cleanup = require('@state/guild-state-cleanup');
+    if (!_cleanup) _cleanup = require('@state/GuildStateCleanup');
     return _cleanup;
 }
 function getPersistent() {
@@ -42,6 +42,8 @@ function getGuildState(guildId) {
         const newState = {
             player,
             connection: null,
+            rawConnection: null,
+            savedPlaybackState: null,
             channelId: null,
             azkarChannelId: null,
             azkarTimer: null,
