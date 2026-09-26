@@ -41,7 +41,7 @@ async function handleCommandInteraction(interaction, guildState) {
         }
         return false;
     }
-    const cooldownResult = coreLoader.checkCooldown(userId, guildId, commandName);
+    const cooldownResult = await coreLoader.checkCooldown(userId, guildId, commandName);
     if (!cooldownResult.allowed) {
         try {
             if (!interaction.deferred && !interaction.replied) {
@@ -75,7 +75,7 @@ async function handleCommandInteraction(interaction, guildState) {
     const success = await executeCommand(interaction, commandName);
     // Set cooldown after successful execution only
     if (success !== false) {
-        coreLoader.setCooldown(userId, guildId, commandName);
+        await coreLoader.setCooldown(userId, guildId, commandName);
     }
     return true;
 }

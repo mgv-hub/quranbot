@@ -65,7 +65,7 @@ async function writeLog(level, msg, meta = {}) {
             db: '\x1B[34;1m',
             loader: '\x1B[36;1m',
             lavalink: '\x1B[35;1m',
-            prayer: '\x1B[33;1m',
+            prayer: '\x1B[38;5;220m',
         };
         const c = colors[level] || '\x1b[37m',
             reset = '\x1b[0m';
@@ -99,6 +99,9 @@ class Logger {
     }
     fatal(m, errObj = null, meta = {}) {
         return this.error(`FATAL ${m}`, errObj, { ...meta, isFatal: true });
+    }
+    critical(m, errObj = null, meta = {}) {
+        return this.fatal(m, errObj, meta);
     }
     debug(m, meta = {}) {
         return writeLog('debug', m, meta);

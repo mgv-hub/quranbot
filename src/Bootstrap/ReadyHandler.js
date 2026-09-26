@@ -18,6 +18,7 @@ const prayerReminderManager = require('@modules/Prayer/Reminders/Services/Prayer
 const { startScheduler } = require('@modules/Prayer/Reminders/Services/PrayerReminderSchedulerModule');
 const { loadPrayerTimesData } = require('@data/PrayerTimes/PrayerTimesData');
 const statusManager = require('@state/StatusManager');
+const { startPrayerVerificationScheduler } = require('@modules/Prayer/Times/Services/PrayerTimesVerificationLogger');
 
 attachManagerEvents(client.lavalink);
 
@@ -50,6 +51,7 @@ loadData()
             await databaseCleaner.performCleanup();
             await retentiondb.cleanExpiredLeftData(client);
             retentiondb.startRetentionScheduler(client);
+            startPrayerVerificationScheduler();
 
             const setup_guilds = await loadSetupGuildsFromFirebase();
             global.setupGuilds = setup_guilds || {};

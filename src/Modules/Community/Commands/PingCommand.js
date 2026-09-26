@@ -80,7 +80,7 @@ function sumCachedUsers() {
 
 function getBotVersion() {
     try {
-        const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../package.json'), 'utf8'));
+        const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../package.json'), 'utf8'));
         return pkg.version || '0.0.0';
     } catch {
         return '0.0.0';

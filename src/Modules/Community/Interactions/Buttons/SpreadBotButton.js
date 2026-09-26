@@ -14,7 +14,7 @@ module.exports = {
         const inviteUrl = generateInviteUrl();
 
         const imageName = 'spreadBot.png';
-        const imagePath = path.resolve(__dirname, '../../../../img', imageName);
+        const imagePath = path.resolve(__dirname, '../../../../../', imageName);
 
         const image = new AttachmentBuilder(imagePath, {
             name: imageName,

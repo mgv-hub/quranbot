@@ -83,7 +83,7 @@ async function handleButtonInteraction(interaction) {
         const cmdKey = customId === 'join_vc' ? 'join' : 'leave';
         const userId = interaction.user.id;
         const guildId = interaction.guildId;
-        const cdResult = coreLoader.checkCooldown(userId, guildId, cmdKey);
+        const cdResult = await coreLoader.checkCooldown(userId, guildId, cmdKey);
         if (!cdResult.allowed) {
             await interaction.deferUpdate().catch(() => {});
             await interaction
@@ -100,7 +100,7 @@ async function handleButtonInteraction(interaction) {
         const success = await handler.execute(interaction);
         if ((customId === 'join_vc' || customId === 'leave_vc') && success !== false) {
             const cmdKey = customId === 'join_vc' ? 'join' : 'leave';
-            coreLoader.setCooldown(interaction.user.id, interaction.guildId, cmdKey);
+            await coreLoader.setCooldown(interaction.user.id, interaction.guildId, cmdKey);
         }
         return true;
     }

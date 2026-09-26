@@ -15,7 +15,7 @@ async function checkVoiceCooldown(interaction, guildState, interactionType, guil
 
     if (interactionType === 'join_vc') {
         if (guildState.connection && !guildState.connection.destroyed) {
-            const voiceCooldown = coreLoader.checkCooldown(interaction.user.id, coreLoader.COOLDOWN_TYPES.VOICE, guildId);
+            const voiceCooldown = await coreLoader.checkCooldown(interaction.user.id, coreLoader.COOLDOWN_TYPES.VOICE, guildId);
 
             if (!voiceCooldown.valid) {
                 await interaction.deferUpdate().catch(() => {});

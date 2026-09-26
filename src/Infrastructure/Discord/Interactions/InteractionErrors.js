@@ -125,7 +125,7 @@ async function handleInteractionError(interaction, error, context) {
                 const guildId = interaction.guildId;
                 const guildState = coreLoader.getGuildState(guildId);
                 if (guildState) {
-                    await coreLoader.updateControlPanel(interaction, guildState);
+                    await coreLoader.updateControlPanel(interaction, guildState, guildId);
                     coreLoader.logger.info(`Recovered Control Panel For Guild ${guildId} After Error`);
                 }
             } catch (recoveryError) {
