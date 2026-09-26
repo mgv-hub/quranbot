@@ -48,10 +48,15 @@ async function registerCommands() {
             )
             .setDefaultMemberPermissions(control),
         new SlashCommandBuilder().setName('خروج').setDescription('الخروج من الروم الصوتي').setDefaultMemberPermissions(connect),
-        new SlashCommandBuilder()
-            .setName('تذكير_الصلاة')
-            .setDescription('إعداد تذكيرات تلقائية لأوقات الصلاة في قناة محددة')
-            .setDefaultMemberPermissions(setup),
+
+        // TEMPORARY: This command is currently disabled while all issues are being fixed
+        // and the command is being fully tested to ensure everything works correctly.
+        // It will be re-enabled once testing is complete and the command is ready to leave the test phase.
+        // new SlashCommandBuilder() 
+        //     .setName('تذكير_الصلاة')
+        //     .setDescription('إعداد تذكيرات تلقائية لأوقات الصلاة في قناة محددة')
+        //     .setDefaultMemberPermissions(setup),
+
         new SlashCommandBuilder().setName('مواقيت_الصلاة').setDescription('عرض مواقيت الصلاة لجميع الدول والمناطق'),
         new SlashCommandBuilder()
             .setName('سورة')
