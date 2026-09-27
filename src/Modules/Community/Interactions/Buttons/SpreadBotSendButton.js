@@ -48,7 +48,7 @@ module.exports = {
         }
         const inviteUrl = generateInviteUrl();
         const bannerName = 'banner.webp';
-        const bannerPath = path.resolve(__dirname, '../../../../img', bannerName);
+        const bannerPath = path.resolve(__dirname, '../../../../../img', bannerName);
 
         const banner = new AttachmentBuilder(bannerPath, {
             name: bannerName,
